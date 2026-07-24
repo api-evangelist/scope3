@@ -1,0 +1,465 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Node API
+security:
+- bearerAuth: []
+tags:
+- name: Node
+paths:
+  /node:
+    get:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: List nodes (both global and custom)
+      operationId: listNodes
+      parameters:
+      - in: query
+        name: service
+        schema:
+          type: string
+        description: Filter nodes by managed service provider
+        required: false
+      - in: query
+        name: cloud
+        schema:
+          type: string
+        description: Filter nodes by cloud provider
+        required: false
+      - in: query
+        name: custom
+        schema:
+          type: boolean
+        description: 'Filter by node type:
+
+          - true: Show only custom nodes
+
+          - false: Show only global nodes
+
+          - Not provided: Show all nodes
+
+          '
+        required: false
+      - in: query
+        name: gpu
+        schema:
+          type: string
+        description: Filter nodes by GPU
+        required: false
+      - in: query
+        name: instance
+        schema:
+          type: string
+        description: Filter nodes by cloud instance type
+        required: false
+      responses:
+        '200':
+          description: Node details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Node
+    post:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Create a custom node
+      operationId: createNode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeCreateRequest'
+      responses:
+        '201':
+          description: Node created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Node'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Node ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Node
+  /node/{nodeId}:
+    parameters:
+    - name: nodeId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Get a specific node (global or custom)
+      operationId: getNode
+      responses:
+        '200':
+          description: Node retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Node'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Node not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Node
+    put:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Update a node (custom nodes only, unless admin)
+      operationId: updateNode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeUpdateRequest'
+      responses:
+        '200':
+          description: Node updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Node'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Cannot modify global nodes without admin privileges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Node not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Node
+    delete:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Delete a node (custom nodes only, unless admin)
+      operationId: deleteNode
+      responses:
+        '204':
+          description: Node deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Cannot delete global nodes without admin privileges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Node not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Node
+components:
+  schemas:
+    NodeCreateRequest:
+      type: object
+      required:
+      - id
+      - gpu_id
+      - gpu_count
+      - cpu_count
+      description: 'Create a new node.
+
+        Note on permissions:
+
+        - cloud_instance_id and managed_service_id can only be set by admins or users who own those resources
+
+        - Custom nodes are visible only to their owners
+
+        - Global nodes are visible to all users
+
+        - Admins can see and manage all nodes
+
+        '
+      properties:
+        id:
+          type: string
+          example: my-custom-node-1
+          pattern: ^[a-z0-9-]+$
+          minLength: 3
+          maxLength: 64
+        cloud_id:
+          type: string
+          example: aws
+        cloud_instance_id:
+          type: string
+          example: a2-highgpu-1g
+        managed_service_id:
+          type: string
+          example: aws-bedrock
+        gpu_id:
+          type: string
+          example: a100_40gb
+        gpu_count:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          example: 8
+          x-go-type: int64
+        cpu_count:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          example: 2
+          x-go-type: int64
+        idle_power_w_ex_gpu:
+          type: number
+          example: 100
+          minimum: 0
+          maximum: 10000
+          format: float
+          x-go-type: float64
+        average_utilization_rate:
+          type: number
+          example: 0.8
+          format: float
+          x-go-type: float64
+          minimum: 0
+          maximum: 1
+        embodied_emissions_kgco2e_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        embodied_water_l_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        use_life_years:
+          type: number
+          example: 5
+          minimum: 1
+          maximum: 30
+          format: float
+          x-go-type: float64
+    NodeResponse:
+      title: Node Response
+      type: object
+      additionalProperties: false
+      required:
+      - nodes
+      properties:
+        nodes:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Node'
+    NodeUpdateRequest:
+      type: object
+      description: 'Update an existing node.
+
+        - Id can not be updated
+
+        Note on permissions:
+
+        - cloud_instance_id and managed_service_id can only be set by admins or users who own those resources
+
+        - Custom nodes are visible only to their owners
+
+        - Global nodes are visible to all users
+
+        - Admins can see and manage all nodes
+
+        '
+      properties:
+        cloud_id:
+          type: string
+          example: aws
+        cloud_instance_id:
+          type: string
+          example: a2-highgpu-1g
+        managed_service_id:
+          type: string
+          example: aws-bedrock
+        gpu_id:
+          type: string
+          example: a100_40gb
+        gpu_count:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          example: 8
+          x-go-type: int64
+        cpu_count:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          example: 2
+          x-go-type: int64
+        idle_power_w_ex_gpu:
+          type: number
+          example: 100
+          minimum: 0
+          maximum: 10000
+          format: float
+          x-go-type: float64
+        average_utilization_rate:
+          type: number
+          example: 0.8
+          format: float
+          x-go-type: float64
+          minimum: 0
+          maximum: 1
+        embodied_emissions_kgco2e_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        embodied_water_l_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        use_life_years:
+          type: number
+          example: 5
+          minimum: 1
+          maximum: 30
+          format: float
+          x-go-type: float64
+    Node:
+      allOf:
+      - $ref: '#/components/schemas/NodeCreateRequest'
+      - type: object
+        required:
+        - created_at
+        - updated_at
+        properties:
+          customer_id:
+            type: integer
+            x-go-type: int64
+            description: ID of the customer who owns this node (visible to admins only)
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+          created_by:
+            type: string
+            description: ID of the user who created the node (admin or owner only)
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

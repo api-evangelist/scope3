@@ -1,0 +1,740 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Model API
+security:
+- bearerAuth: []
+tags:
+- name: Model
+paths:
+  /model:
+    get:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: List models
+      operationId: listModels
+      parameters:
+      - in: query
+        name: family
+        schema:
+          $ref: '#/components/schemas/Family'
+        description: Filter models by family
+        required: false
+      responses:
+        '200':
+          description: Model details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelResponse'
+        '406':
+          description: Not acceptable response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Model
+    post:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Create a model
+      operationId: createModel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelCreateRequest'
+      responses:
+        '201':
+          description: Model created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Model ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Model
+  /model/{modelId}:
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Get a specific model (global or custom)
+      operationId: getModel
+      responses:
+        '200':
+          description: Model retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Model
+    put:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Update a model
+      operationId: updateModel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelUpdateRequest'
+      responses:
+        '200':
+          description: Model updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Model
+    delete:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Delete a model
+      operationId: deleteModel
+      responses:
+        '204':
+          description: Model deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Model
+  /model/{modelId}/alias:
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+    put:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Add a new alias to a model
+      operationId: addModelAlias
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - alias
+              properties:
+                alias:
+                  type: string
+                  example: claude-latest
+      responses:
+        '204':
+          description: Alias deleted successfully
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Alias already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Model
+  /model/{modelId}/alias/{alias}:
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: alias
+      in: path
+      required: true
+      schema:
+        type: string
+    delete:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Remove an alias from a model
+      operationId: removeModelAlias
+      responses:
+        '204':
+          description: Alias deleted successfully
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Alias not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Model
+components:
+  schemas:
+    Task:
+      type: string
+      enum:
+      - text-generation
+      - chat
+      - text-embedding
+      - text-classification
+      - sentiment-analysis
+      - named-entity-recognition
+      - question-answering
+      - summarization
+      - translation
+      - image-classification
+      - object-detection
+      - image-segmentation
+      - image-generation
+      - image-to-text
+      - text-to-image
+      - style-transfer
+      - face-detection
+      - facial-recognition
+      - speech-to-text
+      - text-to-speech
+      - speaker-identification
+      - audio-classification
+      - music-generation
+      - multimodal-embedding
+      - multimodal-generation
+      - visual-question-answering
+      - recommendation-system
+      - reinforcement-learning
+      - anomaly-detection
+      - time-series-forecasting
+      - clustering
+      description: 'Common types of AI/ML models and their primary functions:
+
+        - Text-based models for natural language processing
+
+        - Vision models for image analysis and generation
+
+        - Audio models for speech and sound processing
+
+        - Multimodal models that combine different types of inputs/outputs
+
+        - Specialized models for specific use cases
+
+        '
+    ModelCreateRequest:
+      type: object
+      required:
+      - id
+      description: Create a new model
+      properties:
+        id:
+          type: string
+          example: gpt-4-turbo
+        name:
+          type: string
+          example: GPT-4 Turbo
+        family:
+          type: string
+          example: gpt
+        hugging_face_path:
+          type: string
+          example: EleutherAI/gpt-neo-2.7B
+        benchmark_model_id:
+          type: string
+          example: gpt-4-turbo
+        estimated_use_life_days:
+          type: number
+          example: 365
+          format: float
+          x-go-type: float64
+        estimated_requests_per_day:
+          type: number
+          example: 1000
+          format: float
+          x-go-type: float64
+        fine_tuned_from_model_id:
+          type: string
+          example: gpt-4-turbo
+        aliases:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          example:
+          - claude-latest
+        total_params_billions:
+          type: number
+          example: 175
+          format: float
+          x-go-type: float64
+        number_of_experts:
+          type: integer
+          x-go-type: int64
+          example: 7
+        params_per_expert_billions:
+          type: number
+          example: 8
+          format: float
+          x-go-type: float64
+        training_usage_energy_kwh:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_emissions_kgco2e:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_water_l:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_embodied_emissions_kgco2e:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        training_embodied_water_l:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+    ModelResponse:
+      title: Model Response
+      type: object
+      additionalProperties: false
+      required:
+      - models
+      properties:
+        models:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Model'
+    DataType:
+      type: string
+      enum:
+      - fp8
+      - fp8-e4m3
+      - fp8-e5m2
+      - fp16
+      - tf32
+      - fp32
+      - fp64
+      - bfloat8
+      - bfloat16
+      - bf16
+      - int4
+      - int8
+      - int16
+      - int32
+      - int64
+      - uint4
+      - uint8
+      - uint16
+      - uint32
+      - uint64
+    Model:
+      title: Model
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - created_by
+      - customer_id
+      - aliases
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: gpt-4-turbo
+        aliases:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+          description: List of aliases for this model; must be globally-unique with id
+          example:
+          - claude-latest
+          - claude-3-sonnet-current
+        name:
+          type: string
+          example: GPT-4 Turbo
+        family:
+          type: string
+          example: gpt
+        hugging_face_path:
+          type: string
+          example: EleutherAI/gpt-neo-2.7B
+        benchmark_model_id:
+          type: string
+          example: GPTJ-6B
+        total_params_billions:
+          type: number
+          example: 175
+          format: float
+          x-go-type: float64
+        number_of_experts:
+          type: integer
+          x-go-type: int64
+          example: 7
+        params_per_expert_billions:
+          type: number
+          example: 8
+          format: float
+          x-go-type: float64
+        tensor_parallelism:
+          type: integer
+          example: 1
+        datatype:
+          $ref: '#/components/schemas/DataType'
+          example: fp8
+        task:
+          $ref: '#/components/schemas/Task'
+          example: text-generation
+        training_usage_energy_kwh:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_emissions_kgco2e:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_water_l:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_embodied_emissions_kgco2e:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        training_embodied_water_l:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        estimated_use_life_days:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        estimated_requests_per_day:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        fine_tuned_from_model_id:
+          type: string
+          example: llama_31_8b
+        customer_id:
+          type: integer
+          x-go-type: int64
+          description: ID of the customer who owns this node (visible to admins only)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          description: ID of the user who created the node (admin or owner only)
+    ModelUpdateRequest:
+      type: object
+      description: Update an existing model
+      properties:
+        name:
+          type: string
+          example: GPT-4 Turbo
+        family:
+          type: string
+          example: gpt
+        hugging_face_path:
+          type: string
+          example: EleutherAI/gpt-neo-2.7B
+        benchmark_model_id:
+          type: string
+          example: gpt-4-turbo
+        estimated_use_life_days:
+          type: number
+          format: float
+          example: 365
+          x-go-type: float64
+        estimated_requests_per_day:
+          type: number
+          example: 1000
+          format: float
+          x-go-type: float64
+        fine_tuned_from_model_id:
+          type: string
+          example: gpt-4-turbo
+        total_params_billions:
+          type: number
+          example: 175
+          format: float
+          x-go-type: float64
+        number_of_experts:
+          type: integer
+          x-go-type: int64
+          example: 7
+        params_per_expert_billions:
+          type: number
+          example: 8
+          format: float
+          x-go-type: float64
+        training_usage_energy_kwh:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_emissions_kgco2e:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_water_l:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_embodied_emissions_kgco2e:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        training_embodied_water_l:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+    Family:
+      type: string
+      enum:
+      - claude
+      - gpt
+      - dall-e
+      - whisper
+      - gemini
+      - palm
+      - bert
+      - t5
+      - llama
+      - opt
+      - galactica
+      - phi
+      - stable-diffusion
+      - stable-lm
+      - mistral
+      - mixtral
+      - command
+      - embed
+      - falcon
+      - mpt
+      - pythia
+      - dolly
+      - bloom
+      - roberta
+      - gpt-neo
+      - gpt-j
+      description: 'Core AI model families from various organizations:
+
+        - Commercial models from major AI companies
+
+        - Open source model families
+
+        - Research/academic model families
+
+        - Models may appear in multiple categories if they have both commercial and open source variants
+
+        '
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

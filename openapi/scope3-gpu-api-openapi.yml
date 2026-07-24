@@ -1,0 +1,416 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Gpu API
+security:
+- bearerAuth: []
+tags:
+- name: Gpu
+paths:
+  /gpu:
+    get:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: List GPUs
+      operationId: listGPUs
+      responses:
+        '200':
+          description: GPU details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUResponse'
+        '406':
+          description: Not acceptable response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Gpu
+    post:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Create a GPU
+      operationId: createGPU
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPUCreateRequest'
+      responses:
+        '201':
+          description: GPU created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPU'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: GPU ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Gpu
+  /gpu/{gpuId}:
+    parameters:
+    - name: gpuId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Get a specific GPU (global or custom)
+      operationId: getGPU
+      responses:
+        '200':
+          description: GPU retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPU'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: GPU not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Gpu
+    put:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Update a GPU
+      operationId: updateGPU
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPUUpdateRequest'
+      responses:
+        '200':
+          description: GPU updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPU'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: GPU not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Gpu
+    delete:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Delete a GPU
+      operationId: deleteGPU
+      responses:
+        '204':
+          description: GPU deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: GPU not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Gpu
+components:
+  schemas:
+    GPU:
+      type: object
+      required:
+      - id
+      - name
+      - max_power_w
+      - embodied_emissions_kgco2e
+      - embodied_water_mlh2o
+      - performance_ratio_to_h200
+      - ols_intercept
+      - ols_coefficient_gpu_count
+      - created_at
+      - updated_at
+      - customer_id
+      - created_by
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          example: NVIDIA A100 40GB
+        id:
+          type: string
+          example: a100_40gb
+        max_power_w:
+          type: number
+          example: 700
+          format: float
+          x-go-type: float64
+        embodied_emissions_kgco2e:
+          type: number
+          example: 282.1
+          format: float
+          x-go-type: float64
+        embodied_water_mlh2o:
+          type: number
+          example: 181.1
+          format: float
+          x-go-type: float64
+        performance_ratio_to_h200:
+          type: number
+          example: 1.5
+          format: float
+          x-go-type: float64
+        ols_coefficient_gpu_count:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+        ols_intercept:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+        customer_id:
+          type: integer
+          x-go-type: int64
+          description: ID of the customer who owns this node (visible to admins only)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          description: ID of the user who created the node (admin or owner only)
+    GPUUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: NVIDIA A100 40GB
+        max_power_w:
+          type: number
+          example: 700
+          format: float
+          x-go-type: float64
+        embodied_emissions_kgco2e:
+          type: number
+          example: 282.1
+          format: float
+          x-go-type: float64
+        embodied_water_mlh2o:
+          type: number
+          example: 181.1
+          format: float
+          x-go-type: float64
+        performance_ratio_to_h200:
+          type: number
+          example: 1.5
+          format: float
+          x-go-type: float64
+        ols_coefficient_gpu_count:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+        ols_intercept:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+    GPUResponse:
+      title: GPU Response
+      type: object
+      additionalProperties: false
+      required:
+      - gpus
+      properties:
+        gpus:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/GPU'
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+    GPUCreateRequest:
+      type: object
+      required:
+      - id
+      - name
+      - max_power_w
+      - embodied_emissions_kgco2e
+      - embodied_water_mlh2o
+      - performance_ratio_to_h200
+      - ols_intercept
+      - ols_coefficient_gpu_count
+      properties:
+        name:
+          type: string
+          example: NVIDIA A100 40GB
+        id:
+          type: string
+          example: a100_40gb
+        max_power_w:
+          type: number
+          example: 700
+          format: float
+          x-go-type: float64
+        embodied_emissions_kgco2e:
+          type: number
+          example: 282.1
+          format: float
+          x-go-type: float64
+        embodied_water_mlh2o:
+          type: number
+          example: 181.1
+          format: float
+          x-go-type: float64
+        performance_ratio_to_h200:
+          type: number
+          example: 1.5
+          format: float
+          x-go-type: float64
+        ols_coefficient_gpu_count:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+        ols_intercept:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

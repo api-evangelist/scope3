@@ -1,0 +1,145 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Data API
+security:
+- bearerAuth: []
+tags:
+- name: Data
+paths:
+  /data/upload:
+    post:
+      operationId: postDataUpload
+      summary: Upload Data File
+      description: Returns the uploaded data file status
+      requestBody:
+        description: 'Upload a client data file via CSV.
+
+
+          If the file size exceeds 100MB, please reach out to your Scope3 contact for more options.
+
+          '
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                type:
+                  type: string
+                  enum:
+                  - MEDIA_DELIVERY
+                  - CUSTOMER_USAGE
+                  - CREATIVE_DELIVERY
+                  - ATP_TRAFFIC_SHAPING
+                  - ATP_SUPPLY
+                  - PUB_PROPERTY_METRICS
+                  - DP_INVENTORY_METRICS
+                  - SUSTAINABILITY_FACTS
+                  - CONTENT_METADATA
+                  - AI_INFERENCE
+                  description: The type of data file being uploaded
+                fieldMapping:
+                  type: string
+                  enum:
+                  - CUSTOM
+                  description: The field mapping type
+                version:
+                  type: string
+                  nullable: true
+                  description: The custom mapping version
+                dataSource:
+                  type: string
+                  nullable: true
+                  description: The custom mapping data source
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUploadInformation'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Data
+  /data/upload/{uploadId}:
+    get:
+      operationId: getDataUploadId
+      summary: Get Data File Upload by ID
+      description: Returns requested data file upload information
+      parameters:
+      - in: path
+        name: uploadId
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of the upload to get
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUploadInformation'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Data
+components:
+  schemas:
+    DataUploadStatus:
+      type: string
+      enum:
+      - PENDING
+      - PROCESSING
+      - FAILED
+      - PENDING_REVIEW
+      - SUCCESS
+      - SKIPPED
+      - MANUALLY_IGNORED
+      - REPLACED_BY_REPROCESS
+      description: The status of upload
+    DataUploadInformation:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: integer
+          description: The upload id
+        status:
+          $ref: '#/components/schemas/DataUploadStatus'
+        rowsFailed:
+          type: integer
+          description: Rows that failed to be processed correctly
+        rowsTotal:
+          type: integer
+          description: Total number of rows processed
+        md5:
+          type: string
+          description: Uploaded file md5
+        crc32c:
+          type: string
+          description: Uploaded file crc32c
+        filename:
+          type: string
+          description: Uploaded filename
+        summary:
+          type: object
+          description: Summary of the upload
+        comment:
+          type: string
+          description: Comment for the uploaded file
+        error:
+          type: string
+          description: Error message if upload failed
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

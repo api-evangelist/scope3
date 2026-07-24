@@ -1,0 +1,644 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Creative API
+security:
+- bearerAuth: []
+tags:
+- name: Creative
+paths:
+  /creative:
+    post:
+      summary: Creative emissions
+      description: Calculates the carbon footprint of running a creative
+      operationId: creative
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: includeRows
+        description: Whether to include all rows in the response
+        schema:
+          type: boolean
+      - in: query
+        name: latest
+        description: Whether to use latest available data
+        schema:
+          type: boolean
+      - in: query
+        name: framework
+        description: Default is scope3
+        schema:
+          $ref: '#/components/schemas/Framework'
+      requestBody:
+        description: Rows of delivered creatives to measure
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreativeRequest'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreativeResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Creative
+components:
+  schemas:
+    Framework:
+      type: string
+      enum:
+      - scope3
+      - scope3-consumer-device
+      - gmsf
+      example: scope3
+      description: GMSF framework support is currently in beta.
+    CreativeResponseCoverage:
+      type: object
+      required:
+      - adFormats
+      - totalImpressions
+      - totalRows
+      - channels
+      properties:
+        totalImpressions:
+          $ref: '#/components/schemas/SummaryMetric'
+        totalRows:
+          $ref: '#/components/schemas/SummaryMetric'
+        channels:
+          $ref: '#/components/schemas/MatchSummaryMetric'
+        adFormats:
+          $ref: '#/components/schemas/AdFormatSummaryMetric'
+    Scope3ConsumerDeviceCreativeResponseEmissionsBreakdownDetails:
+      type: object
+      required:
+      - creativeDelivery
+      properties:
+        creativeDelivery:
+          type: number
+          format: double
+          example: 123.45
+        techManipulation:
+          type: number
+          format: double
+          example: 7.89
+    CountryInput:
+      type: string
+      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
+      example: US
+    CreativeResponseRowEmissions:
+      type: object
+      required:
+      - framework
+      - breakdown
+      properties:
+        framework:
+          $ref: '#/components/schemas/Framework'
+        breakdown:
+          oneOf:
+          - $ref: '#/components/schemas/Scope3CreativeResponseRowEmissionsBreakdown'
+          - $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeResponseRowEmissionsBreakdown'
+          - $ref: '#/components/schemas/GMSFCreativeResponseRowEmissionsBreakdown'
+    Plays:
+      type: integer
+      example: 10
+      description: 'How many times an ad was shown. (Supported Channels: DOOH, Linear TV)'
+    Scope3CreativeDeliveryTechManipulationEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdownDetails'
+    RequestId:
+      type: string
+      description: Auto generated request identifier
+    MatchSummaryMetric:
+      type: object
+      required:
+      - metric
+      - modeled
+      - unknown
+      - deprecated
+      properties:
+        metric:
+          $ref: '#/components/schemas/Metric'
+        modeled:
+          type: integer
+          example: 5
+        unknown:
+          type: integer
+          example: 2
+        deprecated:
+          type: integer
+          example: 1
+    NetworkInput:
+      type: string
+      enum:
+      - fixed
+      - mobile
+      example: fixed
+      description: The networking connection used by the consumer device
+    CreativeInput:
+      type: object
+      properties:
+        adFormat:
+          $ref: '#/components/schemas/AdFormat'
+        vendor:
+          $ref: '#/components/schemas/CreativeVendor'
+        totalImageDataTransferBytes:
+          type: integer
+          example: 150000
+          description: Total bytes for the data transfer for the image itself for all impressions, ideally measured by the CDN
+        imageSizesPixels:
+          type: array
+          items:
+            type: string
+          example:
+          - 300x250
+          - 970x250
+          description: Array of images width x height of creative (basic image only)
+        renderedWidthPixels:
+          type: integer
+          example: 300
+          description: Width of the rendered image or video in pixels
+        renderedHeightPixels:
+          type: integer
+          example: 250
+          description: Height of the rendered image or video in pixels
+        totalAudioDataTransferBytes:
+          type: integer
+          example: 15
+          description: Total bytes for the data transfer for the core audio asset for all impressions, ideally measured by the CDN
+        audioDurationSeconds:
+          type: number
+          format: double
+          example: 90.1
+          description: Average audio duration in seconds for a single impression
+        totalVideoDataTransferBytes:
+          type: integer
+          example: 72800
+          description: Total bytes for the data transfer for the core video asset for all loads, ideally measured by the CDN
+        videoVastBytes:
+          type: integer
+          example: 12000
+          description: Average size of VAST/VPAID wrapper for the video in bytes for a single load
+        videoBitrateKbps:
+          type: integer
+          example: 500
+          description: Video bitrate *as delivered* in kilobits per second
+        videoSizeBytes:
+          type: integer
+          example: 150000
+          description: Average video size _as delivered_ in bytes for a single load
+        videoDurationSeconds:
+          type: number
+          format: double
+          example: 30.5
+          description: Video duration in seconds
+        videoViewTimeSeconds:
+          type: number
+          format: double
+          example: 15
+          description: Average time, in seconds, that a video is viewed
+        videoViewRate:
+          type: number
+          format: double
+          example: 0.8
+          description: The percentage of the video that is viewed
+        timeInViewSeconds:
+          type: number
+          format: double
+          example: 15
+          description: Time that the creative was visible on the device
+        adTechPlatformVideoPlayerDomain:
+          type: string
+          example: seenthis.co
+          description: The canonical domain of the ad tech platform that owns the video player or 'default'
+        adTechPlatformCreativeAdserverDomains:
+          type: array
+          items:
+            type: string
+          example: []
+          description: The canonical domains of the creative adservers
+        otherAssetsBytes:
+          type: integer
+          example: 15000
+          description: Metadata, text, html, etc.
+        is3PServed:
+          type: boolean
+          example: true
+          description: Does this ad format expect/support the creative to be served by a third party ad server
+    DeviceTypeInput:
+      type: string
+      enum:
+      - phone
+      - tablet
+      - pc
+      - tv
+      - smart-speaker
+      - radio
+      example: pc
+      description: The consumer device. If not provided, we will infer the device type from the the channel. smart-speaker is only allowed for digital-audio channel radio is only allowed for traditional-radio channel
+    SummaryMetric:
+      type: object
+      required:
+      - metric
+      - modeled
+      - skipped
+      properties:
+        metric:
+          $ref: '#/components/schemas/Metric'
+        modeled:
+          type: integer
+          example: 8132
+        skipped:
+          type: integer
+          example: 48
+    Metric:
+      type: string
+      enum:
+      - impressions
+      - rows
+      - uniqueCount
+    CreativeResponseEmissionsBreakdown:
+      type: object
+      required:
+      - framework
+      - totals
+      properties:
+        framework:
+          $ref: '#/components/schemas/Framework'
+        totals:
+          oneOf:
+          - $ref: '#/components/schemas/Scope3CreativeResponseEmissionsBreakdownDetails'
+          - $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeResponseEmissionsBreakdownDetails'
+          - $ref: '#/components/schemas/GMSFCreativeResponseEmissionsBreakdownDetails'
+    Scope3CreativeDeliveryEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        outdoorDisplay:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    Scope3CreativeResponseEmissionsBreakdownDetails:
+      type: object
+      required:
+      - creativeDelivery
+      properties:
+        creativeDelivery:
+          type: number
+          format: double
+          example: 123.45
+        techManipulation:
+          type: number
+          format: double
+          example: 7.89
+    PrintMedium:
+      type: string
+      enum:
+      - newspaper
+      - magazine
+      - journal
+      - leaflet
+      example: newspaper
+    GMSFCreativeResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        creativeDelivery:
+          $ref: '#/components/schemas/GMSFCreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdown'
+    CreativeRequest:
+      type: object
+      required:
+      - rows
+      properties:
+        rows:
+          type: array
+          minLength: 1
+          items:
+            $ref: '#/components/schemas/CreativeRequestRow'
+    GMSFCreativeDeliveryEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        consumerDevice:
+          $ref: '#/components/schemas/Emissions'
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        outdoorDisplay:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    Scope3ConsumerDeviceCreativeResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        creativeDelivery:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdown'
+    Scope3CreativeResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        creativeDelivery:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdown'
+    CreativeResponseRow:
+      type: object
+      properties:
+        rowIdentifier:
+          type: string
+          example: '1'
+          description: An identifier for this row that was provided in the request.
+        totalEmissions:
+          type: number
+          format: double
+          example: 0.45
+          description: Sum of emissions in grams of CO₂e
+        error:
+          type: string
+          description: Error indicating why the row was not processed.
+        coverage:
+          $ref: '#/components/schemas/CreativeResponseRowCoverage'
+        emissionsBreakdown:
+          $ref: '#/components/schemas/CreativeResponseRowEmissions'
+    Emissions:
+      type: object
+      required:
+      - emissions
+      properties:
+        emissions:
+          type: number
+          format: double
+          example: 0.15
+    GMSFCreativeResponseEmissionsBreakdownDetails:
+      type: object
+      required:
+      - creativeDelivery
+      properties:
+        creativeDelivery:
+          type: number
+          format: double
+          example: 123.45
+        techManipulation:
+          type: number
+          format: double
+          example: 7.89
+    MediaOwner:
+      type: string
+      description: 'The name of the organization that owns the screen inventory. (Supported Channels: DOOH)'
+    CreativeVendor:
+      type: string
+      example: YouTube
+      description: The name of vendor organization that owns the ad format. Should not be provided for platform ad formats.
+    Scope3CreativeDeliveryTechManipulationEmissionsBreakdownDetails:
+      type: object
+      properties:
+        creativeStorage:
+          $ref: '#/components/schemas/Emissions'
+        physicalProduction:
+          $ref: '#/components/schemas/Emissions'
+    Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        consumerDevice:
+          $ref: '#/components/schemas/Emissions'
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        outdoorDisplay:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    CreativeResponseRowCoverage:
+      type: object
+      properties:
+        adFormat:
+          $ref: '#/components/schemas/AdFormatCoverageDetails'
+    Scope3CreativeDeliveryEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative Delivery emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryEmissionsBreakdownDetails'
+    AdFormat:
+      type: string
+      example: generic-instream-video
+      description: The identifier for either a platform ad format or vendor-provided ad format
+    Channel:
+      type: string
+      enum:
+      - app
+      - web
+      - streaming-video
+      - social
+      - digital-audio
+      - dooh
+      - ctv-bvod
+      - linear-tv
+      - search
+      - traditional-radio
+      - classic-ooh
+      - print
+      example: web
+      description: If not provided, we will infer the channel from the the inventory id.  'digital-audio', 'dooh' channels are currently in beta.
+    DatetimeInput:
+      type: string
+      description: 'Dates must be in the past (i.e. prior to today) in the UTC timezone (Supported Formats: YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD,  YYYYMMddThh:mm:ss.s, YYYYMMddThh:mm:ss, yyyy/mm/ddThh:mm:ss.s, yyyy/mm/ddThh:mm:ss, yyyy-mm-ddThh:mm:ss.s,yyyy-mm-ddThh:mm:ss)'
+      example: '2023-03-01'
+    AdFormatCoverageDetails:
+      type: object
+      required:
+      - value
+      - name
+      properties:
+        value:
+          type: string
+        name:
+          type: string
+        vendor:
+          type: string
+        verified:
+          type: boolean
+          example: true
+    Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative Delivery emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdownDetails'
+    AdFormatSummaryMetric:
+      type: object
+      required:
+      - metric
+      - vendorSpecific
+      - generic
+      - unknown
+      properties:
+        metric:
+          $ref: '#/components/schemas/Metric'
+        vendorSpecific:
+          type: integer
+          example: 8
+        generic:
+          type: integer
+          example: 25
+        unknown:
+          type: integer
+          example: 2
+    Views:
+      type: integer
+      example: 10
+      description: The number of views counted.
+    VenueCategory:
+      type: string
+      example: transit.airports.arrival
+      description: 'The inventory venue category. A venue category describes an environment and the audience that may be found there. (Supported Channels: DOOH) [OpenOOH Venue Taxonomy](https://github.com/openooh/venue-taxonomy/blob/main/specification-1.0.md)'
+    RegionInput:
+      type: string
+      description: 'The 2-3 letter country region code (Supported Countries: Canada, US, and Australia)'
+      example: NY
+    CreativeRequestRow:
+      type: object
+      required:
+      - impressions
+      - utcDatetime
+      - country
+      - channel
+      - creative
+      properties:
+        rowIdentifier:
+          type: string
+          example: '1'
+          description: An identifier for this row to be used in the response.
+        impressions:
+          type: integer
+          example: 13821
+        utcDatetime:
+          $ref: '#/components/schemas/DatetimeInput'
+        country:
+          $ref: '#/components/schemas/CountryInput'
+        region:
+          $ref: '#/components/schemas/RegionInput'
+        network:
+          $ref: '#/components/schemas/NetworkInput'
+        deviceType:
+          $ref: '#/components/schemas/DeviceTypeInput'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        views:
+          $ref: '#/components/schemas/Views'
+        plays:
+          $ref: '#/components/schemas/Plays'
+        globalPlacementId:
+          type: string
+          description: This is a publisher-specified placement identifier that is passed unchanged by all supply-side platforms.
+        creative:
+          $ref: '#/components/schemas/CreativeInput'
+        venueCategory:
+          $ref: '#/components/schemas/VenueCategory'
+        mediaOwner:
+          $ref: '#/components/schemas/MediaOwner'
+        displayDurationDays:
+          type: integer
+          example: 30
+          description: Number of days the classic-ooh ad was displayed.
+        campaignStartDate:
+          $ref: '#/components/schemas/DatetimeInput'
+        campaignEndDate:
+          $ref: '#/components/schemas/DatetimeInput'
+        shareOfTimePct:
+          type: number
+          format: double
+          example: 50
+          description: Share of time the ad was visible on the classic-ooh screen as a percentage (0-100).
+        physicalWidthMeters:
+          type: number
+          format: double
+          example: 2.5
+          description: Physical width of the classic-ooh ad in meters.
+        physicalHeightMeters:
+          type: number
+          format: double
+          example: 3
+          description: Physical height of the classic-ooh ad in meters.
+        printMedium:
+          $ref: '#/components/schemas/PrintMedium'
+        printCirculations:
+          type: integer
+          example: 50000
+          description: Number of copies distributed for the print campaign.
+    GMSFCreativeDeliveryEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative Delivery emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/GMSFCreativeDeliveryEmissionsBreakdownDetails'
+    CreativeResponse:
+      type: object
+      required:
+      - totalEmissions
+      - coverage
+      - totalEmissionsBreakdown
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        totalEmissions:
+          type: number
+          format: double
+          example: 0.45
+          description: Sum of emissions of all rows.
+        rows:
+          description: Only included if the includeRows parameter is true.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeResponseRow'
+        totalEmissionsBreakdown:
+          $ref: '#/components/schemas/CreativeResponseEmissionsBreakdown'
+        coverage:
+          $ref: '#/components/schemas/CreativeResponseCoverage'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

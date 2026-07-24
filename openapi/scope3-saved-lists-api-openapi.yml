@@ -1,0 +1,52 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Saved Lists API
+security:
+- bearerAuth: []
+tags:
+- name: Saved Lists
+paths:
+  /saved_lists:
+    get:
+      operationId: getSavedLists
+      summary: Get Saved Lists
+      description: Returns all property lists available for the authenticated customer, including list ID, name, and domain count.
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedList'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Saved Lists
+components:
+  schemas:
+    SavedList:
+      type: object
+      required:
+      - id
+      - name
+      - domain_count
+      properties:
+        id:
+          type: string
+          description: The saved list ID
+        name:
+          type: string
+          description: The saved list name
+        domain_count:
+          type: integer
+          description: Number of domains in the list
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,71 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Reload API
+security:
+- bearerAuth: []
+tags:
+- name: Reload
+paths:
+  /reload:
+    get:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      operationId: reload
+      responses:
+        '200':
+          description: Cache reloaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Reload
+components:
+  schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+    StatusResponse:
+      title: Status Response
+      type: object
+      additionalProperties: false
+      required:
+      - ready
+      properties:
+        ready:
+          type: boolean
+        reason:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

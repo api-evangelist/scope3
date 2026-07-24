@@ -1,0 +1,284 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Segment API
+security:
+- bearerAuth: []
+tags:
+- name: Segment
+paths:
+  /segment/list:
+    get:
+      operationId: getOrganizationSegmentList
+      summary: Get All Organization Segment Information
+      description: Returns filtered list of organization segments
+      parameters:
+      - in: query
+        name: page
+        description: Which page number being requested
+        schema:
+          type: number
+          minimum: 1
+      - in: query
+        name: segmentId
+        description: specify the client segment id to fuzzy search filter on
+        schema:
+          type: string
+      - in: query
+        name: includeDeactivated
+        description: whether to filter out deactivated segments
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Segment
+  /segment/data:
+    get:
+      operationId: getOrganizationSegmentDataBySegmentId
+      summary: Get Organization Segment Data by Segment ID
+      description: Returns requested data for the segment
+      parameters:
+      - in: query
+        name: segmentId
+        schema:
+          type: string
+        description: client segment id
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: scope3 internal segment id
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentDataResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Segment
+components:
+  schemas:
+    SegmentDataType:
+      type: string
+      enum:
+      - INCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY_PLACEMENTS
+      description: The segment data type
+    SegmentList:
+      type: object
+      required:
+      - segments
+      - paging
+      properties:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    DistributionMethod:
+      type: string
+      enum:
+      - BUCKET_PUSH
+      - API_PULL
+      - INTEGRATION
+      description: The segment distribution method
+    PlacementList:
+      type: object
+      required:
+      - name
+      - countries
+      properties:
+        name:
+          type: string
+          description: The placement list name
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries included in the segment
+    Segment:
+      type: object
+      required:
+      - id
+      - name
+      - segmentId
+      - distributionMethod
+      - updateFrequency
+      - propertyLists
+      - placementLists
+      - createdAt
+      properties:
+        id:
+          type: integer
+          description: The internal Scope3 segment id
+        name:
+          type: string
+          description: The segment name
+        segmentId:
+          type: string
+          description: The client segment id
+        partners:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/SegmentPartner'
+          description: The client partners segment information
+        distributionMethod:
+          $ref: '#/components/schemas/DistributionMethod'
+        updateFrequency:
+          $ref: '#/components/schemas/UpdateFrequency'
+        channels:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Channels enabled in the segment - if not populated, all channels are enabled
+        propertyLists:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyList'
+          description: The property lists included in the segment
+        placementLists:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlacementList'
+          description: The placement lists included in the segment
+        fileName:
+          type: string
+          description: The filename template with macros for bucket pushed segment files
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date and time
+          example: '2021-01-30T08:30:00Z'
+        deactivatedAt:
+          type: string
+          format: date-time
+          description: Deactivated date and time
+          example: '2021-01-30T08:30:00Z'
+    PropertyList:
+      type: object
+      required:
+      - name
+      - countries
+      - isInclusion
+      properties:
+        name:
+          type: string
+          description: The property list name
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries included in the segment
+        isInclusion:
+          type: boolean
+          description: Whether the property list is included or excluded from the segment
+    Paging:
+      type: object
+      required:
+      - totalRecords
+      properties:
+        next:
+          type: string
+          description: The url to query for the next page of data
+        previous:
+          type: string
+          description: The url to query for the next page of data
+        totalRecords:
+          type: integer
+          description: The total number of records
+    SegmentPartner:
+      type: object
+      required:
+      - name
+      - segmentId
+      properties:
+        name:
+          type: string
+          description: The client partner's name
+        segmentId:
+          type: string
+          description: The client partner's segment id
+        seatId:
+          nullable: true
+          type: string
+          description: The client partner's seat id
+    UpdateFrequency:
+      type: string
+      enum:
+      - DAILY
+      - MONTHLY
+      description: The segment update frequency
+    SegmentDataResponse:
+      type: object
+      required:
+      - data
+      - paging
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentData'
+          description: The segment data
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SegmentData:
+      type: object
+      required:
+      - id
+      - segmentId
+      - type
+      - property
+      - channel
+      - country
+      - inventoryId
+      properties:
+        id:
+          type: integer
+          description: The internal Scope3 segment id
+        segmentId:
+          type: string
+          description: The client segment id
+        type:
+          $ref: '#/components/schemas/SegmentDataType'
+        property:
+          type: string
+          description: The property that the inventory belongs to
+        channel:
+          type: string
+          description: The property channel
+        country:
+          type: string
+          description: The country, is not populated applies worldwide
+        inventoryId:
+          type: string
+          description: The inventory identifier
+        appStore:
+          type: string
+          nullable: true
+          description: If the inventory is an app, populated with the the app store
+        gpids:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: The GPIDs excluded for the given property
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

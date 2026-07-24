@@ -1,0 +1,147 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement API
+security:
+- bearerAuth: []
+tags:
+- name: AI Impact Measurement
+paths:
+  /:
+    post:
+      servers:
+      - url: https://aiapi.scope3.com
+        description: API server
+      security:
+      - bearerAuth: []
+      summary: Calculate AI model impact metrics for BigQuery
+      description: Processes batched impact calculations for BigQuery remote function calls
+      operationId: calculateImpactBigQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImpactBigQueryRequest'
+      responses:
+        '200':
+          description: Impact metrics calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactBigQueryResponse'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactBigQueryError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactBigQueryError'
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactBigQueryError'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactBigQueryError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactBigQueryError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpactBigQueryError'
+      tags:
+      - AI Impact Measurement
+components:
+  schemas:
+    ImpactBigQueryRequest:
+      type: object
+      required:
+      - requestId
+      - caller
+      - sessionUser
+      - calls
+      properties:
+        requestId:
+          type: string
+          description: Unique identifier for the request
+          example: 124ab1c
+        caller:
+          type: string
+          description: Full resource name of the BigQuery job
+          example: //bigquery.googleapis.com/projects/myproject/jobs/myproject:US.bquxjob_5b4c112c_17961fafeaf
+        sessionUser:
+          type: string
+          description: Email of the user executing the BigQuery query
+          example: user@company.com
+        userDefinedContext:
+          type: object
+          description: User-defined context from BigQuery
+        calls:
+          type: array
+          maxItems: 1000
+          items:
+            description: "Array of function call parameters in this exact order:\n  model_id STRING, model_family STRING, model_name STRING,\n  model_hugging_face_path STRING, request_time TIMESTAMP,\n  node_id STRING, cloud_id STRING, cloud_region STRING,\n  cloud_instance_id STRING, managed_service_id STRING,\n  country STRING, region STRING, task STRING, input_tokens INT64,\n  output_tokens INT64, input_images STRING, output_images STRING,\n  output_video_resolution INT64,\n  output_video_frames INT64, input_audio_seconds INT64, input_steps INT64\n"
+            type: array
+            minItems: 17
+            maxItems: 21
+            items:
+              nullable: true
+              oneOf:
+              - type: string
+              - type: integer
+              x-go-type: StringOrInt64
+            example:
+            - gpt-4-turbo
+            - '2024-03-15T10:30:00Z'
+            - us-central1
+            - US
+            - CA
+            - text-generation
+            - 100
+            - 50
+            - null
+    ImpactBigQueryError:
+      type: object
+      required:
+      - errorMessage
+      properties:
+        errorMessage:
+          type: string
+          description: Error message for BigQuery
+          example: 'Invalid request format: missing required field ''calls'''
+    ImpactBigQueryResponse:
+      type: object
+      required:
+      - replies
+      properties:
+        replies:
+          type: array
+          description: Array of impact metric results
+          minItems: 0
+          maxItems: 1000
+          items:
+            type: string
+        errorMessage:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

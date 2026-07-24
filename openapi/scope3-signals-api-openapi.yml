@@ -1,0 +1,236 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Signals API
+security:
+- bearerAuth: []
+tags:
+- name: Signals
+paths:
+  /signals/saved_list/{saved_list_id}:
+    get:
+      operationId: getSignalsBySavedList
+      summary: Get Signals by Saved List
+      description: Returns paginated domain-level media quality signals for all domains in the specified saved property list.
+      parameters:
+      - in: path
+        name: saved_list_id
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: Numeric ID of the saved property list
+      - in: query
+        name: page
+        schema:
+          default: 1
+        description: Page number (1-based, integer)
+      - in: query
+        name: page_size
+        schema:
+          default: 1000
+        description: Number of domains per page (integer, max 5000)
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalsPage'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Signals
+components:
+  schemas:
+    MQSignal:
+      type: object
+      required:
+      - domain
+      properties:
+        domain:
+          type: string
+          description: The web property domain
+        traffic_percentile:
+          type: number
+          nullable: true
+          description: Traffic percentile rank of the domain
+        is_mfa:
+          type: boolean
+          nullable: true
+          description: Whether the domain is classified as Made for Advertising
+        avg_a2cr:
+          type: number
+          nullable: true
+          description: Average ad-to-content ratio
+        max_a2cr:
+          type: number
+          nullable: true
+          description: Maximum ad-to-content ratio
+        avg_ads_in_view:
+          type: number
+          nullable: true
+          description: Average number of ads in view at one time
+        max_ads_in_view:
+          type: number
+          nullable: true
+          description: Maximum number of ads in view at one time
+        avg_num_sellers:
+          type: number
+          nullable: true
+          description: Average number of sellers in the supply chain
+        avg_num_nodes:
+          type: number
+          nullable: true
+          description: Average number of nodes in the supply chain
+        domain_avg_refresh_rate:
+          type: number
+          nullable: true
+          description: Average ad refresh rate for the domain
+        pct_placements_refreshed:
+          type: number
+          nullable: true
+          description: Percentage of placements that are refreshed
+        avg_a2cr_in_feed:
+          type: number
+          nullable: true
+          description: Average ad-to-content ratio for in-feed placements
+        avg_ads_in_view_in_feed:
+          type: number
+          nullable: true
+          description: Average ads in view for in-feed placements
+        pct_high_viewport_ad:
+          type: number
+          nullable: true
+          description: Percentage of ads in high viewport positions
+        pct_invalid_ads:
+          type: number
+          nullable: true
+          description: Percentage of invalid ad impressions
+        pct_organic_search_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from organic search
+        pct_organic_referral_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from organic referrals
+        pct_social_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from social media
+        pct_ad_network_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from ad networks
+        pct_marketplace_referral_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from marketplace referrals
+        pct_messaging_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from messaging platforms
+        pct_email_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from email
+        pct_ai_assistant_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from AI assistants
+        top_geos:
+          type: string
+          nullable: true
+          description: Pipe-delimited list of top geographic markets (e.g. "US | GB | DE")
+        primary_language:
+          type: string
+          nullable: true
+          description: Primary language of the domain's content
+        avg_viewability:
+          type: number
+          nullable: true
+          description: Average viewability rate
+        total_gpids:
+          type: number
+          nullable: true
+          description: Total number of unique GPIDs observed on the domain
+        eid_rate:
+          type: number
+          nullable: true
+          description: Extended ID availability rate
+        avg_page_height:
+          type: number
+          nullable: true
+          description: Average page height in pixels
+        avg_initial_page_weight_bytes:
+          type: number
+          nullable: true
+          description: Average initial page weight in bytes
+        avg_final_page_weight_bytes:
+          type: number
+          nullable: true
+          description: Average final page weight in bytes after all resources load
+        avg_initial_cpu:
+          type: number
+          nullable: true
+          description: Average initial CPU usage
+        avg_final_cpu:
+          type: number
+          nullable: true
+          description: Average final CPU usage after all resources load
+        avg_initial_network_calls_count:
+          type: number
+          nullable: true
+          description: Average number of network calls at initial page load
+        avg_final_network_calls_count:
+          type: number
+          nullable: true
+          description: Average number of network calls after all resources load
+        missing_ads_text:
+          type: boolean
+          nullable: true
+          description: Whether ads.txt entries are missing for known sellers
+        old_ads_text:
+          type: boolean
+          nullable: true
+          description: Whether ads.txt file has not been updated recently
+        avg_depth:
+          type: number
+          nullable: true
+          description: Average depth of the supply chain
+        max_depth:
+          type: number
+          nullable: true
+          description: Maximum depth of the supply chain
+    SignalsPage:
+      type: object
+      required:
+      - data
+      - page
+      - page_size
+      - has_more
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MQSignal'
+          description: Domain-level MQ signals for this page
+        page:
+          type: integer
+          description: Current page number (1-based)
+        page_size:
+          type: integer
+          description: Number of results per page requested
+        has_more:
+          type: boolean
+          description: Whether additional pages of results exist
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

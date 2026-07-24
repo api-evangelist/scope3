@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AI Impact Measurement Benchmarks API
+security:
+- bearerAuth: []
+tags:
+- name: Benchmarks
+paths:
+  /benchmarks:
+    post:
+      summary: Country-channel benchmarks
+      description: Emissions by percentile per country and channel
+      operationId: benchmarks
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: latest
+        description: Whether to use latest available data
+        schema:
+          type: boolean
+      requestBody:
+        description: Benchmark request parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenchmarksRequest'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenchmarksResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+      tags:
+      - Benchmarks
+components:
+  schemas:
+    ChannelWithBenchmarks:
+      type: string
+      enum:
+      - app
+      - web
+      - streaming-video
+      - social
+      - ctv-bvod
+      example: web
+    CountryInput:
+      type: string
+      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
+      example: US
+    RequestId:
+      type: string
+      description: Auto generated request identifier
+    BenchmarkInformation:
+      type: object
+      required:
+      - percentile
+      - adSelectionAndMediaDistributionEmissionsPerImpression
+      - adSelectionEmissionsPerImpression
+      properties:
+        percentile:
+          type: integer
+          example: 80
+        adSelectionAndMediaDistributionEmissionsPerImpression:
+          type: number
+          format: double
+          example: 1.67
+          description: Ad tech and media distribution emissions in grams of CO₂e including servers and cloud computing; analytics; network traffic; storage; data providers; vendor overhead; content creation.
+        adSelectionEmissionsPerImpression:
+          type: number
+          format: double
+          example: 1.02
+          description: Ad tech emissions in grams of CO₂e.
+    BenchmarksRequest:
+      type: object
+      required:
+      - country
+      - channel
+      properties:
+        country:
+          $ref: '#/components/schemas/CountryInput'
+        channel:
+          $ref: '#/components/schemas/ChannelWithBenchmarks'
+        month:
+          type: string
+          description: 'Year-month which specifies which month''s benchmarks to use. (Supported Formats: YYYY-MM, YYYYMM, or YYYY/MM)'
+          example: 2023-04
+    BenchmarksResponse:
+      type: object
+      required:
+      - benchmarks
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        benchmarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenchmarkInformation'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
