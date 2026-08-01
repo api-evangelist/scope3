@@ -1,0 +1,32 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/scope3-measurement-openapi.yml, openapi/scope3-ai-openapi-original.yml
+standards:
+  - id: oauth2
+    conforms: false
+    evidence: No oauth2 securityScheme; auth is HTTP bearer token.
+  - id: oidc
+    conforms: false
+  - id: http-bearer-jwt
+    conforms: true
+    evidence: aiapi securityScheme bearerAuth type http scheme bearer bearerFormat JWT
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: 4xx/5xx responses use a plain Error schema, not application/problem+json.
+  - id: openapi-3.0
+    conforms: true
+    evidence: Both published specs are OpenAPI 3.0.0.
+  - id: rest-json
+    conforms: true
+    evidence: JSON request/response over REST resources.
+  - id: pagination
+    conforms: true
+    evidence: Measurement signals/segment endpoints return paginated rows.
+  - id: mcp
+    conforms: true
+    evidence: Hosted MCP server on the Agentic Platform (Scope3McpClient).
+  - id: adcp
+    conforms: true
+    evidence: Agentic Platform implements the Ad Context Protocol (AdCP) for agentic advertising.
+  - id: idempotency
+    conforms: false

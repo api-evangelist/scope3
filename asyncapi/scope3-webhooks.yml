@@ -1,0 +1,24 @@
+generated: '2026-07-21'
+method: searched
+source: https://github.com/scope3data/agentic-client
+spec_type: Webhooks
+surface: AdCP (Ad Context Protocol) event webhooks on the Scope3 Agentic Platform
+description: >-
+  The Scope3 Agentic Platform is event-driven over AdCP. The `scope3` npm SDK ships a
+  WebhookServer class for handling AdCP events, and asynchronous operations (media-buy
+  activation, audience/event-source/catalog syndication) track status via webhooks with a
+  polling fallback (`retryAfterSeconds` guidance) when webhooks are unavailable.
+mechanism:
+  transport: http-callback
+  delivery: AdCP async status webhooks
+  server_class: WebhookServer (npm scope3)
+  polling_fallback: true
+event_areas:
+  - media-buy status transitions (pending -> active, active -> paused)
+  - syndication status (audiences, event sources, catalogs to AdCP agents)
+  - creative-review / approval-queue updates (storefront persona)
+no_asyncapi_document: true
+notes: >-
+  Scope3 documents a webhook mechanism but does not publish a machine-readable AsyncAPI
+  document or a fixed named-event catalog; event areas above are captured from the
+  published buyer/storefront skill.md guides and SDK README. No events were fabricated.

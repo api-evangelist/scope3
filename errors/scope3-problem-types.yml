@@ -1,0 +1,52 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/scope3-measurement-openapi.yml, openapi/scope3-ai-openapi-original.yml
+format: plain-error-schema
+note: Responses use a plain Error object (not RFC 9457 problem+json). Status codes observed across the
+  measurement and AI APIs.
+problems:
+- status: 400
+  title: Bad request
+  description: Bad request
+  spec: measurement
+  example_operation: getSignalsBySavedList
+- status: 401
+  title: Unauthorized
+  description: Unauthorized
+  spec: ai
+  example_operation: listModels
+- status: 403
+  title: Forbidden
+  description: Forbidden
+  spec: measurement
+  example_operation: getSavedLists
+- status: 404
+  title: Not found
+  description: Model not found
+  spec: ai
+  example_operation: getModel
+- status: 406
+  title: Not acceptable
+  description: Not acceptable response
+  spec: ai
+  example_operation: listModels
+- status: 409
+  title: Conflict
+  description: Model ID already exists
+  spec: ai
+  example_operation: createModel
+- status: 415
+  title: Unsupported media type
+  description: Unsupported media type
+  spec: ai
+  example_operation: listModels
+- status: 429
+  title: Too many requests
+  description: Too many requests
+  spec: ai
+  example_operation: listModels
+- status: 500
+  title: Internal server error
+  description: Internal server error
+  spec: ai
+  example_operation: calculateImpactBigQuery

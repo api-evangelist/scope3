@@ -1,0 +1,39 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.scope3.com/docs/access-authorization
+authentication:
+  style: bearer
+  header: Authorization
+  format: "Bearer scope3_accessClientId_accessClientSecret"
+  bearer_format: JWT   # aiapi bearerAuth declares bearerFormat: JWT
+  notes: >-
+    A single access token of the form scope3_<accessClientId>_<accessClientSecret> is
+    passed as an Authorization: Bearer header on every request. V1 credentials are combined
+    into the V2 token format. See authentication/scope3-authentication.yml.
+idempotency:
+  supported: false
+  notes: No idempotency-key header or contract is documented in the docs or OpenAPI.
+pagination:
+  supported: true
+  scope: measurement API (segment/data, signals/saved_list)
+  notes: >-
+    Paginated endpoints (e.g. getSignalsBySavedList) return domain-level rows with
+    page parameters. Batching guidance: split large measurement uploads into
+    4,000-8,000 rows per request; requests over ~100,000 rows commonly fail.
+rate_limiting:
+  documented: false
+  notes: >-
+    The Scope3 API does not publish explicit throttling; guidance is to batch rows to
+    minimize bandwidth rather than a fixed rate limit.
+error_envelope:
+  shape: Error schema (object) on 4xx/5xx; not RFC 9457 application/problem+json.
+  see: errors/scope3-problem-types.yml
+versioning:
+  see: lifecycle/scope3-lifecycle.yml
+async:
+  mechanism: AdCP webhooks + polling fallback (agentic platform)
+  see: asyncapi/scope3-webhooks.yml
+cross_links:
+  authentication: authentication/scope3-authentication.yml
+  errors: errors/scope3-problem-types.yml
+  lifecycle: lifecycle/scope3-lifecycle.yml

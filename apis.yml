@@ -1,9 +1,29 @@
 aid: scope3
 name: Scope3
-description: 'Scope3 is a company surfaced as a portfolio company of gv and added to the API Evangelist
-  network as a stub for enrichment. Sector: enterprise. This profile is a lead awaiting the enrichment
-  pipeline.'
+description: >-
+  Scope3 is the source of truth for greenhouse-gas emissions data in media and advertising,
+  and operates the Interchange for agent-to-agent (agentic) advertising. Its APIs let buyers,
+  publishers, and platforms measure the carbon footprint of every ad impression and creative
+  across channels, benchmark against country/channel percentiles, and run AI-powered
+  programmatic advertising through an agentic buyer/storefront platform. Scope3 exposes three
+  public API surfaces: the Carbon Calculator (Measurement) API at api.scope3.com/v2, the AI
+  Impact Measurement API at aiapi.scope3.com (energy, gCO2e, and water per inference), and the
+  Agentic Platform at api.agentic.scope3.com with a hosted MCP server, a `scope3` CLI, and
+  published buyer/storefront Agent Skills. Backed by GV.
 url: https://raw.githubusercontent.com/api-evangelist/scope3/refs/heads/main/apis.yml
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://scope3.com/og-default.png
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
@@ -12,16 +32,235 @@ x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-21'
 tags:
 - Company
 - Enterprise
-apis: []
+- Advertising
+- Carbon Emissions
+- Sustainability
+- AdTech
+- Measurement
+- Artificial Intelligence
+- Agentic
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- name: Scope3 Agentic Platform API
+  description: >-
+    The Interchange for agent-to-agent advertising: buyer and storefront personas for inventory discovery,
+    campaign and creative orchestration, bundles, signals, and billing, served over REST and a hosted
+    MCP server.
+  humanURL: https://docs.scope3.com/docs/atp-getting-started
+  baseURL: https://api.agentic.scope3.com
+  tags:
+  - Agentic
+  - Advertising
+  - AdTech
+- aid: scope3:scope3-ai-impact-measurement-api
+  name: Scope3 AI Impact Measurement API
+  description: The AI Impact Measurement API from Scope3 — 1 operation(s) for ai impact measurement.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - AI Impact Measurement
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-ai-impact-measurement-api-openapi.yml
+- aid: scope3:scope3-benchmarks-api
+  name: Scope3 Benchmarks API
+  description: The Benchmarks API from Scope3 — 1 operation(s) for benchmarks.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Benchmarks
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-benchmarks-api-openapi.yml
+- aid: scope3:scope3-creative-api
+  name: Scope3 Creative API
+  description: The Creative API from Scope3 — 1 operation(s) for creative.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Creative
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-creative-api-openapi.yml
+- aid: scope3:scope3-data-api
+  name: Scope3 Data API
+  description: The Data API from Scope3 — 2 operation(s) for data.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Data
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-data-api-openapi.yml
+- aid: scope3:scope3-gpu-api
+  name: Scope3 Gpu API
+  description: The Gpu API from Scope3 — 2 operation(s) for gpu.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Gpu
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-gpu-api-openapi.yml
+- aid: scope3:scope3-impact-api
+  name: Scope3 Impact API
+  description: The Impact API from Scope3 — 1 operation(s) for impact.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Impact
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-impact-api-openapi.yml
+- aid: scope3:scope3-measure-api
+  name: Scope3 Measure API
+  description: The Measure API from Scope3 — 1 operation(s) for measure.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Measure
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-measure-api-openapi.yml
+- aid: scope3:scope3-model-api
+  name: Scope3 Model API
+  description: The Model API from Scope3 — 4 operation(s) for model.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Model
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-model-api-openapi.yml
+- aid: scope3:scope3-node-api
+  name: Scope3 Node API
+  description: The Node API from Scope3 — 2 operation(s) for node.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Node
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-node-api-openapi.yml
+- aid: scope3:scope3-reload-api
+  name: Scope3 Reload API
+  description: The Reload API from Scope3 — 1 operation(s) for reload.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Reload
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-reload-api-openapi.yml
+- aid: scope3:scope3-saved-lists-api
+  name: Scope3 Saved Lists API
+  description: The Saved Lists API from Scope3 — 1 operation(s) for saved lists.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Saved Lists
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-saved-lists-api-openapi.yml
+- aid: scope3:scope3-segment-api
+  name: Scope3 Segment API
+  description: The Segment API from Scope3 — 2 operation(s) for segment.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Segment
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-segment-api-openapi.yml
+- aid: scope3:scope3-signals-api
+  name: Scope3 Signals API
+  description: The Signals API from Scope3 — 1 operation(s) for signals.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Signals
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-signals-api-openapi.yml
+- aid: scope3:scope3-status-api
+  name: Scope3 Status API
+  description: The Status API from Scope3 — 1 operation(s) for status.
+  humanURL: https://docs.scope3.com/reference/measure-1
+  baseURL: https://api.scope3.com/v2
+  tags:
+  - Status
+  properties:
+  - type: OpenAPI
+    url: openapi/scope3-status-api-openapi.yml
 common:
+- type: AgenticAccess
+  url: agentic-access/scope3-agentic-access.yml
+- type: DomainSecurity
+  url: security/scope3-domain-security.yml
+- type: Authentication
+  url: authentication/scope3-authentication.yml
+- type: Packages
+  url: packages/scope3-packages.yml
+- type: SDKs
+  url: packages/scope3-packages.yml
+- type: CLI
+  url: cli/scope3-cli.yml
+- type: MCPServer
+  url: mcp/scope3-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/scope3-llms.txt
+- type: ErrorCatalog
+  url: errors/scope3-problem-types.yml
+- type: Conventions
+  url: conventions/scope3-conventions.yml
+- type: Lifecycle
+  url: lifecycle/scope3-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/scope3-lifecycle.yml
+- type: ChangeLog
+  url: changelog/scope3-changelog.yml
+- type: Conformance
+  url: conformance/scope3-conformance.yml
+- type: DataModel
+  url: data-model/scope3-data-model.yml
+- type: Sandbox
+  url: sandbox/scope3-sandbox.yml
+- type: Webhooks
+  url: asyncapi/scope3-webhooks.yml
+- type: DeveloperPortal
+  url: https://docs.scope3.com
+- type: Documentation
+  url: https://docs.scope3.com/docs
+- type: APIReference
+  url: https://docs.scope3.com/reference/measure-1
+- type: GettingStarted
+  url: https://docs.scope3.com/docs/getting-started
+- type: Support
+  url: https://scope3.com/support
+- type: Blog
+  url: https://scope3.com/blog/
+- type: GitHubOrganization
+  url: https://github.com/scope3data
+- type: Pricing
+  url: https://scope3.com/agentic-advertising/pricing/
+- type: TermsOfService
+  url: https://scope3.com/terms-and-conditions
+- type: PrivacyPolicy
+  url: https://scope3.com/privacy-policy
 - type: Website
   url: https://scope3.com
+x-enrichment:
+  date: '2026-07-21'
+  status: enriched
+  artifacts_added: 26
+  pass: local-v1

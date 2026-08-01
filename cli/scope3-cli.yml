@@ -1,0 +1,26 @@
+generated: '2026-07-21'
+method: searched
+source: https://github.com/scope3data/agentic-client
+binary: scope3
+package: {registry: npm, name: scope3}
+install:
+  - npm install -g scope3
+description: >-
+  First-party CLI for the Scope3 Agentic Platform, shipped in the `scope3` npm package.
+  Supports a buyer/storefront persona model and typed resource commands.
+config:
+  - scope3 config set apiKey <your_api_key>
+  - scope3 config set environment <staging|production>
+persona_flag: "--persona <buyer|storefront>"
+commands:
+  - group: advertisers
+    examples: [scope3 advertisers list, scope3 advertisers get adv-123]
+  - group: campaigns
+    examples: ["scope3 campaigns list --format json"]
+  - group: bundles
+    examples: ["scope3 bundles create --advertiser-id adv-123 --channels display,video"]
+  - group: storefront
+    examples: ["scope3 --persona storefront storefront get"]
+  - group: commands
+    examples: [scope3 commands]
+    note: Lists every available command.

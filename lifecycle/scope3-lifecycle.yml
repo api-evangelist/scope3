@@ -1,0 +1,24 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.scope3.com/docs/getting-started
+versioning:
+  scheme: uri-path
+  current: v2
+  measurement_server: https://api.scope3.com/v2
+  docs: https://docs.scope3.com/docs/getting-started
+deprecation:
+  policy_url: https://docs.scope3.com/docs/whats-new-in-20.md
+  notes: >-
+    Scope3 runs a dated deprecation cadence. API 1.3 was scheduled for deprecation on
+    September 30; earlier V1 versions of the Scope3 API were fully deprecated on
+    January 1, 2025. Migration guides are published (V1 Measure -> V2 Media Delivery,
+    V1 measure -> V2 measure). Sunset/Deprecation HTTP headers are not documented.
+  migration_guides:
+    - https://docs.scope3.com/docs/migration-guides.md
+    - https://docs.scope3.com/docs/measurement-v1-to-v2.md
+    - https://docs.scope3.com/docs/migrating-from-v1-measure-to-v2-measure.md
+status_page: null   # No public status page found (status.scope3.com does not resolve).
+sla: null
+changelog: https://docs.scope3.com/changelog
+dataset_update_calendar: https://docs.scope3.com/docs/dataset-update-calendar.md
+deprecated_operations: []

@@ -1,0 +1,68 @@
+# Scope3 Documentation
+
+> Scope3 provides the source of truth for greenhouse gas emissions data for media and advertising.
+
+## Guides
+- [Access & Authorization](https://docs.scope3.com/docs/access-authorization.md)
+- [Getting Started: Version 2.0](https://docs.scope3.com/docs/getting-started.md)
+- [What's New in 2.0](https://docs.scope3.com/docs/whats-new-in-20.md): What's changing and what you need to do about it
+- [Migration Guides](https://docs.scope3.com/docs/migration-guides.md)
+- [Migrating from the V1 Measure Endpoint to Media Delivery](https://docs.scope3.com/docs/measurement-v1-to-v2.md)
+- [Migrating from the V1 measurement endpoint to the V2 measurement endpoint](https://docs.scope3.com/docs/migrating-from-v1-measure-to-v2-measure.md)
+- [Migrating from Google Sheets Integration to the Integrate UI](https://docs.scope3.com/docs/google-sheet-to-integrate-ui.md)
+- [Migrating from Snowflake connectors to the Integrate UI](https://docs.scope3.com/docs/migration-from-snowflake-connectors-to-media-delivery.md)
+- [Dataset Updates](https://docs.scope3.com/docs/dataset-update-calendar.md)
+- [Platform Default Ad Formats](https://docs.scope3.com/docs/platform-ad-formats.md): The default ad formats below are based on standard IAB standard sizes.
+- [Configuring ads.txt for geo and channel](https://docs.scope3.com/docs/configuring-adstxt-for-geo-and-channel.md)
+- [Ad Stack Declaration](https://docs.scope3.com/docs/ad-stack-declaration.md): A publisher-defined view of the ad tech supply chain for accurate emissions modeling.
+- [Data Dictionary](https://docs.scope3.com/docs/data-dictionary.md)
+- [FAQ](https://docs.scope3.com/docs/faq.md)
+- [Creative Delivery](https://docs.scope3.com/docs/creative_delivery.md): Upload creative delivery data to share with partners
+- [Media Delivery](https://docs.scope3.com/docs/media-delivery.md): Upload media delivery data to share with partners
+- [Getting Started](https://docs.scope3.com/docs/atp-getting-started.md): How to integrate an ad tech platform with the Scope3 CSP
+- [Traffic Shaping](https://docs.scope3.com/docs/atp-traffic-shaping.md): Upload traffic shaping data to refine the Scope3 emissions model
+- [Inventory Intelligence](https://docs.scope3.com/docs/atp-inventory-intelligence.md): Mapping Scope3 data onto the supply seen by an ad tech platform
+- [Real-Time Data Integration](https://docs.scope3.com/docs/signals-integrations.md): How to enable the Scope3 real-time data provider
+- [Context Agents](https://docs.scope3.com/docs/contextual-agents.md): Build a context agent on the Scope3 platform
+- [Integrate Basic Setup](https://docs.scope3.com/docs/integrate-ui-setup.md)
+- [Cloud Bucket Configuration](https://docs.scope3.com/docs/cloud-bucket-configuration.md)
+- [Media Delivery Integration Setup](https://docs.scope3.com/docs/media-delivery-integration-setup.md)
+- [Display & Video 360 API Connection](https://docs.scope3.com/docs/dv360-api-connection.md)
+- [DV360 App Verification Bypass Guide](https://docs.scope3.com/docs/dv360-app-verification-bypass-guide.md)
+- [Snap Partner API Connection](https://docs.scope3.com/docs/snap-partner-api-connection.md)
+- [The Trade Desk Partner API Connection](https://docs.scope3.com/docs/ttd-partner-api-connection.md)
+- [Artifact](https://docs.scope3.com/docs/content.md): Provide artifact content for ingestion into Brand Standards
+- [ATP Supply](https://docs.scope3.com/docs/atp-supply.md)
+- [Creative Delivery](https://docs.scope3.com/docs/creative-2.md)
+- [Media Delivery](https://docs.scope3.com/docs/media-delivery-schema.md)
+- [Traffic](https://docs.scope3.com/docs/traffic-1.md): Traffic data is used to refine the Scope3 emissions model
+- [Traffic Shaping](https://docs.scope3.com/docs/traffic-shaping.md)
+- [Usage](https://docs.scope3.com/docs/usage.md): For partners to submit usage data for billing
+- [Artifact Classification](https://docs.scope3.com/docs/artifact-classification.md)
+- [Methodology](https://docs.scope3.com/docs/classification-methodology.md): Transparent and multi-layered AI analysis to classify content and determine brand alignment
+- [Content Classification](https://docs.scope3.com/docs/content-classification.md): Managing content for classification by Scope3
+- [Publisher Real-time API](https://docs.scope3.com/docs/publisher-real-time-api.md): Real-time endpoint that provides low latency access to content classifications for ad serving and programmatic integrations
+
+## API Reference
+- [Emissions Measurement](https://docs.scope3.com/reference/measure-1.md): Calculates the carbon footprint for advertising media
+- [Creative emissions](https://docs.scope3.com/reference/creative-1.md): Calculates the carbon footprint of running a creative
+- [Country-channel benchmarks](https://docs.scope3.com/reference/benchmarks-1.md): Emissions by percentile per country and channel
+- [Upload Data File](https://docs.scope3.com/reference/postdataupload-1.md): Returns the uploaded data file status
+- [Get Data File Upload by ID](https://docs.scope3.com/reference/getdatauploadid-1.md): Returns requested data file upload information
+- [Get All Organization Segment Information](https://docs.scope3.com/reference/getorganizationsegmentlist-1.md): Returns filtered list of organization segments
+- [Get Organization Segment Data by Segment ID](https://docs.scope3.com/reference/getorganizationsegmentdatabysegmentid-1.md): Returns requested data for the segment
+- [Get Saved Lists](https://docs.scope3.com/reference/getsavedlists.md): Returns all property lists available for the authenticated customer, including list ID, name, and domain count.
+- [Get Signals by Saved List](https://docs.scope3.com/reference/getsignalsbysavedlist.md): Returns paginated domain-level media quality signals for all domains in the specified saved property list.
+
+## Recipes
+- [Switching from V1 to V2 API](https://docs.scope3.com/recipes/switching-from-v1-to-v2-api.md)
+
+## Pages
+- [Green Media Standard for Media Products](https://docs.scope3.com/green-media-standard-for-media-products.md)
+
+## Changelog
+- [August 2026 Emissions Model](https://docs.scope3.com/changelog/august-2026-emissions-model.md)
+- [February 2026 Emissions Model](https://docs.scope3.com/changelog/february-2026-emissions-model.md)
+- [November 2025 Emissions Model](https://docs.scope3.com/changelog/november-2025-emissions-model.md)
+- [October 2025 Emissions Model](https://docs.scope3.com/changelog/october-2025-emissions-model.md)
+- [September 2025 Emissions Model](https://docs.scope3.com/changelog/september-2025-emissions-model.md)

@@ -1,0 +1,17 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Scope3 Carbon Calculator (Measurement) API
+  version: 1.0.0
+extends: openapi/scope3-measurement-openapi.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provenance: Harvested and merged from docs.scope3.com per-operation OpenAPI definitions (ReadMe).
+      x-api-base-url: https://api.scope3.com/v2
+      x-authentication: authentication/scope3-authentication.yml
+      x-error-catalog: errors/scope3-problem-types.yml
+      x-conventions: conventions/scope3-conventions.yml
+      x-lifecycle: lifecycle/scope3-lifecycle.yml
+  - target: $.info
+    update:
+      x-apievangelist-rating-notes: Bearer JWT auth; paginated signals; batch measurement uploads at 4k-8k rows/request.

@@ -1,0 +1,21 @@
+generated: '2026-07-21'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: scope3.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 30 21:56:56 2026 GMT
+  hsts: false
+- host: api.scope3.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 26 06:01:28 2026 GMT
+  hsts: null
+domains:
+- domain: scope3.com
+  dnssec: true
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: reject

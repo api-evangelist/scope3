@@ -1,0 +1,2336 @@
+openapi: 3.0.0
+info:
+  title: calculator Scope3 Carbon Calculator API
+  description: API to calculate the carbon footprint of a campaign
+  version: 2.0.0
+servers:
+- url: https://api.scope3.com/v2
+security:
+- bearerAuth: []
+paths:
+  /measure:
+    post:
+      summary: Emissions Measurement
+      description: Calculates the carbon footprint for advertising media
+      operationId: measure
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: includeRows
+        description: Whether to include all rows in the response
+        schema:
+          type: boolean
+      - in: query
+        name: latest
+        description: Whether to use latest available data
+        schema:
+          type: boolean
+      - in: query
+        name: fields
+        description: Comma separated list of fields to include in the row level response
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeasureResponseFields'
+      - in: query
+        name: framework
+        description: Default is scope3
+        schema:
+          $ref: '#/components/schemas/Framework'
+      requestBody:
+        description: Rows of delivered media to measure
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeasureRequest'
+      responses:
+        '200':
+          description: Success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeasureResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /creative:
+    post:
+      summary: Creative emissions
+      description: Calculates the carbon footprint of running a creative
+      operationId: creative
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: includeRows
+        description: Whether to include all rows in the response
+        schema:
+          type: boolean
+      - in: query
+        name: latest
+        description: Whether to use latest available data
+        schema:
+          type: boolean
+      - in: query
+        name: framework
+        description: Default is scope3
+        schema:
+          $ref: '#/components/schemas/Framework'
+      requestBody:
+        description: Rows of delivered creatives to measure
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreativeRequest'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreativeResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /benchmarks:
+    post:
+      summary: Country-channel benchmarks
+      description: Emissions by percentile per country and channel
+      operationId: benchmarks
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: latest
+        description: Whether to use latest available data
+        schema:
+          type: boolean
+      requestBody:
+        description: Benchmark request parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenchmarksRequest'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenchmarksResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /data/upload:
+    post:
+      operationId: postDataUpload
+      summary: Upload Data File
+      description: Returns the uploaded data file status
+      requestBody:
+        description: 'Upload a client data file via CSV.
+
+
+          If the file size exceeds 100MB, please reach out to your Scope3 contact for more options.
+
+          '
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                type:
+                  type: string
+                  enum:
+                  - MEDIA_DELIVERY
+                  - CUSTOMER_USAGE
+                  - CREATIVE_DELIVERY
+                  - ATP_TRAFFIC_SHAPING
+                  - ATP_SUPPLY
+                  - PUB_PROPERTY_METRICS
+                  - DP_INVENTORY_METRICS
+                  - SUSTAINABILITY_FACTS
+                  - CONTENT_METADATA
+                  - AI_INFERENCE
+                  description: The type of data file being uploaded
+                fieldMapping:
+                  type: string
+                  enum:
+                  - CUSTOM
+                  description: The field mapping type
+                version:
+                  type: string
+                  nullable: true
+                  description: The custom mapping version
+                dataSource:
+                  type: string
+                  nullable: true
+                  description: The custom mapping data source
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUploadInformation'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /data/upload/{uploadId}:
+    get:
+      operationId: getDataUploadId
+      summary: Get Data File Upload by ID
+      description: Returns requested data file upload information
+      parameters:
+      - in: path
+        name: uploadId
+        schema:
+          type: integer
+        required: true
+        description: Numeric ID of the upload to get
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUploadInformation'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /segment/list:
+    get:
+      operationId: getOrganizationSegmentList
+      summary: Get All Organization Segment Information
+      description: Returns filtered list of organization segments
+      parameters:
+      - in: query
+        name: page
+        description: Which page number being requested
+        schema:
+          type: number
+          minimum: 1
+      - in: query
+        name: segmentId
+        description: specify the client segment id to fuzzy search filter on
+        schema:
+          type: string
+      - in: query
+        name: includeDeactivated
+        description: whether to filter out deactivated segments
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /segment/data:
+    get:
+      operationId: getOrganizationSegmentDataBySegmentId
+      summary: Get Organization Segment Data by Segment ID
+      description: Returns requested data for the segment
+      parameters:
+      - in: query
+        name: segmentId
+        schema:
+          type: string
+        description: client segment id
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: scope3 internal segment id
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentDataResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /saved_lists:
+    get:
+      operationId: getSavedLists
+      summary: Get Saved Lists
+      description: Returns all property lists available for the authenticated customer, including list
+        ID, name, and domain count.
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedList'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+  /signals/saved_list/{saved_list_id}:
+    get:
+      operationId: getSignalsBySavedList
+      summary: Get Signals by Saved List
+      description: Returns paginated domain-level media quality signals for all domains in the specified
+        saved property list.
+      parameters:
+      - in: path
+        name: saved_list_id
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: Numeric ID of the saved property list
+      - in: query
+        name: page
+        schema:
+          default: 1
+        description: Page number (1-based, integer)
+      - in: query
+        name: page_size
+        schema:
+          default: 1000
+        description: Number of domains per page (integer, max 5000)
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalsPage'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    InventoryCoverageEnum:
+      type: string
+      enum:
+      - modeled
+      - missing
+      - unknown
+      description: 'modeled - Inventory is included in the Scope3 dataset for the requested date.
+
+        missing - Inventory is not included in the Scope3 dataset for the requested date.
+
+        unknown - Inventory is unable to measured as a result of errors.'
+    InventoryIdentifier:
+      type: string
+      example: nytimes.com
+      description: This field can accept either a domain, app id, or screen id
+    DatetimeInput:
+      type: string
+      description: 'Dates must be in the past (i.e. prior to today) in the UTC timezone (Supported Formats:
+        YYYY-MM-DD, YYYYMMDD, YYYY/MM/DD,  YYYYMMddThh:mm:ss.s, YYYYMMddThh:mm:ss, yyyy/mm/ddThh:mm:ss.s,
+        yyyy/mm/ddThh:mm:ss, yyyy-mm-ddThh:mm:ss.s,yyyy-mm-ddThh:mm:ss)'
+      example: '2023-03-01'
+    CountryInput:
+      type: string
+      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g.
+        US, USA, United States. (Supported Languages: English)'
+      example: US
+    RegionInput:
+      type: string
+      description: 'The 2-3 letter country region code (Supported Countries: Canada, US, and Australia)'
+      example: NY
+    NetworkInput:
+      type: string
+      enum:
+      - fixed
+      - mobile
+      example: fixed
+      description: The networking connection used by the consumer device
+    DeviceTypeInput:
+      type: string
+      enum:
+      - phone
+      - tablet
+      - pc
+      - tv
+      - smart-speaker
+      - radio
+      example: pc
+      description: The consumer device. If not provided, we will infer the device type from the the channel.
+        smart-speaker is only allowed for digital-audio channel radio is only allowed for traditional-radio
+        channel
+    SellerName:
+      type: string
+      example: Xandr
+      description: Name of the seller entity that sold the media
+    SellerDomain:
+      type: string
+      example: xandr.com
+      description: Canonical domain of the seller entity that sold the media
+    Channel:
+      type: string
+      enum:
+      - app
+      - web
+      - streaming-video
+      - social
+      - digital-audio
+      - dooh
+      - ctv-bvod
+      - linear-tv
+      - search
+      - traditional-radio
+      - classic-ooh
+      - print
+      example: web
+      description: If not provided, we will infer the channel from the the inventory id.  'digital-audio',
+        'dooh' channels are currently in beta.
+    AppStore:
+      type: string
+      enum:
+      - apple-app-store
+      - google-play-store
+      - amazon
+      - roku
+      - samsung
+      - lg
+      - vizio
+      - microsoft
+      example: apple-app-store
+      description: The app store where the app is distributed.
+    BuyingMethod:
+      type: string
+      enum:
+      - programmatic-open
+      - programmatic-pmp
+      - programmatic-guaranteed
+      - direct
+      - direct-takeover
+      example: programmatic-open
+      description: The method used to buy the impressions
+    VenueCategory:
+      type: string
+      example: transit.airports.arrival
+      description: 'The inventory venue category. A venue category describes an environment and the audience
+        that may be found there. (Supported Channels: DOOH) [OpenOOH Venue Taxonomy](https://github.com/openooh/venue-taxonomy/blob/main/specification-1.0.md)'
+    Plays:
+      type: integer
+      example: 10
+      description: 'How many times an ad was shown. (Supported Channels: DOOH, Linear TV)'
+    Views:
+      type: integer
+      example: 10
+      description: The number of views counted.
+    PlayDuration:
+      type: number
+      format: double
+      example: 10
+      description: 'How duration in seconds that an ad was on screen. (Supported Channels: DOOH, Linear
+        TV)'
+    MediaOwner:
+      type: string
+      description: 'The name of the organization that owns the screen inventory. (Supported Channels:
+        DOOH)'
+    DealId:
+      type: string
+      example: '12345'
+      description: The identifier of the deal being bought
+    PrintMedium:
+      type: string
+      enum:
+      - newspaper
+      - magazine
+      - journal
+      - leaflet
+      example: newspaper
+    CreativeInput:
+      type: object
+      properties:
+        adFormat:
+          $ref: '#/components/schemas/AdFormat'
+        vendor:
+          $ref: '#/components/schemas/CreativeVendor'
+        totalImageDataTransferBytes:
+          type: integer
+          example: 150000
+          description: Total bytes for the data transfer for the image itself for all impressions, ideally
+            measured by the CDN
+        imageSizesPixels:
+          type: array
+          items:
+            type: string
+          example:
+          - 300x250
+          - 970x250
+          description: Array of images width x height of creative (basic image only)
+        renderedWidthPixels:
+          type: integer
+          example: 300
+          description: Width of the rendered image or video in pixels
+        renderedHeightPixels:
+          type: integer
+          example: 250
+          description: Height of the rendered image or video in pixels
+        totalAudioDataTransferBytes:
+          type: integer
+          example: 15
+          description: Total bytes for the data transfer for the core audio asset for all impressions,
+            ideally measured by the CDN
+        audioDurationSeconds:
+          type: number
+          format: double
+          example: 90.1
+          description: Average audio duration in seconds for a single impression
+        totalVideoDataTransferBytes:
+          type: integer
+          example: 72800
+          description: Total bytes for the data transfer for the core video asset for all loads, ideally
+            measured by the CDN
+        videoVastBytes:
+          type: integer
+          example: 12000
+          description: Average size of VAST/VPAID wrapper for the video in bytes for a single load
+        videoBitrateKbps:
+          type: integer
+          example: 500
+          description: Video bitrate *as delivered* in kilobits per second
+        videoSizeBytes:
+          type: integer
+          example: 150000
+          description: Average video size _as delivered_ in bytes for a single load
+        videoDurationSeconds:
+          type: number
+          format: double
+          example: 30.5
+          description: Video duration in seconds
+        videoViewTimeSeconds:
+          type: number
+          format: double
+          example: 15
+          description: Average time, in seconds, that a video is viewed
+        videoViewRate:
+          type: number
+          format: double
+          example: 0.8
+          description: The percentage of the video that is viewed
+        timeInViewSeconds:
+          type: number
+          format: double
+          example: 15
+          description: Time that the creative was visible on the device
+        adTechPlatformVideoPlayerDomain:
+          type: string
+          example: seenthis.co
+          description: The canonical domain of the ad tech platform that owns the video player or 'default'
+        adTechPlatformCreativeAdserverDomains:
+          type: array
+          items:
+            type: string
+          example: []
+          description: The canonical domains of the creative adservers
+        otherAssetsBytes:
+          type: integer
+          example: 15000
+          description: Metadata, text, html, etc.
+        is3PServed:
+          type: boolean
+          example: true
+          description: Does this ad format expect/support the creative to be served by a third party ad
+            server
+    AdFormat:
+      type: string
+      example: generic-instream-video
+      description: The identifier for either a platform ad format or vendor-provided ad format
+    CreativeVendor:
+      type: string
+      example: YouTube
+      description: The name of vendor organization that owns the ad format. Should not be provided for
+        platform ad formats.
+    BroadcastMethod:
+      type: string
+      enum:
+      - ota
+      - cable
+      - satellite
+      - iptv
+      - am
+      - fm
+      example: ota
+      description: Signal delivery method
+    MeasureResponseFields:
+      type: string
+      enum:
+      - all
+      - emissionsBreakdown
+      - coverage
+      - policies
+      description: Specify the row level output fields to be returned. By default, only totalEmissions,
+        inventoryCoverage, and error fields are returned.
+    DailyDeliveryRow:
+      type: object
+      required:
+      - utcDatetime
+      properties:
+        rowIdentifier:
+          type: string
+          example: nytimes
+          description: An identifier for this row to be used in the response.
+        impressions:
+          type: integer
+          example: 13821
+        utcDatetime:
+          $ref: '#/components/schemas/DatetimeInput'
+        inventoryId:
+          $ref: '#/components/schemas/InventoryIdentifier'
+        appStore:
+          $ref: '#/components/schemas/AppStore'
+        country:
+          $ref: '#/components/schemas/CountryInput'
+        region:
+          $ref: '#/components/schemas/RegionInput'
+        deviceType:
+          $ref: '#/components/schemas/DeviceTypeInput'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        network:
+          $ref: '#/components/schemas/NetworkInput'
+        creative:
+          $ref: '#/components/schemas/CreativeInput'
+        sellerDomain:
+          $ref: '#/components/schemas/SellerDomain'
+        sellerName:
+          $ref: '#/components/schemas/SellerName'
+        buyingMethod:
+          $ref: '#/components/schemas/BuyingMethod'
+        dealId:
+          $ref: '#/components/schemas/DealId'
+        globalPlacementId:
+          type: string
+          description: This is a publisher-specified placement identifier that is passed unchanged by
+            all supply-side platforms.
+        venueCategory:
+          $ref: '#/components/schemas/VenueCategory'
+        plays:
+          $ref: '#/components/schemas/Plays'
+        views:
+          $ref: '#/components/schemas/Views'
+        playDuration:
+          $ref: '#/components/schemas/PlayDuration'
+        mediaOwner:
+          $ref: '#/components/schemas/MediaOwner'
+        compensationRate:
+          type: number
+          format: double
+          example: 0.05
+          description: The rate at which emissions are compensated. Greater than or equal to zero. If
+            not provided, the reporting customer's compensation rules will be used.
+        isApp:
+          type: boolean
+          example: true
+          description: Whether the inventory is an app.
+        broadcastMethod:
+          $ref: '#/components/schemas/BroadcastMethod'
+        uniqueReach:
+          type: integer
+          example: 203043
+          description: Number of unique individuals reached.
+        averageFrequency:
+          type: number
+          example: 176
+          description: Average number of times each individual has seen the ad.
+        displayDurationDays:
+          type: integer
+          example: 30
+          description: Number of days the classic-ooh ad was displayed.
+        campaignStartDate:
+          $ref: '#/components/schemas/DatetimeInput'
+        campaignEndDate:
+          $ref: '#/components/schemas/DatetimeInput'
+        shareOfTimePct:
+          type: number
+          format: double
+          example: 50
+          description: Share of time the ad was visible on the classic-ooh screen as a percentage (0-100).
+        physicalWidthMeters:
+          type: number
+          format: double
+          example: 2.5
+          description: Physical width of the classic-ooh ad in meters.
+        physicalHeightMeters:
+          type: number
+          format: double
+          example: 3
+          description: Physical height of the classic-ooh ad in meters.
+        printMedium:
+          $ref: '#/components/schemas/PrintMedium'
+        printCirculations:
+          type: integer
+          example: 50000
+          description: Number of copies distributed for the print campaign.
+    CalculateOutputRow:
+      type: object
+      required:
+      - inventoryCoverage
+      properties:
+        rowIdentifier:
+          type: string
+          description: Row identifier associated with these emissions based on the request input
+          example: '1'
+        inventoryCoverage:
+          $ref: '#/components/schemas/InventoryCoverageEnum'
+        totalEmissions:
+          type: number
+          format: double
+          example: 0.45
+          description: Total footprint of the campaign in grams of CO₂e.
+        error:
+          $ref: '#/components/schemas/Error'
+        coverage:
+          $ref: '#/components/schemas/MeasureResponseRowCoverage'
+        emissionsBreakdown:
+          $ref: '#/components/schemas/MeasureResponseRowEmissions'
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+    SupplyGraph:
+      type: object
+      required:
+      - logical
+      - technical
+      properties:
+        totalCount:
+          type: integer
+          example: 8
+          description: Number of times matched seller appears in supply chain emissions graph, or the
+            count of all property ads txt nodes
+        logical:
+          $ref: '#/components/schemas/LogicalSupplyGraph'
+        technical:
+          $ref: '#/components/schemas/TechnicalSupplyGraph'
+      description: Ad selection graph seller depth information. [Programmatic Insights customers only]
+    LogicalSupplyGraph:
+      type: object
+      properties:
+        minDepth:
+          type: integer
+          example: 1
+          description: Minimum depth of ad selection path to the matched seller OR the maximum depth of
+            all property ads txt nodes Based on the minimum depth, buying method and seller type.
+        maxDepth:
+          type: integer
+          example: 5
+          description: Maximum depth of ad selection path to the matched seller OR the maximum depth of
+            all property ads txt nodes Based on the maximum depth, buying method and seller type.
+        averageDepth:
+          type: number
+          format: double
+          example: 3
+          description: Average depth of ad selection path to the matched seller OR the maximum depth of
+            all property ads txt nodes Based on the average depth, buying method and seller type.
+      description: Logical information calculates depth based on the full ad selection graph.
+    TechnicalSupplyGraph:
+      type: object
+      properties:
+        minDepth:
+          type: integer
+          example: 1
+          description: Minimum depth of ad selection path to the matched seller OR the maximum depth of
+            all property ads txt nodes Based on the minimum depth, buying method and seller type.
+        maxDepth:
+          type: integer
+          example: 5
+          description: Maximum depth of ad selection path to the matched seller OR the maximum depth of
+            all property ads txt nodes Based on the maximum depth, buying method and seller type.
+        averageDepth:
+          type: number
+          format: double
+          example: 3
+          description: Average depth of ad selection path to the matched seller OR the maximum depth of
+            all property ads txt nodes Based on the average depth, buying method and seller type.
+      description: Technical information ignores ad selection graph passthrough nodes. The calculated
+        depth only uses nodes that very directly involved in the ad selection process.
+    MeasureRequest:
+      type: object
+      required:
+      - rows
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyDeliveryRow'
+    MeasureResponse:
+      type: object
+      required:
+      - totalEmissions
+      - totalEmissionsBreakdown
+      - coverage
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        totalEmissions:
+          type: number
+          format: double
+          example: 2823.9
+          description: The total emissions in grams of CO₂e
+        rows:
+          description: Only included if the includeRows parameter is true.
+          type: array
+          items:
+            $ref: '#/components/schemas/CalculateOutputRow'
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/SummaryPolicy'
+        totalEmissionsBreakdown:
+          $ref: '#/components/schemas/MeasureResponseEmissionsBreakdown'
+        coverage:
+          $ref: '#/components/schemas/MeasureResponseCoverage'
+    RequestId:
+      type: string
+      description: Auto generated request identifier
+    Error:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+    MeasureResponseEmissionsBreakdown:
+      type: object
+      required:
+      - framework
+      - totals
+      properties:
+        framework:
+          $ref: '#/components/schemas/Framework'
+        totals:
+          oneOf:
+          - $ref: '#/components/schemas/Scope3MeasureResponseEmissionsBreakdownDetails'
+          - $ref: '#/components/schemas/Scope3ConsumerDeviceMeasureResponseEmissionsBreakdownDetails'
+          - $ref: '#/components/schemas/GMSFMeasureResponseEmissionsBreakdownDetails'
+    Scope3MeasureResponseEmissionsBreakdownDetails:
+      type: object
+      properties:
+        mediaDistribution:
+          type: number
+          format: double
+          example: 0.15
+          description: Total media distribution emissions in grams of CO₂e
+        adSelection:
+          type: number
+          format: double
+          example: 0.15
+          description: Total ad selection emissions in grams of CO₂e
+        creativeDelivery:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative delivery emissions in grams of CO₂e
+        compensated:
+          type: number
+          format: double
+          example: 0.15
+          description: Total compensated emissions in grams of CO₂e
+        techManipulation:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        disposal:
+          type: number
+          format: double
+          example: 0.15
+          description: Total disposal emissions in grams of CO₂e
+    Scope3ConsumerDeviceMeasureResponseEmissionsBreakdownDetails:
+      type: object
+      properties:
+        mediaDistribution:
+          type: number
+          format: double
+          example: 0.15
+          description: Total media distribution emissions in grams of CO₂e
+        adSelection:
+          type: number
+          format: double
+          example: 0.15
+          description: Total ad selection emissions in grams of CO₂e
+        creativeDelivery:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative delivery emissions in grams of CO₂e
+        compensated:
+          type: number
+          format: double
+          example: 0.15
+          description: Total compensated emissions in grams of CO₂e
+        techManipulation:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        disposal:
+          type: number
+          format: double
+          example: 0.15
+          description: Total disposal emissions in grams of CO₂e
+    GMSFMeasureResponseEmissionsBreakdownDetails:
+      type: object
+      properties:
+        adSelection:
+          type: number
+          format: double
+          example: 0.15
+          description: Total ad selection emissions in grams of CO₂e
+        creativeDelivery:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative delivery emissions in grams of CO₂e
+        compensated:
+          type: number
+          format: double
+          example: 0.15
+          description: Total compensated emissions in grams of CO₂e
+        techManipulation:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        disposal:
+          type: number
+          format: double
+          example: 0.15
+          description: Total disposal emissions in grams of CO₂e
+    MeasureResponseCoverage:
+      type: object
+      required:
+      - totalImpressions
+      - totalRows
+      properties:
+        totalImpressions:
+          $ref: '#/components/schemas/SummaryMetric'
+        totalRows:
+          $ref: '#/components/schemas/SummaryMetric'
+        sellers:
+          $ref: '#/components/schemas/VerifiedSummaryMetric'
+        properties:
+          $ref: '#/components/schemas/VerifiedSummaryMetric'
+        channels:
+          $ref: '#/components/schemas/MatchSummaryMetric'
+        mediaOwners:
+          $ref: '#/components/schemas/VerifiedSummaryMetric'
+        adFormats:
+          $ref: '#/components/schemas/AdFormatSummaryMetric'
+    AdFormatSummaryMetric:
+      type: object
+      required:
+      - metric
+      - vendorSpecific
+      - generic
+      - unknown
+      properties:
+        metric:
+          $ref: '#/components/schemas/Metric'
+        vendorSpecific:
+          type: integer
+          example: 8
+        generic:
+          type: integer
+          example: 25
+        unknown:
+          type: integer
+          example: 2
+    VerifiedSummaryMetric:
+      type: object
+      required:
+      - metric
+      - modeled
+      - unknown
+      properties:
+        metric:
+          $ref: '#/components/schemas/Metric'
+        modeled:
+          type: integer
+          example: 8132
+        unknown:
+          type: integer
+          example: 48
+        verifiedRate:
+          type: number
+          format: double
+          example: 25
+    MatchSummaryMetric:
+      type: object
+      required:
+      - metric
+      - modeled
+      - unknown
+      - deprecated
+      properties:
+        metric:
+          $ref: '#/components/schemas/Metric'
+        modeled:
+          type: integer
+          example: 5
+        unknown:
+          type: integer
+          example: 2
+        deprecated:
+          type: integer
+          example: 1
+    SummaryMetric:
+      type: object
+      required:
+      - metric
+      - modeled
+      - skipped
+      properties:
+        metric:
+          $ref: '#/components/schemas/Metric'
+        modeled:
+          type: integer
+          example: 8132
+        skipped:
+          type: integer
+          example: 48
+    Metric:
+      type: string
+      enum:
+      - impressions
+      - rows
+      - uniqueCount
+    SummaryPolicy:
+      type: object
+      required:
+      - policy
+      - policyOwner
+      - compliant
+      - noncompliant
+      properties:
+        policy:
+          type: string
+          example: climateRisk
+          description: Policy that was matched.
+        policyOwner:
+          type: string
+          example: Scope3
+          description: Owner of the policy that was matched.
+        compliant:
+          type: integer
+          example: 123
+          description: Number of impressions in compliance with the policy
+        noncompliant:
+          type: integer
+          example: 4321
+          description: Number of impressions not in compliance with the policy
+    Policy:
+      type: object
+      required:
+      - policy
+      - policyOwner
+      - compliant
+      properties:
+        policy:
+          type: string
+          example: climateRisk
+          description: Policy that was matched.
+        policyOwner:
+          type: string
+          example: Scope3
+          description: Owner of the policy that was matched.
+        compliant:
+          type: boolean
+          example: true
+          description: Whether the calculated emissions are in compliance with the policy or not.
+    MeasureResponseRowCoverage:
+      type: object
+      required:
+      - impressions
+      properties:
+        impressions:
+          $ref: '#/components/schemas/ImpressionsCoverageDetails'
+        seller:
+          $ref: '#/components/schemas/CoverageDetails'
+        property:
+          $ref: '#/components/schemas/CoverageDetails'
+        channel:
+          $ref: '#/components/schemas/CoverageDetails'
+        mediaOwner:
+          $ref: '#/components/schemas/CoverageDetails'
+        venueCategory:
+          $ref: '#/components/schemas/CoverageDetails'
+        adFormat:
+          $ref: '#/components/schemas/AdFormatCoverageDetails'
+        supplyGraph:
+          $ref: '#/components/schemas/SupplyGraph'
+        compensationProvider:
+          $ref: '#/components/schemas/CoverageDetails'
+        inventoryClassification:
+          $ref: '#/components/schemas/CoverageDetails'
+    MeasureResponseRowEmissions:
+      type: object
+      required:
+      - framework
+      - breakdown
+      properties:
+        framework:
+          $ref: '#/components/schemas/Framework'
+        breakdown:
+          oneOf:
+          - $ref: '#/components/schemas/Scope3MeasureResponseRowEmissionsBreakdown'
+          - $ref: '#/components/schemas/Scope3ConsumerDeviceMeasureResponseRowEmissionsBreakdown'
+          - $ref: '#/components/schemas/GMSFMeasureResponseRowEmissionsBreakdown'
+    Framework:
+      type: string
+      enum:
+      - scope3
+      - scope3-consumer-device
+      - gmsf
+      example: scope3
+      description: GMSF framework support is currently in beta.
+    Scope3MeasureResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        compensated:
+          $ref: '#/components/schemas/Scope3CompensatedEmissionsBreakdown'
+        mediaDistribution:
+          $ref: '#/components/schemas/Scope3MediaDistributionEmissionsBreakdown'
+        adSelection:
+          $ref: '#/components/schemas/Scope3AdSelectionEmissionsBreakdown'
+        creativeDelivery:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3TechManipulationEmissionsBreakdown'
+        disposal:
+          $ref: '#/components/schemas/Scope3DisposalEmissionsBreakdown'
+    Scope3ConsumerDeviceMeasureResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        compensated:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCompensatedEmissionsBreakdown'
+        mediaDistribution:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceMediaDistributionEmissionsBreakdown'
+        adSelection:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceAdSelectionEmissionsBreakdown'
+        creativeDelivery:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3TechManipulationEmissionsBreakdown'
+        disposal:
+          $ref: '#/components/schemas/Scope3DisposalEmissionsBreakdown'
+    GMSFMeasureResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        compensated:
+          $ref: '#/components/schemas/GMSFCompensatedEmissionsBreakdown'
+        adSelection:
+          $ref: '#/components/schemas/GMSFAdSelectionEmissionsBreakdown'
+        creativeDelivery:
+          $ref: '#/components/schemas/GMSFCreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/GMSFTechManipulationEmissionsBreakdown'
+        disposal:
+          $ref: '#/components/schemas/GMSFDisposalEmissionsBreakdown'
+    Scope3CompensatedEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total compensated emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3CompensatedEmissionsBreakdownDetails'
+    Scope3CompensatedEmissionsBreakdownDetails:
+      type: object
+      required:
+      - compensation
+      properties:
+        compensation:
+          $ref: '#/components/schemas/Scope3CompensatedEmissions'
+    Scope3CompensatedEmissions:
+      type: object
+      required:
+      - emissions
+      - provider
+      properties:
+        emissions:
+          type: number
+          format: double
+          example: 0.15
+          description: Emissions compensated by the provider in grams of CO₂e.
+        provider:
+          type: string
+          example: Carbon Direct
+    Scope3ConsumerDeviceCompensatedEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total compensated emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCompensatedEmissionsBreakdownDetails'
+    Scope3ConsumerDeviceCompensatedEmissionsBreakdownDetails:
+      type: object
+      required:
+      - compensation
+      properties:
+        compensation:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCompensatedEmissions'
+    Scope3ConsumerDeviceCompensatedEmissions:
+      type: object
+      required:
+      - emissions
+      - provider
+      properties:
+        emissions:
+          type: number
+          format: double
+          example: 0.15
+          description: Emissions compensated by the provider in grams of CO₂e.
+        provider:
+          type: string
+          example: Carbon Direct
+    GMSFCompensatedEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total compensated emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/GMSFCompensatedEmissionsBreakdownDetails'
+    GMSFCompensatedEmissionsBreakdownDetails:
+      type: object
+      required:
+      - compensation
+      properties:
+        compensation:
+          $ref: '#/components/schemas/GMSFCompensatedEmissions'
+    GMSFCompensatedEmissions:
+      type: object
+      required:
+      - emissions
+      - provider
+      properties:
+        emissions:
+          type: number
+          format: double
+          example: 0.15
+          description: Emissions compensated by the provider in grams of CO₂e.
+        provider:
+          type: string
+          example: Carbon Direct
+    Scope3MediaDistributionEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total media distribution emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3MediaDistributionEmissionsBreakdownDetails'
+    Scope3MediaDistributionEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        corporate:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    Scope3ConsumerDeviceMediaDistributionEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total media distribution emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceMediaDistributionEmissionsBreakdownDetails'
+    Scope3ConsumerDeviceMediaDistributionEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        corporate:
+          $ref: '#/components/schemas/Emissions'
+        consumerDevice:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    Emissions:
+      type: object
+      required:
+      - emissions
+      properties:
+        emissions:
+          type: number
+          format: double
+          example: 0.15
+    Scope3AdSelectionEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total ad selection emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3AdSelectionEmissionsBreakdownDetails'
+    Scope3AdSelectionEmissionsBreakdownDetails:
+      type: object
+      properties:
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+    Scope3ConsumerDeviceAdSelectionEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total ad selection emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceAdSelectionEmissionsBreakdownDetails'
+    Scope3ConsumerDeviceAdSelectionEmissionsBreakdownDetails:
+      type: object
+      properties:
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+    GMSFAdSelectionEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total ad selection emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/GMSFAdSelectionEmissionsBreakdownDetails'
+    GMSFAdSelectionEmissionsBreakdownDetails:
+      type: object
+      properties:
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+    Scope3CreativeDeliveryEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative Delivery emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryEmissionsBreakdownDetails'
+    Scope3CreativeDeliveryEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        outdoorDisplay:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative Delivery emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdownDetails'
+    Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        consumerDevice:
+          $ref: '#/components/schemas/Emissions'
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        outdoorDisplay:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    GMSFCreativeDeliveryEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total creative Delivery emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/GMSFCreativeDeliveryEmissionsBreakdownDetails'
+    GMSFCreativeDeliveryEmissionsBreakdownDetails:
+      type: object
+      properties:
+        dataTransfer:
+          $ref: '#/components/schemas/Emissions'
+        consumerDevice:
+          $ref: '#/components/schemas/Emissions'
+        adPlatform:
+          $ref: '#/components/schemas/Emissions'
+        outdoorDisplay:
+          $ref: '#/components/schemas/Emissions'
+        storageAndTransport:
+          $ref: '#/components/schemas/Emissions'
+    Scope3TechManipulationEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3TechManipulationEmissionsBreakdownDetails'
+    Scope3TechManipulationEmissionsBreakdownDetails:
+      type: object
+      properties:
+        creativeStorage:
+          $ref: '#/components/schemas/Emissions'
+        physicalProduction:
+          $ref: '#/components/schemas/Emissions'
+        mediaPhysicalProduction:
+          $ref: '#/components/schemas/Emissions'
+    GMSFTechManipulationEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/GMSFTechManipulationEmissionsBreakdownDetails'
+    GMSFTechManipulationEmissionsBreakdownDetails:
+      type: object
+      properties:
+        creativeStorage:
+          $ref: '#/components/schemas/Emissions'
+        physicalProduction:
+          $ref: '#/components/schemas/Emissions'
+        creativeTranscoding:
+          $ref: '#/components/schemas/Emissions'
+    Scope3DisposalEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3DisposalEmissionsBreakdownDetails'
+    Scope3DisposalEmissionsBreakdownDetails:
+      type: object
+      properties:
+        adMaterial:
+          $ref: '#/components/schemas/Emissions'
+        other:
+          $ref: '#/components/schemas/Emissions'
+        media:
+          $ref: '#/components/schemas/Emissions'
+    GMSFDisposalEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/GMSFDisposalEmissionsBreakdownDetails'
+    GMSFDisposalEmissionsBreakdownDetails:
+      type: object
+      properties:
+        adMaterial:
+          $ref: '#/components/schemas/Emissions'
+        other:
+          $ref: '#/components/schemas/Emissions'
+    ImpressionsCoverageDetails:
+      type: object
+      required:
+      - modeled
+      - skipped
+      - processed
+      properties:
+        modeled:
+          type: integer
+          example: 80
+          description: Number of impressions that were modeled for this row for this row.
+        skipped:
+          type: integer
+          example: 10
+          description: Number of impressions that were skipped for this row.
+        processed:
+          type: integer
+          example: 80
+          description: Number of impressions that were processed for this row. For DOOH channel this is
+            derived from plays if impressions are not provided. For all other channels and cases this
+            is equal to the input impressions.
+    CoverageDetails:
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: string
+        verified:
+          type: boolean
+          example: true
+    AdFormatCoverageDetails:
+      type: object
+      required:
+      - value
+      - name
+      properties:
+        value:
+          type: string
+        name:
+          type: string
+        vendor:
+          type: string
+        verified:
+          type: boolean
+          example: true
+    CreativeRequest:
+      type: object
+      required:
+      - rows
+      properties:
+        rows:
+          type: array
+          minLength: 1
+          items:
+            $ref: '#/components/schemas/CreativeRequestRow'
+    CreativeRequestRow:
+      type: object
+      required:
+      - impressions
+      - utcDatetime
+      - country
+      - channel
+      - creative
+      properties:
+        rowIdentifier:
+          type: string
+          example: '1'
+          description: An identifier for this row to be used in the response.
+        impressions:
+          type: integer
+          example: 13821
+        utcDatetime:
+          $ref: '#/components/schemas/DatetimeInput'
+        country:
+          $ref: '#/components/schemas/CountryInput'
+        region:
+          $ref: '#/components/schemas/RegionInput'
+        network:
+          $ref: '#/components/schemas/NetworkInput'
+        deviceType:
+          $ref: '#/components/schemas/DeviceTypeInput'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        views:
+          $ref: '#/components/schemas/Views'
+        plays:
+          $ref: '#/components/schemas/Plays'
+        globalPlacementId:
+          type: string
+          description: This is a publisher-specified placement identifier that is passed unchanged by
+            all supply-side platforms.
+        creative:
+          $ref: '#/components/schemas/CreativeInput'
+        venueCategory:
+          $ref: '#/components/schemas/VenueCategory'
+        mediaOwner:
+          $ref: '#/components/schemas/MediaOwner'
+        displayDurationDays:
+          type: integer
+          example: 30
+          description: Number of days the classic-ooh ad was displayed.
+        campaignStartDate:
+          $ref: '#/components/schemas/DatetimeInput'
+        campaignEndDate:
+          $ref: '#/components/schemas/DatetimeInput'
+        shareOfTimePct:
+          type: number
+          format: double
+          example: 50
+          description: Share of time the ad was visible on the classic-ooh screen as a percentage (0-100).
+        physicalWidthMeters:
+          type: number
+          format: double
+          example: 2.5
+          description: Physical width of the classic-ooh ad in meters.
+        physicalHeightMeters:
+          type: number
+          format: double
+          example: 3
+          description: Physical height of the classic-ooh ad in meters.
+        printMedium:
+          $ref: '#/components/schemas/PrintMedium'
+        printCirculations:
+          type: integer
+          example: 50000
+          description: Number of copies distributed for the print campaign.
+    CreativeResponse:
+      type: object
+      required:
+      - totalEmissions
+      - coverage
+      - totalEmissionsBreakdown
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        totalEmissions:
+          type: number
+          format: double
+          example: 0.45
+          description: Sum of emissions of all rows.
+        rows:
+          description: Only included if the includeRows parameter is true.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeResponseRow'
+        totalEmissionsBreakdown:
+          $ref: '#/components/schemas/CreativeResponseEmissionsBreakdown'
+        coverage:
+          $ref: '#/components/schemas/CreativeResponseCoverage'
+    CreativeResponseEmissionsBreakdown:
+      type: object
+      required:
+      - framework
+      - totals
+      properties:
+        framework:
+          $ref: '#/components/schemas/Framework'
+        totals:
+          oneOf:
+          - $ref: '#/components/schemas/Scope3CreativeResponseEmissionsBreakdownDetails'
+          - $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeResponseEmissionsBreakdownDetails'
+          - $ref: '#/components/schemas/GMSFCreativeResponseEmissionsBreakdownDetails'
+    CreativeResponseCoverage:
+      type: object
+      required:
+      - adFormats
+      - totalImpressions
+      - totalRows
+      - channels
+      properties:
+        totalImpressions:
+          $ref: '#/components/schemas/SummaryMetric'
+        totalRows:
+          $ref: '#/components/schemas/SummaryMetric'
+        channels:
+          $ref: '#/components/schemas/MatchSummaryMetric'
+        adFormats:
+          $ref: '#/components/schemas/AdFormatSummaryMetric'
+    Scope3CreativeResponseEmissionsBreakdownDetails:
+      type: object
+      required:
+      - creativeDelivery
+      properties:
+        creativeDelivery:
+          type: number
+          format: double
+          example: 123.45
+        techManipulation:
+          type: number
+          format: double
+          example: 7.89
+    Scope3ConsumerDeviceCreativeResponseEmissionsBreakdownDetails:
+      type: object
+      required:
+      - creativeDelivery
+      properties:
+        creativeDelivery:
+          type: number
+          format: double
+          example: 123.45
+        techManipulation:
+          type: number
+          format: double
+          example: 7.89
+    GMSFCreativeResponseEmissionsBreakdownDetails:
+      type: object
+      required:
+      - creativeDelivery
+      properties:
+        creativeDelivery:
+          type: number
+          format: double
+          example: 123.45
+        techManipulation:
+          type: number
+          format: double
+          example: 7.89
+    CreativeResponseRow:
+      type: object
+      properties:
+        rowIdentifier:
+          type: string
+          example: '1'
+          description: An identifier for this row that was provided in the request.
+        totalEmissions:
+          type: number
+          format: double
+          example: 0.45
+          description: Sum of emissions in grams of CO₂e
+        error:
+          type: string
+          description: Error indicating why the row was not processed.
+        coverage:
+          $ref: '#/components/schemas/CreativeResponseRowCoverage'
+        emissionsBreakdown:
+          $ref: '#/components/schemas/CreativeResponseRowEmissions'
+    CreativeResponseRowCoverage:
+      type: object
+      properties:
+        adFormat:
+          $ref: '#/components/schemas/AdFormatCoverageDetails'
+    CreativeResponseRowEmissions:
+      type: object
+      required:
+      - framework
+      - breakdown
+      properties:
+        framework:
+          $ref: '#/components/schemas/Framework'
+        breakdown:
+          oneOf:
+          - $ref: '#/components/schemas/Scope3CreativeResponseRowEmissionsBreakdown'
+          - $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeResponseRowEmissionsBreakdown'
+          - $ref: '#/components/schemas/GMSFCreativeResponseRowEmissionsBreakdown'
+    Scope3CreativeResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        creativeDelivery:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdown'
+    Scope3ConsumerDeviceCreativeResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        creativeDelivery:
+          $ref: '#/components/schemas/Scope3ConsumerDeviceCreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdown'
+    GMSFCreativeResponseRowEmissionsBreakdown:
+      type: object
+      properties:
+        creativeDelivery:
+          $ref: '#/components/schemas/GMSFCreativeDeliveryEmissionsBreakdown'
+        techManipulation:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdown'
+    Scope3CreativeDeliveryTechManipulationEmissionsBreakdown:
+      type: object
+      required:
+      - total
+      - breakdown
+      properties:
+        total:
+          type: number
+          format: double
+          example: 0.15
+          description: Total tech manipulation emissions in grams of CO₂e
+        breakdown:
+          $ref: '#/components/schemas/Scope3CreativeDeliveryTechManipulationEmissionsBreakdownDetails'
+    Scope3CreativeDeliveryTechManipulationEmissionsBreakdownDetails:
+      type: object
+      properties:
+        creativeStorage:
+          $ref: '#/components/schemas/Emissions'
+        physicalProduction:
+          $ref: '#/components/schemas/Emissions'
+    BenchmarksRequest:
+      type: object
+      required:
+      - country
+      - channel
+      properties:
+        country:
+          $ref: '#/components/schemas/CountryInput'
+        channel:
+          $ref: '#/components/schemas/ChannelWithBenchmarks'
+        month:
+          type: string
+          description: 'Year-month which specifies which month''s benchmarks to use. (Supported Formats:
+            YYYY-MM, YYYYMM, or YYYY/MM)'
+          example: 2023-04
+    ChannelWithBenchmarks:
+      type: string
+      enum:
+      - app
+      - web
+      - streaming-video
+      - social
+      - ctv-bvod
+      example: web
+    BenchmarksResponse:
+      type: object
+      required:
+      - benchmarks
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        benchmarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenchmarkInformation'
+    BenchmarkInformation:
+      type: object
+      required:
+      - percentile
+      - adSelectionAndMediaDistributionEmissionsPerImpression
+      - adSelectionEmissionsPerImpression
+      properties:
+        percentile:
+          type: integer
+          example: 80
+        adSelectionAndMediaDistributionEmissionsPerImpression:
+          type: number
+          format: double
+          example: 1.67
+          description: Ad tech and media distribution emissions in grams of CO₂e including servers and
+            cloud computing; analytics; network traffic; storage; data providers; vendor overhead; content
+            creation.
+        adSelectionEmissionsPerImpression:
+          type: number
+          format: double
+          example: 1.02
+          description: Ad tech emissions in grams of CO₂e.
+    DataUploadStatus:
+      type: string
+      enum:
+      - PENDING
+      - PROCESSING
+      - FAILED
+      - PENDING_REVIEW
+      - SUCCESS
+      - SKIPPED
+      - MANUALLY_IGNORED
+      - REPLACED_BY_REPROCESS
+      description: The status of upload
+    DataUploadInformation:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: integer
+          description: The upload id
+        status:
+          $ref: '#/components/schemas/DataUploadStatus'
+        rowsFailed:
+          type: integer
+          description: Rows that failed to be processed correctly
+        rowsTotal:
+          type: integer
+          description: Total number of rows processed
+        md5:
+          type: string
+          description: Uploaded file md5
+        crc32c:
+          type: string
+          description: Uploaded file crc32c
+        filename:
+          type: string
+          description: Uploaded filename
+        summary:
+          type: object
+          description: Summary of the upload
+        comment:
+          type: string
+          description: Comment for the uploaded file
+        error:
+          type: string
+          description: Error message if upload failed
+    Err:
+      type: object
+      required:
+      - message
+      properties:
+        message:
+          type: string
+    DistributionMethod:
+      type: string
+      enum:
+      - BUCKET_PUSH
+      - API_PULL
+      - INTEGRATION
+      description: The segment distribution method
+    UpdateFrequency:
+      type: string
+      enum:
+      - DAILY
+      - MONTHLY
+      description: The segment update frequency
+    Paging:
+      type: object
+      required:
+      - totalRecords
+      properties:
+        next:
+          type: string
+          description: The url to query for the next page of data
+        previous:
+          type: string
+          description: The url to query for the next page of data
+        totalRecords:
+          type: integer
+          description: The total number of records
+    SegmentList:
+      type: object
+      required:
+      - segments
+      - paging
+      properties:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    Segment:
+      type: object
+      required:
+      - id
+      - name
+      - segmentId
+      - distributionMethod
+      - updateFrequency
+      - propertyLists
+      - placementLists
+      - createdAt
+      properties:
+        id:
+          type: integer
+          description: The internal Scope3 segment id
+        name:
+          type: string
+          description: The segment name
+        segmentId:
+          type: string
+          description: The client segment id
+        partners:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/SegmentPartner'
+          description: The client partners segment information
+        distributionMethod:
+          $ref: '#/components/schemas/DistributionMethod'
+        updateFrequency:
+          $ref: '#/components/schemas/UpdateFrequency'
+        channels:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Channels enabled in the segment - if not populated, all channels are enabled
+        propertyLists:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyList'
+          description: The property lists included in the segment
+        placementLists:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlacementList'
+          description: The placement lists included in the segment
+        fileName:
+          type: string
+          description: The filename template with macros for bucket pushed segment files
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date and time
+          example: '2021-01-30T08:30:00Z'
+        deactivatedAt:
+          type: string
+          format: date-time
+          description: Deactivated date and time
+          example: '2021-01-30T08:30:00Z'
+    SegmentPartner:
+      type: object
+      required:
+      - name
+      - segmentId
+      properties:
+        name:
+          type: string
+          description: The client partner's name
+        segmentId:
+          type: string
+          description: The client partner's segment id
+        seatId:
+          nullable: true
+          type: string
+          description: The client partner's seat id
+    PropertyList:
+      type: object
+      required:
+      - name
+      - countries
+      - isInclusion
+      properties:
+        name:
+          type: string
+          description: The property list name
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries included in the segment
+        isInclusion:
+          type: boolean
+          description: Whether the property list is included or excluded from the segment
+    PlacementList:
+      type: object
+      required:
+      - name
+      - countries
+      properties:
+        name:
+          type: string
+          description: The placement list name
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries included in the segment
+    SegmentDataType:
+      type: string
+      enum:
+      - INCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY_PLACEMENTS
+      description: The segment data type
+    SegmentDataResponse:
+      type: object
+      required:
+      - data
+      - paging
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentData'
+          description: The segment data
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SegmentData:
+      type: object
+      required:
+      - id
+      - segmentId
+      - type
+      - property
+      - channel
+      - country
+      - inventoryId
+      properties:
+        id:
+          type: integer
+          description: The internal Scope3 segment id
+        segmentId:
+          type: string
+          description: The client segment id
+        type:
+          $ref: '#/components/schemas/SegmentDataType'
+        property:
+          type: string
+          description: The property that the inventory belongs to
+        channel:
+          type: string
+          description: The property channel
+        country:
+          type: string
+          description: The country, is not populated applies worldwide
+        inventoryId:
+          type: string
+          description: The inventory identifier
+        appStore:
+          type: string
+          nullable: true
+          description: If the inventory is an app, populated with the the app store
+        gpids:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: The GPIDs excluded for the given property
+    SavedList:
+      type: object
+      required:
+      - id
+      - name
+      - domain_count
+      properties:
+        id:
+          type: string
+          description: The saved list ID
+        name:
+          type: string
+          description: The saved list name
+        domain_count:
+          type: integer
+          description: Number of domains in the list
+    SignalsPage:
+      type: object
+      required:
+      - data
+      - page
+      - page_size
+      - has_more
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MQSignal'
+          description: Domain-level MQ signals for this page
+        page:
+          type: integer
+          description: Current page number (1-based)
+        page_size:
+          type: integer
+          description: Number of results per page requested
+        has_more:
+          type: boolean
+          description: Whether additional pages of results exist
+    MQSignal:
+      type: object
+      required:
+      - domain
+      properties:
+        domain:
+          type: string
+          description: The web property domain
+        traffic_percentile:
+          type: number
+          nullable: true
+          description: Traffic percentile rank of the domain
+        is_mfa:
+          type: boolean
+          nullable: true
+          description: Whether the domain is classified as Made for Advertising
+        avg_a2cr:
+          type: number
+          nullable: true
+          description: Average ad-to-content ratio
+        max_a2cr:
+          type: number
+          nullable: true
+          description: Maximum ad-to-content ratio
+        avg_ads_in_view:
+          type: number
+          nullable: true
+          description: Average number of ads in view at one time
+        max_ads_in_view:
+          type: number
+          nullable: true
+          description: Maximum number of ads in view at one time
+        avg_num_sellers:
+          type: number
+          nullable: true
+          description: Average number of sellers in the supply chain
+        avg_num_nodes:
+          type: number
+          nullable: true
+          description: Average number of nodes in the supply chain
+        domain_avg_refresh_rate:
+          type: number
+          nullable: true
+          description: Average ad refresh rate for the domain
+        pct_placements_refreshed:
+          type: number
+          nullable: true
+          description: Percentage of placements that are refreshed
+        avg_a2cr_in_feed:
+          type: number
+          nullable: true
+          description: Average ad-to-content ratio for in-feed placements
+        avg_ads_in_view_in_feed:
+          type: number
+          nullable: true
+          description: Average ads in view for in-feed placements
+        pct_high_viewport_ad:
+          type: number
+          nullable: true
+          description: Percentage of ads in high viewport positions
+        pct_invalid_ads:
+          type: number
+          nullable: true
+          description: Percentage of invalid ad impressions
+        pct_organic_search_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from organic search
+        pct_organic_referral_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from organic referrals
+        pct_social_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from social media
+        pct_ad_network_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from ad networks
+        pct_marketplace_referral_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from marketplace referrals
+        pct_messaging_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from messaging platforms
+        pct_email_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from email
+        pct_ai_assistant_traffic:
+          type: number
+          nullable: true
+          description: Percentage of traffic from AI assistants
+        top_geos:
+          type: string
+          nullable: true
+          description: Pipe-delimited list of top geographic markets (e.g. "US | GB | DE")
+        primary_language:
+          type: string
+          nullable: true
+          description: Primary language of the domain's content
+        avg_viewability:
+          type: number
+          nullable: true
+          description: Average viewability rate
+        total_gpids:
+          type: number
+          nullable: true
+          description: Total number of unique GPIDs observed on the domain
+        eid_rate:
+          type: number
+          nullable: true
+          description: Extended ID availability rate
+        avg_page_height:
+          type: number
+          nullable: true
+          description: Average page height in pixels
+        avg_initial_page_weight_bytes:
+          type: number
+          nullable: true
+          description: Average initial page weight in bytes
+        avg_final_page_weight_bytes:
+          type: number
+          nullable: true
+          description: Average final page weight in bytes after all resources load
+        avg_initial_cpu:
+          type: number
+          nullable: true
+          description: Average initial CPU usage
+        avg_final_cpu:
+          type: number
+          nullable: true
+          description: Average final CPU usage after all resources load
+        avg_initial_network_calls_count:
+          type: number
+          nullable: true
+          description: Average number of network calls at initial page load
+        avg_final_network_calls_count:
+          type: number
+          nullable: true
+          description: Average number of network calls after all resources load
+        missing_ads_text:
+          type: boolean
+          nullable: true
+          description: Whether ads.txt entries are missing for known sellers
+        old_ads_text:
+          type: boolean
+          nullable: true
+          description: Whether ads.txt file has not been updated recently
+        avg_depth:
+          type: number
+          nullable: true
+          description: Average depth of the supply chain
+        max_depth:
+          type: number
+          nullable: true
+          description: Maximum depth of the supply chain

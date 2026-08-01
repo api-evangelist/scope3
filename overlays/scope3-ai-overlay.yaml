@@ -1,0 +1,14 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Scope3 AI Impact Measurement API
+  version: 1.0.0
+extends: openapi/scope3-ai-openapi-original.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provenance: Verbatim published spec (scope3data/scope3ai-py tests/api-mocks/aiapi.yaml).
+      x-api-base-url: https://aiapi.scope3.com
+      x-authentication: authentication/scope3-authentication.yml
+      x-error-catalog: errors/scope3-problem-types.yml
+      x-data-model: data-model/scope3-data-model.yml
+      x-sdk: "pip install scope3ai"

@@ -1,0 +1,16 @@
+generated: '2026-07-21'
+method: searched
+source: https://github.com/scope3data/agentic-client
+environments:
+  - name: production
+    base_url: https://api.agentic.scope3.com
+    dashboard: https://agentic.scope3.com
+  - name: staging
+    base_url: https://api.agentic.staging.scope3.com
+    note: Dedicated staging environment for the Agentic Platform; select via `scope3 config set environment staging` or the SDK environment option.
+notes: >-
+  Scope3 separates production and staging Agentic Platform environments, each with its own
+  API keys obtained from the dashboard. No published magic test values, test cards, or
+  fixture tokens were found for the measurement or AI APIs (API access is granted per
+  customer by a Scope3 representative). Never invent test values.
+test_values: []

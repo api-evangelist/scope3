@@ -1,0 +1,104 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/scope3-ai-openapi-original.yml, openapi/scope3-measurement-openapi.yml
+entities:
+- name: Model
+  api: ai
+  id_field: modelId
+  notes: An AI model tracked for impact; has aliases and belongs to a Family.
+- name: Node
+  api: ai
+  id_field: nodeId
+  notes: Compute node hosting inference.
+- name: GPU
+  api: ai
+  id_field: gpuId
+  notes: GPU hardware profile used in energy/impact modeling.
+- name: Impact
+  api: ai
+  notes: Computed environmental impact (energy Wh, gCO2e, mLH2O) for an inference row.
+- name: Advertiser
+  api: agentic
+  notes: Buyer entity with conversionEvents, creativeSets, audiences, catalogs, propertyLists.
+- name: Campaign
+  api: agentic
+  notes: Discovery/performance campaign with creatives and media buys.
+- name: Bundle
+  api: agentic
+  notes: Product bundle discovered/browsed and attached to a campaign.
+- name: Storefront
+  api: agentic
+  notes: Publisher/seller entity with inventorySources, agents, billing.
+- name: Segment
+  api: measurement
+  id_field: segmentId
+  notes: Organization data segment.
+- name: SavedList
+  api: measurement
+  id_field: saved_list_id
+  notes: Property list with domain-level media-quality signals.
+relationships:
+- from: Model
+  type: has_many
+  to: Alias
+  via: alias
+- from: Impact
+  type: belongs_to
+  to: Model
+  via: modelId
+- from: Advertiser
+  type: has_many
+  to: Campaign
+  via: advertiserId
+- from: Campaign
+  type: has_many
+  to: Creative
+  via: campaignId
+- from: Campaign
+  type: belongs_to
+  to: Bundle
+  via: bundleId
+- from: Storefront
+  type: has_many
+  to: InventorySource
+  via: storefrontId
+- from: SavedList
+  type: has_many
+  to: Signal
+  via: saved_list_id
+- from: Segment
+  type: belongs_to
+  to: Organization
+  via: organization
+ai_schema_inventory:
+- StatusResponse
+- ModelResponse
+- NodeResponse
+- NodeCreateRequest
+- NodeUpdateRequest
+- GPUResponse
+- ModelCreateRequest
+- ModelUpdateRequest
+- GPUCreateRequest
+- GPUUpdateRequest
+- ImpactBigQueryRequest
+- ImpactBigQueryResponse
+- ImpactBigQueryError
+- ImpactRequest
+- ImpactRow
+- Model
+- ImpactResponse
+- ModeledRow
+- ImpactMetrics
+- DebugInfo
+- PredictionStep
+- Error
+- GridMix
+- Node
+- GPU
+- Image
+- Task
+- Family
+- DataType
+- CountryCode
+- RegionCode

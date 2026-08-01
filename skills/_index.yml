@@ -1,0 +1,23 @@
+generated: '2026-07-21'
+method: searched
+skills:
+  - file: scope3-agentic-buyer.md
+    name: scope3-agentic-buyer
+    method: searched
+    source: https://api.agentic.scope3.com/api/v2/buyer/skill.md
+    description: Provider-published Agent Skill for the Scope3 Agentic Buyer API (AI-powered programmatic advertising, inventory discovery, campaign & creative orchestration via MCP).
+  - file: scope3-agentic-storefront.md
+    name: scope3-agentic-storefront
+    method: searched
+    source: https://api.agentic.scope3.com/api/v2/storefront/skill.md
+    description: Provider-published Agent Skill for the Scope3 Agentic Storefront API (publisher/seller integrations, inventory sources, approvals, billing).
+  - file: scope3-measure-campaign-emissions.md
+    name: Measure advertising campaign emissions
+    method: generated
+    api: openapi/scope3-measurement-openapi.yml
+    operations: [measure, creative, benchmarks]
+  - file: scope3-track-ai-impact.md
+    name: Track AI inference environmental impact
+    method: generated
+    api: openapi/scope3-ai-openapi-original.yml
+    operations: [getImpact, calculateImpactBigQuery, listModels, getModel]

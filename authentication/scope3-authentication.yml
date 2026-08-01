@@ -1,0 +1,22 @@
+generated: '2026-07-21'
+method: searched
+source: openapi/scope3-ai-openapi-original.yml, openapi/scope3-measurement-openapi.yml
+docs: https://docs.scope3.com/docs/access-authorization
+summary:
+  types:
+  - http
+  token_format: "scope3_<accessClientId>_<accessClientSecret>"
+  header: Authorization
+  obtain: Contact your Scope3 representative for API access (dashboard key management at https://agentic.scope3.com for the Agentic Platform).
+schemes:
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  in: header
+  header: Authorization
+  format: "Bearer scope3_<accessClientId>_<accessClientSecret>"
+  docs: https://docs.scope3.com/docs/access-authorization
+  sources:
+  - openapi/scope3-ai-openapi-original.yml
+  - openapi/scope3-measurement-openapi.yml

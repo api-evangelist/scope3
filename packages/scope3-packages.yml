@@ -1,0 +1,29 @@
+generated: '2026-07-21'
+method: searched
+source: https://github.com/scope3data
+packages:
+  - language: javascript
+    registry: npm
+    name: scope3
+    url: https://www.npmjs.com/package/scope3
+    install: npm install scope3
+    version: 2.1.0
+    official: true
+    description: Scope3 SDK - REST and MCP client for the Agentic Platform (ships the `scope3` CLI and Scope3McpClient).
+    repository: https://github.com/scope3data/agentic-client
+  - language: python
+    registry: pypi
+    name: scope3ai
+    url: https://pypi.org/project/scope3ai/
+    install: pip install scope3ai
+    version: 0.3.0
+    official: true
+    description: Scope3AI Python SDK - track the environmental impact of AI inference across OpenAI, Anthropic, Cohere, HuggingFace, LiteLLM, Mistral.
+    repository: https://github.com/scope3data/scope3ai-py
+  - language: go
+    registry: pkg.go.dev
+    name: scope3-segment-api-golang
+    url: https://github.com/scope3data/scope3-segment-api-golang
+    official: true
+    description: First-party Go helper library for the Scope3 Segment API.
+    repository: https://github.com/scope3data/scope3-segment-api-golang

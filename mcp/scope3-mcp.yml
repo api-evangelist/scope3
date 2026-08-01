@@ -1,0 +1,33 @@
+generated: '2026-07-21'
+method: searched
+status: published
+source: https://github.com/scope3data/agentic-client
+server:
+  name: scope3-agentic
+  transport: http
+  description: >-
+    The Scope3 Agentic Platform ships a hosted MCP server for AI agents. The npm
+    `scope3` package exposes Scope3McpClient, a thin connection helper that wires up
+    bearer auth and the MCP URL and exposes callTool(), readResource(), and listTools()
+    as direct passthroughs. Two agent personas are served (buyer, storefront), each with
+    a published skill.md operating guide.
+  base_url: https://api.agentic.scope3.com
+  auth:
+    type: bearer
+    obtain: https://agentic.scope3.com  # Manage API Keys
+personas:
+  - name: buyer
+    skill: https://api.agentic.scope3.com/api/v2/buyer/skill.md
+  - name: storefront
+    skill: https://api.agentic.scope3.com/api/v2/storefront/skill.md
+tools:
+  - name: api_call
+    description: Invoke a named buyer/storefront REST operation via the MCP server (operation field required; no raw method+endpoint mode).
+  - name: ask_about_capability
+    description: Query the platform for what a capability supports.
+  - name: customer_switch
+    description: Session-level customer/context switch (dedicated tool, not routed through api_call).
+notes: >-
+  Tool list captured from the published SDK README and skill.md guides. The MCP server
+  performs routing/validation server-side; the full tool catalog is enumerable at runtime
+  via listTools(). This is a genuinely published (hosted) MCP server, not a derived candidate.

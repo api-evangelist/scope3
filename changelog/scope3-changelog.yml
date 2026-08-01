@@ -1,0 +1,30 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.scope3.com/changelog
+scheme: dated monthly emissions-model releases + semver API versions
+current_api_version: '2.0'
+docs: https://docs.scope3.com/changelog
+entries:
+  - version: August 2026 Emissions Model
+    date: '2026-08'
+    type: model-update
+    url: https://docs.scope3.com/changelog/august-2026-emissions-model.md
+  - version: February 2026 Emissions Model
+    date: '2026-02'
+    type: model-update
+    url: https://docs.scope3.com/changelog/february-2026-emissions-model.md
+  - version: November 2025 Emissions Model
+    date: '2025-11'
+    type: model-update
+    url: https://docs.scope3.com/changelog/november-2025-emissions-model.md
+  - version: October 2025 Emissions Model
+    date: '2025-10'
+    type: model-update
+    url: https://docs.scope3.com/changelog/october-2025-emissions-model.md
+  - version: September 2025 Emissions Model
+    date: '2025-09'
+    type: model-update
+    url: https://docs.scope3.com/changelog/september-2025-emissions-model.md
+api_version_changelog:
+  - {version: '1.3', url: https://docs.scope3.com/changelog/api-13}
+  - {version: '1.2.1', url: https://docs.scope3.com/changelog/api-121}

@@ -1,0 +1,48 @@
+{
+  "provider": "scope3",
+  "sources": [
+    "scope3-ai-impact-measurement-api-openapi.yml",
+    "scope3-benchmarks-api-openapi.yml",
+    "scope3-creative-api-openapi.yml",
+    "scope3-data-api-openapi.yml",
+    "scope3-gpu-api-openapi.yml",
+    "scope3-impact-api-openapi.yml",
+    "scope3-measure-api-openapi.yml",
+    "scope3-model-api-openapi.yml",
+    "scope3-node-api-openapi.yml",
+    "scope3-reload-api-openapi.yml",
+    "scope3-saved-lists-api-openapi.yml",
+    "scope3-segment-api-openapi.yml",
+    "scope3-signals-api-openapi.yml",
+    "scope3-status-api-openapi.yml"
+  ],
+  "outputs": [
+    "scope3-ai-impact-measurement-api-openapi.yml",
+    "scope3-benchmarks-api-openapi.yml",
+    "scope3-creative-api-openapi.yml",
+    "scope3-data-api-openapi.yml",
+    "scope3-gpu-api-openapi.yml",
+    "scope3-impact-api-openapi.yml",
+    "scope3-measure-api-openapi.yml",
+    "scope3-model-api-openapi.yml",
+    "scope3-node-api-openapi.yml",
+    "scope3-reload-api-openapi.yml",
+    "scope3-saved-lists-api-openapi.yml",
+    "scope3-segment-api-openapi.yml",
+    "scope3-signals-api-openapi.yml",
+    "scope3-status-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [
+    "scope3-benchmarks-api-openapi.yml: dangling $ref: #/components/responses/ErrorResponse",
+    "scope3-creative-api-openapi.yml: dangling $ref: #/components/responses/ErrorResponse",
+    "scope3-data-api-openapi.yml: dangling $ref: #/components/responses/ErrorResponse",
+    "scope3-measure-api-openapi.yml: dangling $ref: #/components/responses/ErrorResponse",
+    "scope3-saved-lists-api-openapi.yml: dangling $ref: #/components/responses/ErrorResponse",
+    "scope3-segment-api-openapi.yml: dangling $ref: #/components/responses/ErrorResponse",
+    "scope3-signals-api-openapi.yml: dangling $ref: #/components/responses/ErrorResponse"
+  ],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
