@@ -201,6 +201,8 @@ apis:
   - type: OpenAPI
     url: openapi/scope3-status-api-openapi.yml
 common:
+- type: Overlay
+  url: overlays/scope3-ai-overlay.yaml
 - type: AgenticAccess
   url: agentic-access/scope3-agentic-access.yml
 - type: DomainSecurity
