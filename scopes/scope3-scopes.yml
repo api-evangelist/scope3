@@ -1,0 +1,75 @@
+generated: '2026-08-13'
+method: probed
+source: https://identity.scope3.com/.well-known/openid-configuration
+docs: https://docs.interchange.io/v2/authentication
+note: >-
+  Neither published OpenAPI declares an oauth2 securityScheme — both use HTTP bearer
+  (`bearerAuth`), so 0-working/derive-oauth-scopes.py finds nothing to derive. The OAuth scope
+  surface is published outside the specs, in the discovery documents the Interchange MCP
+  endpoints advertise. Everything below was read from those documents on 2026-08-13, not
+  inferred from the specs.
+identity_provider:
+  vendor: WorkOS
+  vendor_source: https://docs.interchange.io/v2/authentication
+  note: Interchange documents WorkOS as its credential control plane.
+schemes:
+- name: interchange-mcp-oauth
+  type: oauth2
+  role: authorization server fronting the MCP endpoints
+  source: https://api.interchange.io/.well-known/oauth-authorization-server
+  issuer: https://api.interchange.io
+  authorization_endpoint: https://api.interchange.io/authorize
+  token_endpoint: https://api.interchange.io/auth/token
+  registration_endpoint: https://api.interchange.io/auth/register
+  dynamic_client_registration: true
+  flows:
+  - flow: authorizationCode
+    pkce: S256
+    token_endpoint_auth_methods: [none]
+    note: Public-client authorization code with PKCE — the shape a Claude/ChatGPT MCP connector uses.
+  grant_types: [authorization_code, refresh_token]
+  scopes_published: false
+  scopes_note: >-
+    This document publishes no scopes_supported. The protected resource it guards is
+    https://api.interchange.io/mcp (RFC 9728 metadata at
+    https://api.interchange.io/.well-known/oauth-protected-resource), and it names
+    https://identity.scope3.com as a co-equal authorization server.
+- name: scope3-identity
+  type: openIdConnect
+  role: Scope3 identity provider
+  source: https://identity.scope3.com/.well-known/openid-configuration
+  issuer: https://identity.scope3.com
+  authorization_endpoint: https://identity.scope3.com/oauth2/authorize
+  token_endpoint: https://identity.scope3.com/oauth2/token
+  grant_types: [authorization_code, client_credentials, refresh_token, 'urn:ietf:params:oauth:grant-type:device_code']
+  scopes_published: true
+scopes:
+- scope: openid
+  description: Standard OIDC scope requesting an ID token.
+  schemes: [scope3-identity]
+  sources: ['https://identity.scope3.com/.well-known/openid-configuration']
+- scope: profile
+  description: Standard OIDC scope granting access to basic profile claims.
+  schemes: [scope3-identity]
+  sources: ['https://identity.scope3.com/.well-known/openid-configuration']
+- scope: email
+  description: Standard OIDC scope granting access to the email and email_verified claims.
+  schemes: [scope3-identity]
+  sources: ['https://identity.scope3.com/.well-known/openid-configuration']
+- scope: offline_access
+  description: Requests a refresh token so the client can act without the user present.
+  schemes: [scope3-identity]
+  sources: ['https://identity.scope3.com/.well-known/openid-configuration']
+authorization_model:
+  api_scopes: none
+  note: >-
+    Scope3 publishes only the four standard OIDC identity scopes; there is no product-level
+    scope vocabulary (no read:campaigns / write:storefront style permissions) in any discovery
+    document or in the docs. Interchange authorization is enforced by account role,
+    organization entitlement (e.g. the `modular-sources` entitlement) and persona (buyer vs
+    storefront) rather than by OAuth scope — a 403 carries FORBIDDEN, ACCESS_DENIED,
+    ALPHA_OPT_IN_REQUIRED or TOS_ACCEPTANCE_REQUIRED. Recorded as an honest absence.
+cross_links:
+  authentication: authentication/scope3-authentication.yml
+  well_known: well-known/scope3-well-known.yml
+  mcp: mcp/scope3-mcp.yml

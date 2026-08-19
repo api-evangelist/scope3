@@ -1,30 +1,76 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
-source: https://docs.scope3.com/changelog
-scheme: dated monthly emissions-model releases + semver API versions
-current_api_version: '2.0'
-docs: https://docs.scope3.com/changelog
-entries:
-  - version: August 2026 Emissions Model
-    date: '2026-08'
-    type: model-update
-    url: https://docs.scope3.com/changelog/august-2026-emissions-model.md
-  - version: February 2026 Emissions Model
-    date: '2026-02'
-    type: model-update
-    url: https://docs.scope3.com/changelog/february-2026-emissions-model.md
-  - version: November 2025 Emissions Model
-    date: '2025-11'
-    type: model-update
-    url: https://docs.scope3.com/changelog/november-2025-emissions-model.md
-  - version: October 2025 Emissions Model
-    date: '2025-10'
-    type: model-update
-    url: https://docs.scope3.com/changelog/october-2025-emissions-model.md
-  - version: September 2025 Emissions Model
-    date: '2025-09'
-    type: model-update
-    url: https://docs.scope3.com/changelog/september-2025-emissions-model.md
-api_version_changelog:
-  - {version: '1.3', url: https://docs.scope3.com/changelog/api-13}
-  - {version: '1.2.1', url: https://docs.scope3.com/changelog/api-121}
+source: https://docs.interchange.io/v2/changelog
+docs:
+- https://docs.interchange.io/v2/changelog
+- https://docs.scope3.com/changelog
+scheme: >-
+  Two independent cadences. Interchange (the agentic platform) ships continuous semver builds
+  with a timestamped entry per release; the measurement platform ships dated monthly
+  emissions-model releases plus semver API versions.
+platforms:
+- name: Scope3 Interchange (agentic platform)
+  docs: https://docs.interchange.io/v2/changelog
+  scheme: semver, continuous deployment
+  current_version: 5.148.0
+  current_version_verified:
+    source: https://api.interchange.io/health
+    checked: '2026-08-13'
+    note: The health endpoint reports the same version as the top changelog entry, plus its commitSha.
+  cadence: >-
+    Multiple releases per day. Fourteen distinct versions were published on 2026-08-13 alone,
+    the most recent at 18:53 UTC.
+  entry_structure:
+    note: >-
+      Entries are unusually disciplined for a public changelog — each change states its Action
+      (what existing customers must do), Buyer impact, Monetization (whether a new fee or meter
+      is introduced), and Rollout and controls (entitlement gating, kill switch, adoption
+      criteria before expansion).
+    fields: [Action, Buyer impact, Monetization, Rollout and controls]
+  entries:
+  - version: 5.148.0
+    date: '2026-08-13T18:53:00Z'
+    type: additions
+    breaking: false
+    highlights:
+    - Buyer signup intake now captures whether a prospect needs a campaign management system or an AI agent, plus markets, channels and timing.
+    - Universal Ads connection capabilities now report CRM audience sync as unsupported, and sync attempts stop before changing provider data.
+    - Sellers with the modular-sources entitlement can send inventory feeds through authenticated Storefront API endpoints (preview, commit, push).
+    - Media buys reject an ISO subdivision before dispatch when a seller capability marks that value unsupported.
+    action: No action required for existing sellers; existing sources, feed defaults and buyer-facing fulfillment are unchanged.
+    monetization: No new fee, buyer charge, billing meter, or UI package; access follows the existing Enterprise modular-sources entitlement.
+  - {version: 5.147.0, date: '2026-08-13T17:49:00Z'}
+  - {version: 5.146.0, date: '2026-08-13T16:54:00Z'}
+  - {version: 5.144.0, date: '2026-08-13T09:52:00Z'}
+  - {version: 5.143.5, date: '2026-08-13T08:41:00Z'}
+  - {version: 5.143.2, date: '2026-08-13T06:12:00Z'}
+  - {version: 5.141.12, date: '2026-08-13T02:54:00Z'}
+  - {version: 5.141.11, date: '2026-08-13T02:12:00Z'}
+  - {version: 5.141.10, date: '2026-08-13T01:48:00Z'}
+  - {version: 5.141.9, date: '2026-08-13T01:00:00Z'}
+  - {version: 5.141.8, date: '2026-08-13T00:36:00Z'}
+  - {version: 5.141.5, date: '2026-08-12T22:46:00Z'}
+  - {version: 5.141.3, date: '2026-08-12T21:54:00Z'}
+  - {version: 5.141.1, date: '2026-08-12T20:56:00Z'}
+  - {version: 5.139.0, date: '2026-08-12T19:48:00Z'}
+  - {version: 5.138.0, date: '2026-08-12T18:42:00Z'}
+  - {version: 5.137.0, date: '2026-08-12T17:47:00Z'}
+  - {version: 5.136.0, date: '2026-08-12T16:31:00Z'}
+  - {version: 5.135.0, date: '2026-08-12T15:38:00Z'}
+  - {version: 5.134.0, date: '2026-08-12T14:41:00Z'}
+  window_note: Recent window only; the live changelog is the source of truth.
+- name: Scope3 measurement platform
+  docs: https://docs.scope3.com/changelog
+  scheme: dated monthly emissions-model releases + semver API versions
+  current_api_version: '2.0'
+  entries:
+  - {version: August 2026 Emissions Model, date: '2026-08', type: model-update, url: 'https://docs.scope3.com/changelog/august-2026-emissions-model.md'}
+  - {version: February 2026 Emissions Model, date: '2026-02', type: model-update, url: 'https://docs.scope3.com/changelog/february-2026-emissions-model.md'}
+  - {version: November 2025 Emissions Model, date: '2025-11', type: model-update, url: 'https://docs.scope3.com/changelog/november-2025-emissions-model.md'}
+  - {version: October 2025 Emissions Model, date: '2025-10', type: model-update, url: 'https://docs.scope3.com/changelog/october-2025-emissions-model.md'}
+  - {version: September 2025 Emissions Model, date: '2025-09', type: model-update, url: 'https://docs.scope3.com/changelog/september-2025-emissions-model.md'}
+  api_version_changelog:
+  - {version: '1.3', url: 'https://docs.scope3.com/changelog/api-13'}
+  - {version: '1.2.1', url: 'https://docs.scope3.com/changelog/api-121'}
+  release_updates_api:
+    note: Both Interchange specs expose a "Release Updates" tag (2 operations each) so an agent can read release news over the API.

@@ -1,0 +1,77 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.interchange.io/v2/reference/rate-limits
+docs: https://docs.interchange.io/v2/reference/rate-limits
+applies_to: Scope3 Interchange v2 Buyer and Storefront APIs (https://api.interchange.io/api/v2/*)
+limit_count: 4
+exhaustion:
+  status: 429
+  error_code: RATE_LIMITED
+  envelope: '{"data": null, "error": {"code": "RATE_LIMITED", "message": "Too many requests"}}'
+headers:
+  standard: IETF RateLimit header fields, draft-7
+  returned:
+  - name: Retry-After
+    meaning: Seconds to wait before retrying. Scope3 documents this as always to be honored.
+  - name: RateLimit-Limit
+    meaning: Max requests allowed in the current window
+  - name: RateLimit-Remaining
+    meaning: Requests remaining in the current window
+  - name: RateLimit-Reset
+    meaning: Seconds until the window resets
+  guidance: >-
+    Scope3 documents reading RateLimit-Remaining on every response, not only on 429s, and
+    slowing down preemptively when it is low.
+limits:
+- scope: per-ip
+  surface: General API endpoints
+  window: 1 minute
+  limit: 100
+  unit: requests
+- scope: per-ip
+  surface: Auth endpoints (/auth/*)
+  window: 15 minutes
+  limit: 40
+  unit: requests
+  environment: production
+- scope: per-ip
+  surface: Signup endpoints
+  window: 1 hour
+  limit: 20
+  unit: requests
+  environment: production
+- scope: per-ip
+  surface: Password reset
+  window: 1 hour
+  limit: 12
+  unit: requests
+  environment: production
+per_account:
+  documented: true
+  values_published: false
+  note: >-
+    Scope3 states per-account quotas are tier-based and may differ from the per-IP defaults,
+    and directs customers hitting RATE_LIMITED consistently to support@scope3.com for a
+    higher-tier quota. The tier values themselves are not published.
+polling_cadences:
+  note: Recommended cadences for long-running async endpoints, published alongside the limits.
+  entries:
+  - endpoint: GET /campaigns/:id/media-buy-status
+    cadence: every 30s minimum
+    note: Media-buy state changes are minute-scale.
+  - endpoint: GET /discovery/:id/discover-products
+    cadence: every 5-10s while pending
+    note: Back off to 15s after one minute of pending state; slower for large agent sets.
+  - endpoint: GET /campaigns/:id after POST /execute
+    cadence: every 15-30s
+    note: Scope3 recommends webhooks where available to remove the need to poll.
+measurement_apis:
+  documented: false
+  note: >-
+    The Carbon Calculator (api.scope3.com/v2) and AI Impact Measurement (aiapi.scope3.com)
+    APIs publish no explicit throttling; the published guidance is to batch measurement rows
+    (4,000-8,000 rows per request; requests over ~100,000 rows commonly fail) rather than a
+    fixed request-rate ceiling. See conventions/scope3-conventions.yml.
+cross_links:
+  errors: errors/scope3-problem-types.yml
+  conventions: conventions/scope3-conventions.yml

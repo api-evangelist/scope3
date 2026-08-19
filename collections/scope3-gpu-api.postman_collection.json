@@ -1,0 +1,1652 @@
+{
+  "item": [
+    {
+      "id": "0c8bd7fc-078e-4b4f-a79a-bbd72480c23d",
+      "name": "Gpu",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "e545a7e7-45fe-45ac-9cfa-7e354d6ec3f9",
+          "name": "List GPUs",
+          "request": {
+            "name": "List GPUs",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gpu"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "51ed1c5a-7c18-4713-86b3-34015340962b",
+              "name": "GPU details retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"gpus\": [\n    {\n      \"id\": \"a100_40gb\",\n      \"name\": \"NVIDIA A100 40GB\",\n      \"max_power_w\": 700,\n      \"embodied_emissions_kgco2e\": 282.1,\n      \"embodied_water_mlh2o\": 181.1,\n      \"performance_ratio_to_h200\": 1.5,\n      \"ols_intercept\": 11.4,\n      \"ols_coefficient_gpu_count\": 11.4,\n      \"created_at\": \"2003-01-20T08:02:04.684Z\",\n      \"updated_at\": \"1989-01-19T18:08:16.670Z\",\n      \"customer_id\": 6169,\n      \"created_by\": \"string\"\n    },\n    {\n      \"id\": \"a100_40gb\",\n      \"name\": \"NVIDIA A100 40GB\",\n      \"max_power_w\": 700,\n      \"embodied_emissions_kgco2e\": 282.1,\n      \"embodied_water_mlh2o\": 181.1,\n      \"performance_ratio_to_h200\": 1.5,\n      \"ols_intercept\": 11.4,\n      \"ols_coefficient_gpu_count\": 11.4,\n      \"created_at\": \"1974-04-20T13:46:48.249Z\",\n      \"updated_at\": \"1964-07-09T08:10:32.549Z\",\n      \"customer_id\": 9984,\n      \"created_by\": \"string\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "145f49c7-3257-4107-a620-c7e6dd5ebc6f",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "be297b3f-d937-4341-bbb4-ed4ce0cd09eb",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1557efba-82e9-4780-ba7c-ae3c640b23fe",
+              "name": "Not acceptable response",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e435838f-f4ab-4d50-8309-93723190ce07",
+              "name": "Unsupported media type",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6641f573-4d8c-46c1-a20b-07dff2742a5e",
+              "name": "Too many requests",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "95858044-a174-495b-abda-8dca3d9af75c",
+              "name": "Unexpected error",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "64945f36-d79c-436d-a9fb-2a7ebd05a99d",
+          "name": "Create a GPU",
+          "request": {
+            "name": "Create a GPU",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gpu"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"max_power_w\": \"<float>\",\n  \"embodied_emissions_kgco2e\": \"<float>\",\n  \"embodied_water_mlh2o\": \"<float>\",\n  \"performance_ratio_to_h200\": \"<float>\",\n  \"ols_intercept\": \"<float>\",\n  \"ols_coefficient_gpu_count\": \"<float>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cd86c4ed-7c50-4a70-8b05-e11da3db3b86",
+              "name": "GPU created successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"created_at\": \"1958-12-20T04:26:14.654Z\",\n  \"updated_at\": \"1968-01-25T05:34:42.227Z\",\n  \"customer_id\": 4076,\n  \"created_by\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bb02f259-e7d2-41bb-8a21-ad760ce34e69",
+              "name": "Invalid request format",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7801fcd2-a501-4780-a7f5-770f8d27c847",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5db76be1-e0a3-4183-b611-2429d8b38996",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "02148002-f4d8-4876-8197-859c89240f01",
+              "name": "GPU ID already exists",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d19e5cfa-a96a-44f0-8325-e92839cfd396",
+          "name": "Get a specific GPU (global or custom)",
+          "request": {
+            "name": "Get a specific GPU (global or custom)",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gpu",
+                ":gpuId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "gpuId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "e06f3b22-0b39-4c17-8222-a5acb34b0711",
+              "name": "GPU retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"created_at\": \"1958-12-20T04:26:14.654Z\",\n  \"updated_at\": \"1968-01-25T05:34:42.227Z\",\n  \"customer_id\": 4076,\n  \"created_by\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "feb0f6d0-f7cd-4ee4-9b2b-9a18aca834a4",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "58095cbf-b708-4b40-aaf5-6c0194b2a88b",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "142bcca7-798d-4481-9ec2-412d1b327466",
+              "name": "GPU not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "bd00b185-300f-446c-a87c-0e4289ebcb6c",
+          "name": "Update a GPU",
+          "request": {
+            "name": "Update a GPU",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gpu",
+                ":gpuId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "gpuId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"max_power_w\": \"<float>\",\n  \"embodied_emissions_kgco2e\": \"<float>\",\n  \"embodied_water_mlh2o\": \"<float>\",\n  \"performance_ratio_to_h200\": \"<float>\",\n  \"ols_coefficient_gpu_count\": \"<float>\",\n  \"ols_intercept\": \"<float>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "369b552b-0d8c-4828-b206-37887ed80e1e",
+              "name": "GPU updated successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"ols_intercept\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"a100_40gb\",\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_intercept\": 11.4,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"created_at\": \"1958-12-20T04:26:14.654Z\",\n  \"updated_at\": \"1968-01-25T05:34:42.227Z\",\n  \"customer_id\": 4076,\n  \"created_by\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1e9ca618-3301-4b79-af13-f09f2a3c5a15",
+              "name": "Invalid request format",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"ols_intercept\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2d24c2a8-088e-4e54-9089-f16050cc3146",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"ols_intercept\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "585dee09-b2bc-4523-be9e-a61f01fbc911",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"ols_intercept\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "88ca0748-6fbc-4bc2-af6a-74bb69b4df7f",
+              "name": "GPU not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"NVIDIA A100 40GB\",\n  \"max_power_w\": 700,\n  \"embodied_emissions_kgco2e\": 282.1,\n  \"embodied_water_mlh2o\": 181.1,\n  \"performance_ratio_to_h200\": 1.5,\n  \"ols_coefficient_gpu_count\": 11.4,\n  \"ols_intercept\": 11.4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d5d5c6f3-1b9e-4f9d-be6e-06d0b5fcefe5",
+          "name": "Delete a GPU",
+          "request": {
+            "name": "Delete a GPU",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gpu",
+                ":gpuId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "gpuId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "aa0854be-0480-4564-91a3-a79bc2f969d4",
+              "name": "GPU deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "62f189be-1db9-4059-bb16-e03ff886fd0d",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "612697a8-9f34-4523-a204-02a1523d170a",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0f41e9b6-15f9-4a02-be88-597dcac440fd",
+              "name": "GPU not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "gpu",
+                    ":gpuId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "gpuId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "9cab1f4d-8aeb-4e72-807a-ad20c7e8d6f0",
+    "name": "AI Impact Measurement Gpu API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

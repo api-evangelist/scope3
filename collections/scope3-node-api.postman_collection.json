@@ -1,0 +1,1562 @@
+{
+  "item": [
+    {
+      "id": "1f5a7890-a6ea-4bc5-a57e-71dc73a108ed",
+      "name": "Node",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "29b365da-b34a-42bb-a10c-d1986e74fd76",
+          "name": "List nodes (both global and custom)",
+          "request": {
+            "name": "List nodes (both global and custom)",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "node"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "service",
+                  "value": "<string>",
+                  "description": "Filter nodes by managed service provider"
+                },
+                {
+                  "disabled": false,
+                  "key": "cloud",
+                  "value": "<string>",
+                  "description": "Filter nodes by cloud provider"
+                },
+                {
+                  "disabled": false,
+                  "key": "custom",
+                  "value": "<boolean>",
+                  "description": "Filter by node type:\n- true: Show only custom nodes\n- false: Show only global nodes\n- Not provided: Show all nodes\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "gpu",
+                  "value": "<string>",
+                  "description": "Filter nodes by GPU"
+                },
+                {
+                  "disabled": false,
+                  "key": "instance",
+                  "value": "<string>",
+                  "description": "Filter nodes by cloud instance type"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "746cdbe2-41aa-4d64-a78c-9a3c739fafe0",
+              "name": "Node details retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "service",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "cloud",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "custom",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "gpu",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "instance",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"nodes\": [\n    {\n      \"cpu_count\": 2,\n      \"created_at\": \"1960-06-18T07:19:05.729Z\",\n      \"gpu_count\": 8,\n      \"gpu_id\": \"a100_40gb\",\n      \"id\": \"my-custom-node-1\",\n      \"updated_at\": \"1973-04-10T19:11:40.417Z\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"a2-highgpu-1g\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"idle_power_w_ex_gpu\": 100,\n      \"average_utilization_rate\": 0.8,\n      \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n      \"embodied_water_l_ex_gpu\": 2500,\n      \"use_life_years\": 5,\n      \"customer_id\": 3584,\n      \"created_by\": \"string\"\n    },\n    {\n      \"cpu_count\": 2,\n      \"created_at\": \"1970-11-13T08:45:20.066Z\",\n      \"gpu_count\": 8,\n      \"gpu_id\": \"a100_40gb\",\n      \"id\": \"my-custom-node-1\",\n      \"updated_at\": \"1949-07-11T02:47:41.983Z\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"a2-highgpu-1g\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"idle_power_w_ex_gpu\": 100,\n      \"average_utilization_rate\": 0.8,\n      \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n      \"embodied_water_l_ex_gpu\": 2500,\n      \"use_life_years\": 5,\n      \"customer_id\": 732,\n      \"created_by\": \"string\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "05bf044e-5771-466c-8c7e-c524b15babb6",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "service",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "cloud",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "custom",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "gpu",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "instance",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7b7d82c2-b71f-419f-ab5a-efa597c3c34d",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "service",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "cloud",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "custom",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "gpu",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "instance",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "15b2274a-8a06-4aa2-9fb9-1e4126bc1578",
+          "name": "Create a custom node",
+          "request": {
+            "name": "Create a custom node",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "node"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"<string>\",\n  \"gpu_id\": \"<string>\",\n  \"gpu_count\": \"<integer>\",\n  \"cpu_count\": \"<integer>\",\n  \"cloud_id\": \"<string>\",\n  \"cloud_instance_id\": \"<string>\",\n  \"managed_service_id\": \"<string>\",\n  \"idle_power_w_ex_gpu\": \"<float>\",\n  \"average_utilization_rate\": \"<float>\",\n  \"embodied_emissions_kgco2e_ex_gpu\": \"<float>\",\n  \"embodied_water_l_ex_gpu\": \"<float>\",\n  \"use_life_years\": \"<float>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "30806cbe-b38a-494a-b00b-afdb195fae70",
+              "name": "Node created successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"my-custom-node-1\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"cpu_count\": 2,\n  \"created_at\": \"2011-08-11T04:36:50.040Z\",\n  \"gpu_count\": 8,\n  \"gpu_id\": \"a100_40gb\",\n  \"id\": \"my-custom-node-1\",\n  \"updated_at\": \"2021-09-14T11:01:09.319Z\",\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5,\n  \"customer_id\": 5551,\n  \"created_by\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "76a3f6df-3c46-443f-a47b-4d92c9296610",
+              "name": "Invalid request format",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"my-custom-node-1\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "62c65b52-034f-4362-9e87-2c6d31d0a68b",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"my-custom-node-1\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1295975a-5fed-4f92-91d7-6dabcfd7e6b4",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"my-custom-node-1\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f8a156ec-88a1-4b01-897d-0a577bb2ddcd",
+              "name": "Node ID already exists",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"my-custom-node-1\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "39fc08ae-0731-47d6-9b2f-c4f6a6e6f156",
+          "name": "Get a specific node (global or custom)",
+          "request": {
+            "name": "Get a specific node (global or custom)",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "node",
+                ":nodeId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "nodeId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "177fa013-5003-47da-a2f9-d9ba6197ca0e",
+              "name": "Node retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"cpu_count\": 2,\n  \"created_at\": \"2011-08-11T04:36:50.040Z\",\n  \"gpu_count\": 8,\n  \"gpu_id\": \"a100_40gb\",\n  \"id\": \"my-custom-node-1\",\n  \"updated_at\": \"2021-09-14T11:01:09.319Z\",\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5,\n  \"customer_id\": 5551,\n  \"created_by\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d797048a-d147-49b3-bd97-35259a685542",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dffde422-9106-42e8-a11a-8f97ba180fa4",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fd928f2b-f58c-4f5d-850a-a18c77d05155",
+              "name": "Node not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9a1b9f3c-29c5-45c0-9b07-ae5b7e336a68",
+          "name": "Update a node (custom nodes only, unless admin)",
+          "request": {
+            "name": "Update a node (custom nodes only, unless admin)",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "node",
+                ":nodeId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "nodeId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cloud_id\": \"<string>\",\n  \"cloud_instance_id\": \"<string>\",\n  \"managed_service_id\": \"<string>\",\n  \"gpu_id\": \"<string>\",\n  \"gpu_count\": \"<integer>\",\n  \"cpu_count\": \"<integer>\",\n  \"idle_power_w_ex_gpu\": \"<float>\",\n  \"average_utilization_rate\": \"<float>\",\n  \"embodied_emissions_kgco2e_ex_gpu\": \"<float>\",\n  \"embodied_water_l_ex_gpu\": \"<float>\",\n  \"use_life_years\": \"<float>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "1f951762-3668-4e10-a23f-993e0055826a",
+              "name": "Node updated successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"cpu_count\": 2,\n  \"created_at\": \"2011-08-11T04:36:50.040Z\",\n  \"gpu_count\": 8,\n  \"gpu_id\": \"a100_40gb\",\n  \"id\": \"my-custom-node-1\",\n  \"updated_at\": \"2021-09-14T11:01:09.319Z\",\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5,\n  \"customer_id\": 5551,\n  \"created_by\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "335b5809-635f-4f1d-90d6-81fb3f6df2e8",
+              "name": "Invalid request format",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d8d025ee-5aae-41bd-876b-b6d8ea7ef3f9",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d7599067-b807-4b4b-9384-b443ffc94318",
+              "name": "Forbidden - Cannot modify global nodes without admin privileges",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d70bbec4-2755-44d8-ab3e-f42c4b7ca014",
+              "name": "Node not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cloud_id\": \"aws\",\n  \"cloud_instance_id\": \"a2-highgpu-1g\",\n  \"managed_service_id\": \"aws-bedrock\",\n  \"gpu_id\": \"a100_40gb\",\n  \"gpu_count\": 8,\n  \"cpu_count\": 2,\n  \"idle_power_w_ex_gpu\": 100,\n  \"average_utilization_rate\": 0.8,\n  \"embodied_emissions_kgco2e_ex_gpu\": 2500,\n  \"embodied_water_l_ex_gpu\": 2500,\n  \"use_life_years\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "22bc8d83-6038-474f-8340-6b6a0523b938",
+          "name": "Delete a node (custom nodes only, unless admin)",
+          "request": {
+            "name": "Delete a node (custom nodes only, unless admin)",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "node",
+                ":nodeId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "nodeId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "1cee5ff2-1c7f-4125-bfd6-bff88784d665",
+              "name": "Node deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "cce6b1b3-4717-4e32-a445-603c1249b6c7",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d30da961-65e8-4149-8f7f-af68aeabe3ef",
+              "name": "Forbidden - Cannot delete global nodes without admin privileges",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "98d65d40-c795-4e81-83c5-f848f896642e",
+              "name": "Node not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "node",
+                    ":nodeId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "nodeId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "47b87981-1f9e-4588-bfca-18169970d4f3",
+    "name": "AI Impact Measurement Node API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AI Impact Measurement Benchmarks API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Benchmarks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Country-channel benchmarks",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/benchmarks",
+            "params": [
+              {
+                "name": "latest",
+                "value": "",
+                "type": "query",
+                "description": "Whether to use latest available data"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Emissions by percentile per country and channel"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

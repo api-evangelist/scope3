@@ -1,0 +1,2379 @@
+{
+  "item": [
+    {
+      "id": "36c859ea-be28-46d5-aa93-2dd0b77c91be",
+      "name": "Model",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "a12cc179-a1c9-4f63-b51d-36328cbaca7b",
+          "name": "List models",
+          "request": {
+            "name": "List models",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "model"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "family",
+                  "value": "<string>",
+                  "description": "Filter models by family"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "28875ffc-e2a3-4c46-a27a-175cb2a71ceb",
+              "name": "Model details retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "family",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"models\": [\n    {\n      \"id\": \"gpt-4-turbo\",\n      \"created_at\": \"1968-08-05T17:18:46.590Z\",\n      \"updated_at\": \"1993-11-14T14:02:24.645Z\",\n      \"created_by\": \"string\",\n      \"customer_id\": 8268,\n      \"aliases\": [\n        \"claude-latest\",\n        \"claude-3-sonnet-current\"\n      ],\n      \"name\": \"GPT-4 Turbo\",\n      \"family\": \"gpt\",\n      \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n      \"benchmark_model_id\": \"GPTJ-6B\",\n      \"total_params_billions\": 175,\n      \"number_of_experts\": 7,\n      \"params_per_expert_billions\": 8,\n      \"tensor_parallelism\": 1,\n      \"datatype\": \"fp8\",\n      \"task\": \"text-generation\",\n      \"training_usage_energy_kwh\": 1013.1,\n      \"training_usage_emissions_kgco2e\": 1013.1,\n      \"training_usage_water_l\": 1013.1,\n      \"training_embodied_emissions_kgco2e\": 11013.1,\n      \"training_embodied_water_l\": 11013.1,\n      \"estimated_use_life_days\": 1013.1,\n      \"estimated_requests_per_day\": 1013.1,\n      \"fine_tuned_from_model_id\": \"llama_31_8b\"\n    },\n    {\n      \"id\": \"gpt-4-turbo\",\n      \"created_at\": \"1968-01-14T07:41:46.716Z\",\n      \"updated_at\": \"1991-03-11T23:06:17.917Z\",\n      \"created_by\": \"string\",\n      \"customer_id\": 2947,\n      \"aliases\": [\n        \"claude-latest\",\n        \"claude-3-sonnet-current\"\n      ],\n      \"name\": \"GPT-4 Turbo\",\n      \"family\": \"gpt\",\n      \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n      \"benchmark_model_id\": \"GPTJ-6B\",\n      \"total_params_billions\": 175,\n      \"number_of_experts\": 7,\n      \"params_per_expert_billions\": 8,\n      \"tensor_parallelism\": 1,\n      \"datatype\": \"fp8\",\n      \"task\": \"text-generation\",\n      \"training_usage_energy_kwh\": 1013.1,\n      \"training_usage_emissions_kgco2e\": 1013.1,\n      \"training_usage_water_l\": 1013.1,\n      \"training_embodied_emissions_kgco2e\": 11013.1,\n      \"training_embodied_water_l\": 11013.1,\n      \"estimated_use_life_days\": 1013.1,\n      \"estimated_requests_per_day\": 1013.1,\n      \"fine_tuned_from_model_id\": \"llama_31_8b\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "af45524f-4750-486e-ac93-bbba3ba30876",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "family",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b1d7173d-0c41-4d7b-90af-38c6601d3983",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "family",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5e7b3be9-2949-4ae0-96bf-7f7c7809ae70",
+              "name": "Not acceptable response",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "family",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f9c75600-8e46-4002-b5a8-0fb575fe78d1",
+              "name": "Unsupported media type",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "family",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e38ef753-3183-479b-9e47-2ddb6a3d501b",
+              "name": "Too many requests",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "family",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "733b65a6-5395-4476-a072-e84d0bd08c4e",
+              "name": "Unexpected error",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "family",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f5b7a8ae-5b76-4203-83d5-1dcca15b2c00",
+          "name": "Create a model",
+          "request": {
+            "name": "Create a model",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "model"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"family\": \"<string>\",\n  \"hugging_face_path\": \"<string>\",\n  \"benchmark_model_id\": \"<string>\",\n  \"estimated_use_life_days\": \"<float>\",\n  \"estimated_requests_per_day\": \"<float>\",\n  \"fine_tuned_from_model_id\": \"<string>\",\n  \"aliases\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"total_params_billions\": \"<float>\",\n  \"number_of_experts\": \"<integer>\",\n  \"params_per_expert_billions\": \"<float>\",\n  \"training_usage_energy_kwh\": \"<float>\",\n  \"training_usage_emissions_kgco2e\": \"<float>\",\n  \"training_usage_water_l\": \"<float>\",\n  \"training_embodied_emissions_kgco2e\": \"<float>\",\n  \"training_embodied_water_l\": \"<float>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "527850e3-68a2-4d51-9d7c-fe1a38eb65ce",
+              "name": "Model created successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"gpt-4-turbo\",\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"aliases\": [\n    \"claude-latest\"\n  ],\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"gpt-4-turbo\",\n  \"created_at\": \"1977-06-26T22:10:08.778Z\",\n  \"updated_at\": \"1968-01-14T06:09:39.765Z\",\n  \"created_by\": \"string\",\n  \"customer_id\": 8494,\n  \"aliases\": [\n    \"claude-latest\",\n    \"claude-3-sonnet-current\"\n  ],\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"GPTJ-6B\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"tensor_parallelism\": 1,\n  \"datatype\": \"fp8\",\n  \"task\": \"text-generation\",\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1,\n  \"estimated_use_life_days\": 1013.1,\n  \"estimated_requests_per_day\": 1013.1,\n  \"fine_tuned_from_model_id\": \"llama_31_8b\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2de18c7b-b20b-4265-8c68-a3ff8aa196ec",
+              "name": "Invalid request format",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"gpt-4-turbo\",\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"aliases\": [\n    \"claude-latest\"\n  ],\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e5968e79-6c2e-4573-bbb6-ea24b7a48ddb",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"gpt-4-turbo\",\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"aliases\": [\n    \"claude-latest\"\n  ],\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c6caaa22-14fd-4586-a2bc-8d6f9a167d1c",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"gpt-4-turbo\",\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"aliases\": [\n    \"claude-latest\"\n  ],\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fee8e8b7-3e2e-4b70-82e8-9e9530c4b4d5",
+              "name": "Model ID already exists",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"gpt-4-turbo\",\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"aliases\": [\n    \"claude-latest\"\n  ],\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0d3515f6-ae3c-44c5-8d5b-8fa31e76cd1b",
+              "name": "Too Many Requests",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"gpt-4-turbo\",\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"aliases\": [\n    \"claude-latest\"\n  ],\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "5dbd6247-0b05-49e0-b4e1-f252317101cb",
+          "name": "Get a specific model (global or custom)",
+          "request": {
+            "name": "Get a specific model (global or custom)",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "model",
+                ":modelId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "modelId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "371b7416-0516-4cc6-8edb-e378770b90d2",
+              "name": "Model retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"gpt-4-turbo\",\n  \"created_at\": \"1977-06-26T22:10:08.778Z\",\n  \"updated_at\": \"1968-01-14T06:09:39.765Z\",\n  \"created_by\": \"string\",\n  \"customer_id\": 8494,\n  \"aliases\": [\n    \"claude-latest\",\n    \"claude-3-sonnet-current\"\n  ],\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"GPTJ-6B\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"tensor_parallelism\": 1,\n  \"datatype\": \"fp8\",\n  \"task\": \"text-generation\",\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1,\n  \"estimated_use_life_days\": 1013.1,\n  \"estimated_requests_per_day\": 1013.1,\n  \"fine_tuned_from_model_id\": \"llama_31_8b\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7d24cb13-aa7e-4997-b074-91e282019cc1",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4acae55c-f0d5-4963-9db7-7ff6cb9539bf",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8a9bcb00-2b50-4db7-a7f5-6df667680b0b",
+              "name": "Model not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "4075ec06-11d9-4815-b3b3-6903e72bb2b7",
+          "name": "Update a model",
+          "request": {
+            "name": "Update a model",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "model",
+                ":modelId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "modelId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"family\": \"<string>\",\n  \"hugging_face_path\": \"<string>\",\n  \"benchmark_model_id\": \"<string>\",\n  \"estimated_use_life_days\": \"<float>\",\n  \"estimated_requests_per_day\": \"<float>\",\n  \"fine_tuned_from_model_id\": \"<string>\",\n  \"total_params_billions\": \"<float>\",\n  \"number_of_experts\": \"<integer>\",\n  \"params_per_expert_billions\": \"<float>\",\n  \"training_usage_energy_kwh\": \"<float>\",\n  \"training_usage_emissions_kgco2e\": \"<float>\",\n  \"training_usage_water_l\": \"<float>\",\n  \"training_embodied_emissions_kgco2e\": \"<float>\",\n  \"training_embodied_water_l\": \"<float>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "7382a782-c289-485a-b7da-c9352a7d1dea",
+              "name": "Model updated successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"gpt-4-turbo\",\n  \"created_at\": \"1977-06-26T22:10:08.778Z\",\n  \"updated_at\": \"1968-01-14T06:09:39.765Z\",\n  \"created_by\": \"string\",\n  \"customer_id\": 8494,\n  \"aliases\": [\n    \"claude-latest\",\n    \"claude-3-sonnet-current\"\n  ],\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"GPTJ-6B\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"tensor_parallelism\": 1,\n  \"datatype\": \"fp8\",\n  \"task\": \"text-generation\",\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1,\n  \"estimated_use_life_days\": 1013.1,\n  \"estimated_requests_per_day\": 1013.1,\n  \"fine_tuned_from_model_id\": \"llama_31_8b\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7dffabb5-9378-444b-b3e5-fc59259c34ee",
+              "name": "Invalid request format",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b5bff8d9-ab15-43b6-af32-d42b3415b608",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "404ff256-45c1-494c-9cef-dc18de9fddcb",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ceeacf07-f9a4-4e71-8736-4374c236ae7d",
+              "name": "Model not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"GPT-4 Turbo\",\n  \"family\": \"gpt\",\n  \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n  \"benchmark_model_id\": \"gpt-4-turbo\",\n  \"estimated_use_life_days\": 365,\n  \"estimated_requests_per_day\": 1000,\n  \"fine_tuned_from_model_id\": \"gpt-4-turbo\",\n  \"total_params_billions\": 175,\n  \"number_of_experts\": 7,\n  \"params_per_expert_billions\": 8,\n  \"training_usage_energy_kwh\": 1013.1,\n  \"training_usage_emissions_kgco2e\": 1013.1,\n  \"training_usage_water_l\": 1013.1,\n  \"training_embodied_emissions_kgco2e\": 11013.1,\n  \"training_embodied_water_l\": 11013.1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "3b84d078-dda4-4695-be97-2b97346ef359",
+          "name": "Delete a model",
+          "request": {
+            "name": "Delete a model",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "model",
+                ":modelId"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "modelId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "95dd018a-7089-48ee-94ee-c535934a449e",
+              "name": "Model deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "6d240bff-8612-4bfe-bdf3-92a89b5bb527",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9a751cee-f851-4cef-a564-cfde9689b63d",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f70e1ce9-7e44-4449-8ea4-369c29f140f2",
+              "name": "Model not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "4dfc9563-642d-42b5-a3b1-09fbed1d752b",
+          "name": "Add a new alias to a model",
+          "request": {
+            "name": "Add a new alias to a model",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "model",
+                ":modelId",
+                "alias"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "modelId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d96ca22c-e7c5-47b5-a0a7-6a13a2138ec2",
+              "name": "Alias deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"claude-latest\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ac63bf69-d089-4fa4-a676-f5bf59bc698b",
+              "name": "Invalid request format",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"claude-latest\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9a10796d-2be2-4ed0-a4a9-c8ac6f2afc26",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"claude-latest\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b277db4f-e261-40e3-8705-d7821ff23778",
+              "name": "Model not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"claude-latest\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "86fa9932-614d-48f5-81bc-2a4afac515af",
+              "name": "Alias already exists",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"claude-latest\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9709995a-fdea-4dbb-89c7-d30a9a06d85d",
+          "name": "Remove an alias from a model",
+          "request": {
+            "name": "Remove an alias from a model",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "model",
+                ":modelId",
+                "alias",
+                ":alias"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "modelId",
+                  "description": "(Required) "
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "alias",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "e7aca988-8740-4862-945d-41aa11a0e303",
+              "name": "Alias deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias",
+                    ":alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "alias",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ff0f8d8e-b874-4b5c-9c2c-1b4ca8e5ee3d",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias",
+                    ":alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "alias",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1e51f126-5ac9-4620-9e91-44c41a1e7a2e",
+              "name": "Alias not found",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "model",
+                    ":modelId",
+                    "alias",
+                    ":alias"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "modelId",
+                      "description": "(Required) "
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "alias",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "6a40e334-3050-44fb-90f3-31a7bfc98839",
+    "name": "AI Impact Measurement Model API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

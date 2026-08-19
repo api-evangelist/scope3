@@ -1,39 +1,151 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
-source: https://docs.scope3.com/docs/access-authorization
+source:
+- https://docs.interchange.io/v2/reference/errors
+- https://docs.interchange.io/v2/reference/pagination
+- https://docs.interchange.io/v2/reference/rate-limits
+- https://docs.interchange.io/v2/authentication
+- https://docs.scope3.com/docs/access-authorization
+scope_note: >-
+  Scope3 runs two convention regimes. The Interchange v2 Buyer/Storefront APIs
+  (api.interchange.io/api/v2/*) carry a full, documented cross-cutting contract — envelope,
+  pagination, rate-limit headers, error codes. The older measurement APIs
+  (api.scope3.com/v2, aiapi.scope3.com) share the bearer-token style but publish none of the
+  rest. Each section below says which regime it describes.
 authentication:
   style: bearer
   header: Authorization
-  format: "Bearer scope3_accessClientId_accessClientSecret"
-  bearer_format: JWT   # aiapi bearerAuth declares bearerFormat: JWT
-  notes: >-
-    A single access token of the form scope3_<accessClientId>_<accessClientSecret> is
-    passed as an Authorization: Bearer header on every request. V1 credentials are combined
-    into the V2 token format. See authentication/scope3-authentication.yml.
+  alternate_header: x-scope3-api-key
+  api_key_prefix: scope3_
+  measurement_format: 'Bearer scope3_<accessClientId>_<accessClientSecret>'
+  oauth: true
+  oauth_note: >-
+    Interchange MCP connectors use OAuth authorization-code + PKCE S256 with dynamic client
+    registration; RFC 8414 and RFC 9728 metadata are published. See
+    authentication/scope3-authentication.yml.
+response_envelope:
+  regime: interchange-v2
+  shape: '{"data": <result>, "error": null}'
+  failure_shape: '{"data": null, "error": {"code", "message", "field?", "details?"}}'
+  list_addition: 'list endpoints add a top-level "meta" block'
+  note: >-
+    A single envelope on every endpoint. Documentation examples show the `data` payload only;
+    on the wire it is always wrapped. Clients read the result from response.data.
 idempotency:
-  supported: false
-  notes: No idempotency-key header or contract is documented in the docs or OpenAPI.
-pagination:
   supported: true
-  scope: measurement API (segment/data, signals/saved_list)
-  notes: >-
-    Paginated endpoints (e.g. getSignalsBySavedList) return domain-level rows with
-    page parameters. Batching guidance: split large measurement uploads into
-    4,000-8,000 rows per request; requests over ~100,000 rows commonly fail.
+  style: request-body key (not a header)
+  regime: interchange-v2
+  keys:
+  - name: idempotencyKey
+    location: request body
+    constraints: {minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9._:-]+$'}
+    required_on:
+    - accept an exact organization IU Rate Card offer (buyer + storefront)
+    - accept an exact storefront Rate Card offer
+    note: >-
+      Required, not optional, on the commercial-acceptance operations — the money path. Found in
+      both published specs.
+  - name: idempotency_key
+    location: request body
+    used_by: creative generation requests
+    source: https://api.interchange.io/api/v2/buyer/skill.md
+  - name: external_row_id
+    location: request body row
+    used_by: measurement data sync (sync_measurement_data)
+    semantics: upsert
+    note: >-
+      "External row identifier for idempotency" — re-submitting the same measurement data is
+      documented as safe and idempotent.
+  replay_signal:
+    field: idempotencyReplayOfActivityUid
+    location: activity response object
+    note: >-
+      A required, nullable response field naming the original activity a replayed request
+      matched. This is the strongest part of the contract: the caller can tell a replay from a
+      first execution rather than guessing.
+  merge_semantics:
+    note: >-
+      Product-selection batches document `replace: false` as merging selections idempotently
+      and `replace: true` as making the batch the complete selection set.
+  retry_guidance:
+    note: >-
+      Campaign execution spans bilateral seller calls and is explicitly documented as not
+      atomic; on partial failure successful buys remain successful and the caller retries the
+      unchanged request to dispatch only remaining DRAFT work.
+  header_key: false
+  header_note: >-
+    Scope3 does not implement a Stripe-style Idempotency-Key request header. The contract is
+    body-level and per-operation. Recorded precisely so an integrator does not send a header
+    that will be ignored.
+pagination:
+  regime: interchange-v2
+  styles:
+  - style: offset
+    params: {take: page size, skip: records to skip}
+    defaults: {skip: 0}
+    caps: most endpoints cap take at 100 or 200
+    used_by: most list endpoints (audit logs, reporting, creatives, test cohorts)
+    response_block: meta.pagination
+    response_fields: [skip, take, total, hasMore]
+  - style: custom-offset
+    params: [groupOffset, groupLimit, productOffset, productsPerGroup]
+    used_by: 'product discovery (POST /discovery/.../discover-products)'
+  docs: https://docs.interchange.io/v2/reference/pagination
+  measurement_regime:
+    note: >-
+      The measurement API paginates domain-level rows on endpoints such as
+      getSignalsBySavedList, but publishes no named pagination contract. Published batching
+      guidance is 4,000-8,000 rows per measurement request; requests over ~100,000 rows
+      commonly fail.
 rate_limiting:
-  documented: false
-  notes: >-
-    The Scope3 API does not publish explicit throttling; guidance is to batch rows to
-    minimize bandwidth rather than a fixed rate limit.
+  documented: true
+  regime: interchange-v2
+  standard: IETF RateLimit fields, draft-7
+  headers: [RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset, Retry-After]
+  exhaustion: {status: 429, code: RATE_LIMITED}
+  see: rate-limits/scope3-rate-limits.yml
+  measurement_regime: {documented: false, note: no published throttling on the measurement APIs}
 error_envelope:
-  shape: Error schema (object) on 4xx/5xx; not RFC 9457 application/problem+json.
+  regime: interchange-v2
+  shape: 'error: {code, message, field?, details?}'
+  machine_code_field: code
+  validation: Zod issues surfaced in details.issues[] with path + message
+  mcp_errors:
+    note: >-
+      MCP tool errors follow the AdCP error spec and are returned in structuredContent rather
+      than as HTTP status codes.
+    spec: https://adcontextprotocol.org/schemas/3.0.0-rc.3/core/error.json
+  measurement_regime: {shape: 'plain Error schema on 4xx/5xx', rfc9457: false}
   see: errors/scope3-problem-types.yml
 versioning:
+  rest: uri-path, pinned to v2 (https://api.interchange.io/api/v2/*)
+  rest_note: The REST URLs are pinned to v2 and keep serving v2 after a future major version ships.
+  mcp: unversioned aliases that auto-redirect to the currently stable version (today v2)
+  platform_build_version: readable from GET https://api.interchange.io/health
   see: lifecycle/scope3-lifecycle.yml
+request_tracing:
+  fields: [requestId, transportRequestId, activityUid]
+  location: activity response object
+  note: >-
+    Three correlation identifiers on the activity object, alongside
+    idempotencyReplayOfActivityUid. No documented request-id request header.
 async:
-  mechanism: AdCP webhooks + polling fallback (agentic platform)
+  mechanism: webhook subscriptions + AdCP async status with a documented polling fallback
   see: asyncapi/scope3-webhooks.yml
+health:
+  endpoint: https://api.interchange.io/health
+  auth: none
+  returns: [status, version, commitSha, inFlightJobs, services, timestamp]
+  note: Unauthenticated liveness endpoint that also reports mcp and a2a readiness.
 cross_links:
   authentication: authentication/scope3-authentication.yml
+  scopes: scopes/scope3-scopes.yml
   errors: errors/scope3-problem-types.yml
   lifecycle: lifecycle/scope3-lifecycle.yml
+  rate_limits: rate-limits/scope3-rate-limits.yml
+  webhooks: asyncapi/scope3-webhooks.yml
+supersedes:
+  note: >-
+    The 2026-07-21 version recorded idempotency.supported false and rate_limiting.documented
+    false. Both were correct for the measurement APIs but wrong for the platform as a whole —
+    the Interchange v2 specs and reference docs, discovered this round, publish both.

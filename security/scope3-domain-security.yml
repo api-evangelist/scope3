@@ -1,4 +1,4 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: probed
 source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
 hosts:
@@ -7,11 +7,18 @@ hosts:
   tls_version: TLSv1.3
   cert_expires: Sep 30 21:56:56 2026 GMT
   hsts: false
-- host: api.scope3.com
+- host: docs.scope3.com
   https: true
   tls_version: TLSv1.3
-  cert_expires: Sep 26 06:01:28 2026 GMT
-  hsts: null
+  cert_expires: Oct  2 17:56:51 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: api.agentic.scope3.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct  9 19:53:05 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
 domains:
 - domain: scope3.com
   dnssec: true

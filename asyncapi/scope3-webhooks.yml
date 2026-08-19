@@ -1,24 +1,71 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
-source: https://github.com/scope3data/agentic-client
+source: openapi/_original/scope3-buyer-openapi-original.yml, https://docs.interchange.io/v2/reference/public-callback-url-requirements
 spec_type: Webhooks
-surface: AdCP (Ad Context Protocol) event webhooks on the Scope3 Agentic Platform
+surface: >-
+  Scope3 Interchange webhook subscriptions (buyer API) plus AdCP async status callbacks on the
+  agentic platform
 description: >-
-  The Scope3 Agentic Platform is event-driven over AdCP. The `scope3` npm SDK ships a
-  WebhookServer class for handling AdCP events, and asynchronous operations (media-buy
-  activation, audience/event-source/catalog syndication) track status via webhooks with a
-  polling fallback (`retryAfterSeconds` guidance) when webhooks are unavailable.
-mechanism:
-  transport: http-callback
-  delivery: AdCP async status webhooks
-  server_class: WebhookServer (npm scope3)
-  polling_fallback: true
-event_areas:
+  The Interchange Buyer API ships a real, first-class webhook-subscription resource with three
+  published operations and an HMAC-style shared secret. Beyond that registry, the platform is
+  event-driven over AdCP: long-running work (media-buy activation, discovery, syndication)
+  reports status via callbacks with a documented polling fallback, and the `scope3` npm SDK
+  ships a WebhookServer class for handling AdCP events.
+subscription_api:
+  base: https://api.interchange.io/api/v2/buyer
+  spec: openapi/_original/scope3-buyer-openapi-original.yml
+  operations:
+  - {operationId: createWebhookSubscription, method: POST, path: /webhook-subscriptions, summary: Register a webhook subscription}
+  - {operationId: listWebhookSubscriptions, method: GET, path: /webhook-subscriptions, summary: List webhook subscriptions}
+  - {operationId: deleteWebhookSubscription, method: DELETE, path: '/webhook-subscriptions/{id}', summary: Delete a webhook subscription}
+  registration_contract:
+    url: {type: string, format: uri, maxLength: 2048, required: true}
+    secret: {type: string, minLength: 16, maxLength: 256, required: true}
+    eventTypes: {type: array, minItems: 1, required: true}
+  callback_requirements: https://docs.interchange.io/v2/reference/public-callback-url-requirements
+event_types:
+  note: >-
+    The published enum on createWebhookSubscription.eventTypes carries exactly one value today.
+    Recorded as published; no additional event names were invented.
+  enum:
+  - discovery.revision
+async_status_areas:
+  note: >-
+    Async surfaces that report completion via callback or polling, captured from the published
+    buyer/storefront skill.md guides, the rate-limits page and the SDK README. These are
+    documented status transitions, not a published event-name registry.
+  areas:
   - media-buy status transitions (pending -> active, active -> paused)
+  - discovery / discover-products completion
+  - ADCP comply-check completion
   - syndication status (audiences, event sources, catalogs to AdCP agents)
   - creative-review / approval-queue updates (storefront persona)
+polling_fallback:
+  supported: true
+  guidance: https://docs.interchange.io/v2/reference/rate-limits
+  cadences:
+  - {endpoint: 'GET /campaigns/:id/media-buy-status', cadence: 30s minimum}
+  - {endpoint: 'GET /discovery/:id/discover-products', cadence: 5-10s while pending, backoff: 15s after one minute}
+  - {endpoint: 'GET /campaigns/:id after POST /execute', cadence: 15-30s}
+  note: Scope3 recommends webhooks where available to remove the need to poll.
+sdk_support:
+  server_class: WebhookServer
+  package: npm scope3
+  see: packages/scope3-packages.yml
+notifications_api:
+  note: >-
+    Distinct from webhooks — an in-platform notification inbox with its own operations
+    (listNotifications, readNotification, readAllNotifications, acknowledgeNotification) in both
+    the buyer and storefront specs.
 no_asyncapi_document: true
 notes: >-
-  Scope3 documents a webhook mechanism but does not publish a machine-readable AsyncAPI
-  document or a fixed named-event catalog; event areas above are captured from the
-  published buyer/storefront skill.md guides and SDK README. No events were fabricated.
+  Scope3 publishes no machine-readable AsyncAPI document on any host; probes of /asyncapi.yaml
+  and the docs event pages found none, and none was fabricated. The webhook catalog above is
+  derived from the provider's own OpenAPI and documentation. Upgraded from the 2026-07-21
+  version, which predated discovery of the Interchange specs and recorded only the AdCP event
+  areas without the subscription API, the registration contract, or the published event enum.
+measurement_apis:
+  event_surface: none
+  note: >-
+    The Carbon Calculator and AI Impact Measurement APIs are request/response only and publish
+    no webhook or event surface.

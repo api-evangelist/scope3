@@ -1,8 +1,17 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
 source: https://github.com/scope3data/agentic-client
 binary: scope3
-package: {registry: npm, name: scope3}
+package: {registry: npm, name: scope3, version: 2.1.0, published: '2026-02-24'}
+currency_note: >-
+  Verified 2026-08-13. The CLI ships inside the `scope3` npm package, whose latest release
+  (2.1.0, 2026-02-24) predates the platform's move to the Interchange domain. Its configured
+  environments target api.agentic.scope3.com / api.agentic.staging.scope3.com, while the
+  provider now documents https://api.interchange.io/api/v2/* as the API base and
+  https://interchange.io/user-api-keys as where keys are issued. The docs' own recommended
+  paths for headless work are the MCP connectors (`codex mcp add interchange-storefront --url
+  https://api.interchange.io/mcp/storefront`) rather than this CLI. Recorded as an observed
+  drift, not a judgement.
 install:
   - npm install -g scope3
 description: >-

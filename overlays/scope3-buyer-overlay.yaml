@@ -1,0 +1,40 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Scope3 Interchange Buyer API
+  version: 1.0.0
+extends: openapi/_original/scope3-buyer-openapi-original.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provenance: >-
+        Verbatim published spec, fetched 2026-08-13 from
+        https://api.interchange.io/api/v2/buyer/openapi.yaml (HTTP 200). Ownership confirmed
+        from the document itself: info.title "Scope3 Buyer API" and servers[0].url
+        https://api.interchange.io/api/v2/buyer. Interchange is Scope3's agentic-advertising
+        product; api.interchange.io names identity.scope3.com as an authorization server.
+      x-api-base-url: https://api.interchange.io/api/v2/buyer
+      x-authentication: authentication/scope3-authentication.yml
+      x-oauth-scopes: scopes/scope3-scopes.yml
+      x-error-catalog: errors/scope3-problem-types.yml
+      x-conventions: conventions/scope3-conventions.yml
+      x-rate-limits: rate-limits/scope3-rate-limits.yml
+      x-plans: plans/scope3-plans-pricing.yml
+      x-data-model: data-model/scope3-data-model.yml
+      x-lifecycle: lifecycle/scope3-lifecycle.yml
+      x-webhooks: asyncapi/scope3-webhooks.yml
+      x-mcp-server: https://api.interchange.io/mcp/buyer
+      x-tool-crosswalk: mcp/scope3-tool-crosswalk.yml
+      x-agent-card: a2a/scope3-a2a.yml
+      x-agent-skill: skills/scope3-agentic-buyer.md
+      x-idempotency: >-
+        Body-level idempotencyKey (minLength 8, maxLength 128, pattern ^[A-Za-z0-9._:-]+$),
+        required on rate-card acceptance. No Idempotency-Key request header.
+      x-response-envelope: '{"data": <result>, "error": null}'
+      x-pagination: 'offset via take/skip; meta.pagination carries skip, take, total, hasMore'
+      x-sdk-gap: >-
+        No first-party client library targets this API; the documented integration paths are
+        the hosted MCP endpoint and raw REST.
+  - target: $.servers
+    update:
+      - url: https://api.interchange.io/api/v2/buyer
+        description: Production server

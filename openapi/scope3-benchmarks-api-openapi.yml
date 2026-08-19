@@ -6,6 +6,9 @@ security:
 - bearerAuth: []
 tags:
 - name: Benchmarks
+servers:
+- url: https://api.scope3.com/v2
+  description: Carbon Calculator (Measurement) API server
 paths:
   /benchmarks:
     post:

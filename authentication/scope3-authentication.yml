@@ -1,13 +1,23 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
-source: openapi/scope3-ai-openapi-original.yml, openapi/scope3-measurement-openapi.yml
-docs: https://docs.scope3.com/docs/access-authorization
+source: >-
+  openapi/_original/scope3-ai-openapi-original.yml, openapi/_original/scope3-measurement-openapi.yml,
+  openapi/_original/scope3-buyer-openapi-original.yml, openapi/_original/scope3-storefront-openapi-original.yml,
+  https://api.interchange.io/.well-known/oauth-authorization-server
+docs:
+- https://docs.scope3.com/docs/access-authorization
+- https://docs.interchange.io/v2/authentication
 summary:
-  types:
-  - http
-  token_format: "scope3_<accessClientId>_<accessClientSecret>"
+  types: [http, oauth2, openIdConnect]
+  http_schemes: [bearer]
+  api_key_prefix: scope3_
+  api_key_headers: [Authorization, x-scope3-api-key]
+  oauth2_flows: [authorizationCode, clientCredentials, deviceCode]
+  identity_provider: WorkOS (https://identity.scope3.com)
   header: Authorization
-  obtain: Contact your Scope3 representative for API access (dashboard key management at https://agentic.scope3.com for the Agentic Platform).
+  obtain:
+  - https://interchange.io/user-api-keys
+  - Contact a Scope3 representative for Carbon Calculator / AI Impact Measurement access
 schemes:
 - name: bearerAuth
   type: http
@@ -15,8 +25,72 @@ schemes:
   bearerFormat: JWT
   in: header
   header: Authorization
-  format: "Bearer scope3_<accessClientId>_<accessClientSecret>"
+  format: 'Bearer scope3_<accessClientId>_<accessClientSecret>'
   docs: https://docs.scope3.com/docs/access-authorization
+  applies_to: Carbon Calculator (api.scope3.com/v2), AI Impact Measurement (aiapi.scope3.com)
   sources:
-  - openapi/scope3-ai-openapi-original.yml
-  - openapi/scope3-measurement-openapi.yml
+  - openapi/_original/scope3-ai-openapi-original.yml
+  - openapi/_original/scope3-measurement-openapi.yml
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  in: header
+  header: Authorization
+  format: 'Bearer scope3_<api_key>'
+  alternate_header: x-scope3-api-key
+  docs: https://docs.interchange.io/v2/authentication
+  applies_to: Interchange Buyer + Storefront v2 (api.interchange.io/api/v2/*) and the MCP endpoints
+  obtain: https://interchange.io/user-api-keys
+  sources:
+  - openapi/_original/scope3-buyer-openapi-original.yml
+  - openapi/_original/scope3-storefront-openapi-original.yml
+  probe_evidence:
+    note: >-
+      An unauthenticated POST to https://api.interchange.io/mcp/buyer returns HTTP 401
+      {"error":"Authentication required","message":"API key required. Please provide via
+      x-scope3-api-key header or Authorization: Bearer header"} — observed 2026-08-13.
+- name: interchange-mcp-oauth
+  type: oauth2
+  role: Recommended path for AI agent connectors (Claude, ChatGPT, Cursor, Codex)
+  discovery: https://api.interchange.io/.well-known/oauth-authorization-server
+  protected_resource: https://api.interchange.io/.well-known/oauth-protected-resource
+  issuer: https://api.interchange.io
+  authorization_endpoint: https://api.interchange.io/authorize
+  token_endpoint: https://api.interchange.io/auth/token
+  registration_endpoint: https://api.interchange.io/auth/register
+  dynamic_client_registration: true
+  pkce: S256
+  flows: [authorizationCode]
+  grant_types: [authorization_code, refresh_token]
+  token_endpoint_auth_methods: [none]
+  sources: ['https://api.interchange.io/.well-known/oauth-authorization-server']
+- name: scope3-identity
+  type: openIdConnect
+  openIdConnectUrl: https://identity.scope3.com/.well-known/openid-configuration
+  issuer: https://identity.scope3.com
+  scopes: [openid, profile, email, offline_access]
+  grant_types: [authorization_code, client_credentials, refresh_token, 'urn:ietf:params:oauth:grant-type:device_code']
+  note: >-
+    Named as a co-equal authorization server in the Interchange protected-resource metadata.
+    client_credentials here is what backs the documented M2M application path.
+  sources: ['https://identity.scope3.com/.well-known/openid-configuration']
+credential_paths:
+  note: Interchange documents four distinct credential paths, all fronted by WorkOS.
+  paths:
+  - {name: OAuth, audience: interactive connectors and AI agents, mechanism: authorization code + PKCE via MCP connector}
+  - {name: Agent Registration, audience: AI agents, mechanism: dynamic client registration at /auth/register}
+  - {name: Organization API keys, audience: simple customer automation, mechanism: 'scope3_ prefixed bearer key'}
+  - {name: M2M applications, audience: backend integrations, mechanism: OAuth client credentials}
+sso:
+  supported: true
+  docs: https://docs.interchange.io/v2/setup/sso-setup
+authorization:
+  model: role + organization entitlement + persona
+  note: >-
+    No product-level OAuth scopes are published. See scopes/scope3-scopes.yml. A 403 carries
+    FORBIDDEN, ACCESS_DENIED, ALPHA_OPT_IN_REQUIRED or TOS_ACCEPTANCE_REQUIRED, which is where
+    the real authorization surface is visible.
+cross_links:
+  scopes: scopes/scope3-scopes.yml
+  well_known: well-known/scope3-well-known.yml
+  conventions: conventions/scope3-conventions.yml

@@ -1,0 +1,332 @@
+{
+  "item": [
+    {
+      "id": "9add9a6c-d5c9-4e8e-a2dd-0f55e2b21f8b",
+      "name": "Signals",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "fa70eb90-22bd-4442-bd56-567af7842e6c",
+          "name": "Get Signals by Saved List",
+          "request": {
+            "name": "Get Signals by Saved List",
+            "description": {
+              "content": "Returns paginated domain-level media quality signals for all domains in the specified saved property list.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "signals",
+                "saved_list",
+                ":saved_list_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (1-based, integer)"
+                },
+                {
+                  "disabled": false,
+                  "key": "page_size",
+                  "value": "1000",
+                  "description": "Number of domains per page (integer, max 5000)"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "saved_list_id",
+                  "description": "(Required) Numeric ID of the saved property list"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "28588a55-c365-4ed2-b718-6e0d2d5b17f6",
+              "name": "success response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "signals",
+                    "saved_list",
+                    ":saved_list_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "1000"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "saved_list_id",
+                      "description": "(Required) Numeric ID of the saved property list"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"domain\": \"string\",\n      \"traffic_percentile\": 4889.796835588317,\n      \"is_mfa\": false,\n      \"avg_a2cr\": 9626.44178728714,\n      \"max_a2cr\": 9960.796093821004,\n      \"avg_ads_in_view\": 9523.013704060359,\n      \"max_ads_in_view\": 4578.578136001011,\n      \"avg_num_sellers\": 8724.636881832252,\n      \"avg_num_nodes\": 186.47256660772493,\n      \"domain_avg_refresh_rate\": 4720.046054400692,\n      \"pct_placements_refreshed\": 8644.36044485877,\n      \"avg_a2cr_in_feed\": 5.777021471801147,\n      \"avg_ads_in_view_in_feed\": 670.7973025101488,\n      \"pct_high_viewport_ad\": 6111.984506502651,\n      \"pct_invalid_ads\": 3603.674085113585,\n      \"pct_organic_search_traffic\": 9376.193519971956,\n      \"pct_organic_referral_traffic\": 3225.780697387275,\n      \"pct_social_traffic\": 3946.800170242877,\n      \"pct_ad_network_traffic\": 2881.6878206840724,\n      \"pct_marketplace_referral_traffic\": 7000.500529324415,\n      \"pct_messaging_traffic\": 6622.399593582998,\n      \"pct_email_traffic\": 5379.487300177983,\n      \"pct_ai_assistant_traffic\": 196.82015884479932,\n      \"top_geos\": \"string\",\n      \"primary_language\": \"string\",\n      \"avg_viewability\": 1227.3645098194474,\n      \"total_gpids\": 7226.955143675924,\n      \"eid_rate\": 4770.669869091512,\n      \"avg_page_height\": 1484.5624272950909,\n      \"avg_initial_page_weight_bytes\": 8205.259007192566,\n      \"avg_final_page_weight_bytes\": 3519.4463354020354,\n      \"avg_initial_cpu\": 5131.839286566462,\n      \"avg_final_cpu\": 3476.2805933647132,\n      \"avg_initial_network_calls_count\": 385.4635613782831,\n      \"avg_final_network_calls_count\": 8621.853069045595,\n      \"missing_ads_text\": true,\n      \"old_ads_text\": false,\n      \"avg_depth\": 3075.312253529451,\n      \"max_depth\": 5063.390033032531\n    },\n    {\n      \"domain\": \"string\",\n      \"traffic_percentile\": 6096.758580838921,\n      \"is_mfa\": true,\n      \"avg_a2cr\": 2333.9374878314425,\n      \"max_a2cr\": 7547.239401836549,\n      \"avg_ads_in_view\": 5533.313096455395,\n      \"max_ads_in_view\": 3785.4032449311926,\n      \"avg_num_sellers\": 8272.364503005509,\n      \"avg_num_nodes\": 706.1545159589589,\n      \"domain_avg_refresh_rate\": 5520.242519867802,\n      \"pct_placements_refreshed\": 6383.234922743888,\n      \"avg_a2cr_in_feed\": 7074.132276384044,\n      \"avg_ads_in_view_in_feed\": 2311.8788254609144,\n      \"pct_high_viewport_ad\": 2197.6541119526905,\n      \"pct_invalid_ads\": 3220.2590718635406,\n      \"pct_organic_search_traffic\": 8876.532723532124,\n      \"pct_organic_referral_traffic\": 7295.915221786994,\n      \"pct_social_traffic\": 7229.382762072885,\n      \"pct_ad_network_traffic\": 8930.640118085286,\n      \"pct_marketplace_referral_traffic\": 7804.596600168608,\n      \"pct_messaging_traffic\": 2856.953958680124,\n      \"pct_email_traffic\": 234.39485844863663,\n      \"pct_ai_assistant_traffic\": 7781.74320384995,\n      \"top_geos\": \"string\",\n      \"primary_language\": \"string\",\n      \"avg_viewability\": 4610.769103456207,\n      \"total_gpids\": 4689.571141512988,\n      \"eid_rate\": 2261.337730831721,\n      \"avg_page_height\": 916.8015541067409,\n      \"avg_initial_page_weight_bytes\": 7785.356757210599,\n      \"avg_final_page_weight_bytes\": 3254.734541629802,\n      \"avg_initial_cpu\": 1003.223799769628,\n      \"avg_final_cpu\": 7156.688355730888,\n      \"avg_initial_network_calls_count\": 1645.8247190629727,\n      \"avg_final_network_calls_count\": 809.0511811892243,\n      \"missing_ads_text\": false,\n      \"old_ads_text\": false,\n      \"avg_depth\": 341.31659323495154,\n      \"max_depth\": 2999.3636051134486\n    }\n  ],\n  \"page\": 2368,\n  \"page_size\": 1032,\n  \"has_more\": false\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "378b52d8-8b8d-4a7a-bca2-13017b49f53e",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "signals",
+                    "saved_list",
+                    ":saved_list_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "1000"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "saved_list_id",
+                      "description": "(Required) Numeric ID of the saved property list"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "fbc5a6f5-8e4a-4074-af7b-b7008ecb35b0",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "signals",
+                    "saved_list",
+                    ":saved_list_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "1000"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "saved_list_id",
+                      "description": "(Required) Numeric ID of the saved property list"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "eab97017-385f-40fd-83e8-1c9a18aa90f9",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "signals",
+                    "saved_list",
+                    ":saved_list_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "1000"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "saved_list_id",
+                      "description": "(Required) Numeric ID of the saved property list"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "36fd1dfb-1e8b-494c-955b-56ae47271594",
+    "name": "AI Impact Measurement Signals API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

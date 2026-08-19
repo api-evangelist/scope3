@@ -1,0 +1,63 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AI Impact Measurement Creative API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Creative",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Creative emissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/creative",
+            "params": [
+              {
+                "name": "includeRows",
+                "value": "",
+                "type": "query",
+                "description": "Whether to include all rows in the response"
+              },
+              {
+                "name": "latest",
+                "value": "",
+                "type": "query",
+                "description": "Whether to use latest available data"
+              },
+              {
+                "name": "framework",
+                "value": "",
+                "type": "query",
+                "description": "Default is scope3"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Calculates the carbon footprint of running a creative"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

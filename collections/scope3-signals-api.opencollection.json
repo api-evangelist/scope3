@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AI Impact Measurement Signals API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Signals",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Signals by Saved List",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/signals/saved_list/:saved_list_id",
+            "params": [
+              {
+                "name": "saved_list_id",
+                "value": "",
+                "type": "path",
+                "description": "Numeric ID of the saved property list"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number (1-based, integer)"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "Number of domains per page (integer, max 5000)"
+              }
+            ]
+          },
+          "docs": "Returns paginated domain-level media quality signals for all domains in the specified saved property list."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

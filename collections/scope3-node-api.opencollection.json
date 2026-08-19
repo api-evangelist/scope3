@@ -1,0 +1,160 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AI Impact Measurement Node API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Node",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List nodes (both global and custom)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/node",
+            "params": [
+              {
+                "name": "service",
+                "value": "",
+                "type": "query",
+                "description": "Filter nodes by managed service provider"
+              },
+              {
+                "name": "cloud",
+                "value": "",
+                "type": "query",
+                "description": "Filter nodes by cloud provider"
+              },
+              {
+                "name": "custom",
+                "value": "",
+                "type": "query",
+                "description": "Filter by node type:\n- true: Show only custom nodes\n- false: Show only global nodes\n- Not provided: Show all nodes\n"
+              },
+              {
+                "name": "gpu",
+                "value": "",
+                "type": "query",
+                "description": "Filter nodes by GPU"
+              },
+              {
+                "name": "instance",
+                "value": "",
+                "type": "query",
+                "description": "Filter nodes by cloud instance type"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List nodes (both global and custom)"
+        },
+        {
+          "info": {
+            "name": "Create a custom node",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/node",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a custom node"
+        },
+        {
+          "info": {
+            "name": "Get a specific node (global or custom)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/node/:nodeId",
+            "params": [
+              {
+                "name": "nodeId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Get a specific node (global or custom)"
+        },
+        {
+          "info": {
+            "name": "Update a node (custom nodes only, unless admin)",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/node/:nodeId",
+            "params": [
+              {
+                "name": "nodeId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Update a node (custom nodes only, unless admin)"
+        },
+        {
+          "info": {
+            "name": "Delete a node (custom nodes only, unless admin)",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/node/:nodeId",
+            "params": [
+              {
+                "name": "nodeId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Delete a node (custom nodes only, unless admin)"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

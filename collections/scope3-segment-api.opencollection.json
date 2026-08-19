@@ -1,0 +1,80 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AI Impact Measurement Segment API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Segment",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get All Organization Segment Information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/segment/list",
+            "params": [
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Which page number being requested"
+              },
+              {
+                "name": "segmentId",
+                "value": "",
+                "type": "query",
+                "description": "specify the client segment id to fuzzy search filter on"
+              },
+              {
+                "name": "includeDeactivated",
+                "value": "",
+                "type": "query",
+                "description": "whether to filter out deactivated segments"
+              }
+            ]
+          },
+          "docs": "Returns filtered list of organization segments"
+        },
+        {
+          "info": {
+            "name": "Get Organization Segment Data by Segment ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/segment/data",
+            "params": [
+              {
+                "name": "segmentId",
+                "value": "",
+                "type": "query",
+                "description": "client segment id"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "query",
+                "description": "scope3 internal segment id"
+              }
+            ]
+          },
+          "docs": "Returns requested data for the segment"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

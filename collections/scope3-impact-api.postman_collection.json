@@ -1,0 +1,525 @@
+{
+  "item": [
+    {
+      "id": "51c81bb9-7068-458a-a356-dac16f6c5e06",
+      "name": "Impact",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "8f56a187-d37d-4a1a-9e18-66d21567e0e8",
+          "name": "Get impact metrics for a task",
+          "request": {
+            "name": "Get impact metrics for a task",
+            "description": {},
+            "url": {
+              "protocol": "https",
+              "path": [
+                "v1",
+                "impact"
+              ],
+              "host": [
+                "aiapi",
+                "scope3",
+                "com"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "debug",
+                  "value": "<boolean>",
+                  "description": "Return debug information"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"<dateTime>\",\n      \"request_duration_ms\": \"<float>\",\n      \"processing_duration_ms\": \"<float>\",\n      \"request_cost\": \"<float>\",\n      \"currency\": \"<string>\",\n      \"integration_source\": \"<string>\",\n      \"environment\": \"<string>\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"<string>\",\n      \"model_family\": \"<string>\",\n      \"model_name\": \"<string>\",\n      \"model_hugging_face_path\": \"<string>\",\n      \"model_used_id\": \"<string>\",\n      \"cloud_region\": \"<string>\",\n      \"managed_service_id\": \"<string>\",\n      \"cloud_id\": \"<string>\",\n      \"cloud_instance_id\": \"<string>\",\n      \"node_id\": \"<string>\",\n      \"country\": \"<string>\",\n      \"region\": \"<string>\",\n      \"task\": \"<string>\",\n      \"input_tokens\": \"<integer>\",\n      \"input_audio_seconds\": \"<float>\",\n      \"output_tokens\": \"<integer>\",\n      \"input_images\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"input_steps\": \"<integer>\",\n      \"output_images\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"output_audio_seconds\": \"<float>\",\n      \"output_audio_tokens\": \"<integer>\",\n      \"output_video_frames\": \"<integer>\",\n      \"output_video_resolution\": \"<integer>\"\n    },\n    {\n      \"utc_datetime\": \"<dateTime>\",\n      \"request_duration_ms\": \"<float>\",\n      \"processing_duration_ms\": \"<float>\",\n      \"request_cost\": \"<float>\",\n      \"currency\": \"<string>\",\n      \"integration_source\": \"<string>\",\n      \"environment\": \"<string>\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"<string>\",\n      \"model_family\": \"<string>\",\n      \"model_name\": \"<string>\",\n      \"model_hugging_face_path\": \"<string>\",\n      \"model_used_id\": \"<string>\",\n      \"cloud_region\": \"<string>\",\n      \"managed_service_id\": \"<string>\",\n      \"cloud_id\": \"<string>\",\n      \"cloud_instance_id\": \"<string>\",\n      \"node_id\": \"<string>\",\n      \"country\": \"<string>\",\n      \"region\": \"<string>\",\n      \"task\": \"<string>\",\n      \"input_tokens\": \"<integer>\",\n      \"input_audio_seconds\": \"<float>\",\n      \"output_tokens\": \"<integer>\",\n      \"input_images\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"input_steps\": \"<integer>\",\n      \"output_images\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"output_audio_seconds\": \"<float>\",\n      \"output_audio_tokens\": \"<integer>\",\n      \"output_video_frames\": \"<integer>\",\n      \"output_video_resolution\": \"<integer>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "dadabb38-be91-4a6e-a7c5-36488d8b51ca",
+              "name": "Impact metrics retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "v1",
+                    "impact"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "debug",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    },\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"rows\": [\n    {\n      \"total_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"inference_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"training_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"fine_tuning_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"debug\": {\n        \"model\": {\n          \"id\": \"gpt-4-turbo\",\n          \"created_at\": \"1994-07-22T02:05:28.633Z\",\n          \"updated_at\": \"1972-07-19T06:30:54.678Z\",\n          \"created_by\": \"string\",\n          \"customer_id\": 3652,\n          \"aliases\": [\n            \"claude-latest\",\n            \"claude-3-sonnet-current\"\n          ],\n          \"name\": \"GPT-4 Turbo\",\n          \"family\": \"gpt\",\n          \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n          \"benchmark_model_id\": \"GPTJ-6B\",\n          \"total_params_billions\": 175,\n          \"number_of_experts\": 7,\n          \"params_per_expert_billions\": 8,\n          \"tensor_parallelism\": 1,\n          \"datatype\": \"fp8\",\n          \"task\": \"text-generation\",\n          \"training_usage_energy_kwh\": 1013.1,\n          \"training_usage_emissions_kgco2e\": 1013.1,\n          \"training_usage_water_l\": 1013.1,\n          \"training_embodied_emissions_kgco2e\": 11013.1,\n          \"training_embodied_water_l\": 11013.1,\n          \"estimated_use_life_days\": 1013.1,\n          \"estimated_requests_per_day\": 1013.1,\n          \"fine_tuned_from_model_id\": \"llama_31_8b\"\n        },\n        \"hardware_node\": {\n          \"cpu_count\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"created_at\": \"2006-07-16T06:54:25.946Z\",\n          \"gpu_count\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"gpu_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updated_at\": \"2024-11-10T20:19:50.739Z\",\n          \"cloud_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"cloud_instance_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"managed_service_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"idle_power_w_ex_gpu\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"average_utilization_rate\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"embodied_emissions_kgco2e_ex_gpu\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"embodied_water_l_ex_gpu\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"use_life_years\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"customer_id\": 4312,\n          \"created_by\": \"string\"\n        },\n        \"grid_mix\": {\n          \"country\": \"US\",\n          \"gco2e_per_kwh\": 475,\n          \"region\": \"NY\"\n        },\n        \"steps\": [\n          {\n            \"description\": \"string\",\n            \"duration_ms\": 2382.068090216465,\n            \"inferences\": 8508\n          },\n          {\n            \"description\": \"string\",\n            \"duration_ms\": 6059.210280519349,\n            \"inferences\": 3434\n          }\n        ]\n      },\n      \"error\": {\n        \"message\": \"string\",\n        \"code\": \"string\",\n        \"details\": {\n          \"reason\": \"string\",\n          \"field\": \"string\"\n        }\n      }\n    },\n    {\n      \"total_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"inference_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"training_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"fine_tuning_impact\": {\n        \"usage_energy_wh\": 0.13,\n        \"usage_emissions_gco2e\": 0.81,\n        \"usage_water_ml\": 1.32,\n        \"embodied_emissions_gco2e\": 0.81,\n        \"embodied_water_ml\": 1.32\n      },\n      \"debug\": {\n        \"model\": {\n          \"id\": \"gpt-4-turbo\",\n          \"created_at\": \"1999-06-10T13:54:19.376Z\",\n          \"updated_at\": \"1980-04-15T10:43:09.937Z\",\n          \"created_by\": \"string\",\n          \"customer_id\": 458,\n          \"aliases\": [\n            \"claude-latest\",\n            \"claude-3-sonnet-current\"\n          ],\n          \"name\": \"GPT-4 Turbo\",\n          \"family\": \"gpt\",\n          \"hugging_face_path\": \"EleutherAI/gpt-neo-2.7B\",\n          \"benchmark_model_id\": \"GPTJ-6B\",\n          \"total_params_billions\": 175,\n          \"number_of_experts\": 7,\n          \"params_per_expert_billions\": 8,\n          \"tensor_parallelism\": 1,\n          \"datatype\": \"fp8\",\n          \"task\": \"text-generation\",\n          \"training_usage_energy_kwh\": 1013.1,\n          \"training_usage_emissions_kgco2e\": 1013.1,\n          \"training_usage_water_l\": 1013.1,\n          \"training_embodied_emissions_kgco2e\": 11013.1,\n          \"training_embodied_water_l\": 11013.1,\n          \"estimated_use_life_days\": 1013.1,\n          \"estimated_requests_per_day\": 1013.1,\n          \"fine_tuned_from_model_id\": \"llama_31_8b\"\n        },\n        \"hardware_node\": {\n          \"cpu_count\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"created_at\": \"2013-01-19T11:31:59.068Z\",\n          \"gpu_count\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"gpu_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updated_at\": \"2002-06-22T04:43:15.142Z\",\n          \"cloud_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"cloud_instance_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"managed_service_id\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"idle_power_w_ex_gpu\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"average_utilization_rate\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"embodied_emissions_kgco2e_ex_gpu\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"embodied_water_l_ex_gpu\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"use_life_years\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"customer_id\": 6443,\n          \"created_by\": \"string\"\n        },\n        \"grid_mix\": {\n          \"country\": \"US\",\n          \"gco2e_per_kwh\": 475,\n          \"region\": \"NY\"\n        },\n        \"steps\": [\n          {\n            \"description\": \"string\",\n            \"duration_ms\": 8014.327129035045,\n            \"inferences\": 6804\n          },\n          {\n            \"description\": \"string\",\n            \"duration_ms\": 9239.667785159565,\n            \"inferences\": 5856\n          }\n        ]\n      },\n      \"error\": {\n        \"message\": \"string\",\n        \"code\": \"string\",\n        \"details\": {\n          \"reason\": \"string\",\n          \"field\": \"string\"\n        }\n      }\n    }\n  ],\n  \"has_errors\": false,\n  \"total_energy_wh\": 0.13,\n  \"total_gco2e\": 0.81,\n  \"total_mlh2o\": 1.32\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4506d896-fe79-4b35-9c68-eb48d6662678",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "v1",
+                    "impact"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "debug",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    },\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "002b2385-3154-4512-88bc-ce2c138168a8",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "v1",
+                    "impact"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "debug",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    },\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3e22be67-7425-4276-9f43-650dc0a9fa7a",
+              "name": "Not acceptable response",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "v1",
+                    "impact"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "debug",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    },\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "632a631c-4d9d-4e32-9925-b6feb16ab02e",
+              "name": "Unsupported media type",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "v1",
+                    "impact"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "debug",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    },\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bea606ef-c8e3-4e22-8cee-bb90a45ab6e4",
+              "name": "Too many requests",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "v1",
+                    "impact"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "debug",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    },\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d17be7ff-045c-4638-b246-de98d713dd5e",
+              "name": "Unexpected error",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "v1",
+                    "impact"
+                  ],
+                  "host": [
+                    "aiapi",
+                    "scope3",
+                    "com"
+                  ],
+                  "query": [
+                    {
+                      "key": "debug",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    },\n    {\n      \"utc_datetime\": \"2022-01-01T00:00:00Z\",\n      \"request_duration_ms\": 283,\n      \"processing_duration_ms\": 238,\n      \"request_cost\": 0.18,\n      \"currency\": \"USD\",\n      \"integration_source\": \"litellm\",\n      \"environment\": \"staging\",\n      \"session_id\": \"<string>\",\n      \"trace_id\": \"<string>\",\n      \"request_id\": \"<string>\",\n      \"client_id\": \"<string>\",\n      \"project_id\": \"<string>\",\n      \"application_id\": \"<string>\",\n      \"model_id\": \"llama_31_8b\",\n      \"model_family\": \"llama\",\n      \"model_name\": \"LLaMa v3.1 8B\",\n      \"model_hugging_face_path\": \"meta/llama31_8b\",\n      \"model_used_id\": \"llama_31_8b_0125\",\n      \"cloud_region\": \"us-central1\",\n      \"managed_service_id\": \"aws-bedrock\",\n      \"cloud_id\": \"aws\",\n      \"cloud_instance_id\": \"p4d.24xlarge\",\n      \"node_id\": \"aws:p4d.24xlarge\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"task\": \"text-generation\",\n      \"input_tokens\": 128,\n      \"input_audio_seconds\": 60,\n      \"output_tokens\": 128,\n      \"input_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"input_steps\": 50,\n      \"output_images\": [\n        \"1024x1024\",\n        \"1024x1024\"\n      ],\n      \"output_audio_seconds\": 60,\n      \"output_audio_tokens\": 2300,\n      \"output_video_frames\": 60,\n      \"output_video_resolution\": 1080\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"code\": \"string\",\n  \"details\": {\n    \"reason\": \"string\",\n    \"field\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "47e20f7b-045c-476c-92b7-39b6a58eaed6",
+    "name": "AI Measurement Impact API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

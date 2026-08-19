@@ -6,6 +6,9 @@ security:
 - bearerAuth: []
 tags:
 - name: Model
+servers:
+- url: https://aiapi.scope3.com
+  description: AI Impact Measurement API server
 paths:
   /model:
     get:

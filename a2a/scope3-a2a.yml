@@ -1,0 +1,75 @@
+generated: '2026-08-13'
+method: probed
+source: https://docs.interchange.io/.well-known/agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: docs.interchange.io
+ownership:
+  note: >-
+    interchange.io is a Scope3-operated domain, not a third party. Its SPA shell declares
+    og:url https://scope3.com/ and twitter:site @Scope3data; https://api.interchange.io/.well-known/oauth-authorization-server
+    names https://identity.scope3.com as a co-equal authorization server and
+    https://docs.interchange.io as its service_documentation; and the OpenAPI documents served
+    from api.interchange.io carry info.title "Scope3 Buyer API" / "Scope3 Storefront API".
+    Scope3 Interchange is the product name for the agentic-advertising platform.
+  evidence:
+  - https://api.interchange.io/.well-known/oauth-authorization-server
+  - https://api.interchange.io/api/v2/buyer/openapi.yaml
+conformance:
+  spec: A2A 1.0.0
+  grade: near-conformant
+  protocol_version: '0.3'
+  preferred_transport: HTTP+JSON
+  hard_checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+  deviations:
+  - supportedInterfaces-instead-of-additionalInterfaces
+  - protocolVersion-not-full-semver
+  grade_note: >-
+    All three A2A 1.0.0 hard checks pass and every optional field (preferredTransport,
+    defaultInputModes, defaultOutputModes) is present, but the card publishes the non-spec
+    key `supportedInterfaces` where A2A 1.0.0 defines `additionalInterfaces`, and declares
+    protocolVersion "0.3" rather than "0.3.0". Graded near-conformant rather than conformant
+    so the field-naming deviation is not credited away.
+card:
+  name: Interchange API
+  url: https://docs.interchange.io/
+  version: 1.0.0
+  organization: Interchange API
+  documentation_url: https://docs.interchange.io/
+  capabilities:
+    streaming: false
+    pushNotifications: false
+  skills: 1
+  skill_ids:
+  - scope3
+  skill_files:
+  - https://docs.interchange.io/.well-known/agent-skills/scope3/skill.md
+  file: scope3-agent-card.json
+related_surfaces:
+  note: >-
+    The unauthenticated health endpoint https://api.interchange.io/health reports
+    services.a2a "ready" and services.mcp "ready", so the A2A posture is live rather than
+    documentation-only. The MCP endpoints are catalogued in mcp/scope3-mcp.yml.
+  health: https://api.interchange.io/health
+  mcp:
+  - https://api.interchange.io/mcp/buyer
+  - https://api.interchange.io/mcp/storefront
+x-evidence:
+  fetched: '2026-08-13'
+  url: https://docs.interchange.io/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  misses:
+  - {url: 'https://scope3.com/.well-known/agent-card.json', status: 404}
+  - {url: 'https://scope3.com/.well-known/agent.json', status: 404}
+  - {url: 'https://api.scope3.com/.well-known/agent-card.json', status: 404}
+  - {url: 'https://aiapi.scope3.com/.well-known/agent-card.json', status: 404}
+  - {url: 'https://api.agentic.scope3.com/.well-known/agent-card.json', status: 404}
+  - {url: 'https://docs.scope3.com/.well-known/agent-card.json', status: 404}
+  - {url: 'https://api.interchange.io/.well-known/agent-card.json', status: 404}
+  - {url: 'https://identity.scope3.com/.well-known/agent-card.json', status: 404}
+  - {url: 'https://docs.interchange.io/.well-known/agent.json', status: 404}

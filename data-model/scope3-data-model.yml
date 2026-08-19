@@ -1,75 +1,198 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: derived
-source: openapi/scope3-ai-openapi-original.yml, openapi/scope3-measurement-openapi.yml
+source:
+- openapi/_original/scope3-buyer-openapi-original.yml
+- openapi/_original/scope3-storefront-openapi-original.yml
+- openapi/_original/scope3-ai-openapi-original.yml
+- openapi/_original/scope3-measurement-openapi.yml
+note: >-
+  Derived from the four published specs — path structure, tag grouping, and id-reference field
+  names in components.schemas. The 2026-07-21 version described the agentic platform from the
+  SDK README only, because no agentic OpenAPI had been found; this round replaces that guess
+  with an entity graph read out of the real Buyer (462 schemas) and Storefront (443 schemas)
+  documents. Nothing here is inferred beyond what the specs declare.
+domains:
+- name: interchange-buyer
+  spec: openapi/_original/scope3-buyer-openapi-original.yml
+  base: https://api.interchange.io/api/v2/buyer
+  operations: 212
+  schemas: 462
+- name: interchange-storefront
+  spec: openapi/_original/scope3-storefront-openapi-original.yml
+  base: https://api.interchange.io/api/v2/storefront
+  operations: 269
+  schemas: 443
+- name: measurement
+  spec: openapi/_original/scope3-measurement-openapi.yml
+  base: https://api.scope3.com/v2
+- name: ai-impact
+  spec: openapi/_original/scope3-ai-openapi-original.yml
+  base: https://aiapi.scope3.com
 entities:
+- name: Account
+  domain: interchange-buyer, interchange-storefront
+  id_field: accountId
+  path_root: /accounts
+  notes: >-
+    The organization an API key or OAuth session resolves to. One billing organization holds
+    one IU plan and wallet shared by buyer, storefront and Murph activity.
+- name: Advertiser
+  domain: interchange-buyer
+  id_field: advertiserId
+  path_root: /advertisers
+  operations: 43
+  notes: >-
+    Buyer entity. Requires a verified brand domain before any advertiser action. Owns
+    campaigns, creatives, property lists, catalogs and pricing rules.
+- name: Campaign
+  domain: interchange-buyer
+  id_field: campaignId
+  path_root: /campaigns
+  operations: 29
+  notes: >-
+    Acts as the cart for product selection, then executes into media buys. Lifecycle
+    operations include execute, pause, reactivate, auto-select products and delete.
+- name: MediaBuy
+  domain: interchange-buyer, interchange-storefront
+  id_field: mediaBuyId
+  path_root: /media-buys
+  notes: >-
+    The unit dispatched to a seller. Execution spans bilateral seller calls and is explicitly
+    not atomic. Has its own ADCP status and approval mode.
+- name: Product
+  domain: interchange-buyer, interchange-storefront
+  id_field: productId
+  notes: The sellable unit a storefront lists and a buyer discovers, selects and buys.
+- name: Discovery
+  domain: interchange-buyer
+  path_root: /discovery
+  notes: >-
+    A pre-campaign product-discovery session with its own selection set, refinement and
+    revision events (the sole published webhook event type is discovery.revision).
+- name: Creative
+  domain: interchange-buyer
+  path_root: /creatives
+  operations: 39
+  notes: Largest single buyer capability; includes generation, review and campaign mapping.
+- name: Storefront
+  domain: interchange-storefront
+  id_field: storefrontId
+  path_root: /storefront
+  operations: 159
+  notes: >-
+    Publisher/seller entity. Distinguishes registered domain, operator domain and publisher
+    domains, where only publisher domains (authorized via each domain's adagents.json) are the
+    inventory being sold.
+- name: InventorySource
+  domain: interchange-storefront
+  id_field: sourceId
+  path_root: /inventory-sources
+  operations: 40
+  notes: Where a storefront's avails come from; includes modular source feeds and ad-server sources.
+- name: Agent
+  domain: interchange-storefront
+  id_field: agentId
+  path_root: /agents
+  notes: A sales/storefront agent that transacts on AdCP.
+- name: Signal
+  domain: interchange-storefront, measurement
+  id_field: signal_id
+  notes: >-
+    The most referenced id in the storefront spec (68 occurrences). Also the measurement-side
+    media-quality signal attached to a saved property list.
+- name: RateCard
+  domain: interchange-buyer, interchange-storefront
+  id_field: rateCardId
+  notes: >-
+    The Organization IU Rate Card. Accepting an exact revision requires offerVersion, planId
+    and a required idempotencyKey.
+- name: Plan
+  domain: interchange-buyer, interchange-storefront
+  id_field: planId
+  notes: A commercial package on a rate-card revision (Pay as you go / 250 / 1,000).
+- name: Contract
+  domain: interchange-storefront
+  id_field: contractId
+  notes: Governs source, tenant and pricing checks on inventory feeds.
+- name: CommercialOffer
+  domain: interchange-buyer
+  id_field: commercialOfferId
+  notes: A versioned commercial document with an agreementDocumentId and acceptance state.
+- name: PricingOption
+  domain: interchange-storefront
+  id_field: pricing_option_id
+  notes: Second most referenced id in the storefront spec (61 occurrences).
+- name: WebhookSubscription
+  domain: interchange-buyer
+  path_root: /webhook-subscriptions
+  notes: url + secret + eventTypes; see asyncapi/scope3-webhooks.yml.
 - name: Model
-  api: ai
+  domain: ai-impact
   id_field: modelId
   notes: An AI model tracked for impact; has aliases and belongs to a Family.
 - name: Node
-  api: ai
+  domain: ai-impact
   id_field: nodeId
   notes: Compute node hosting inference.
 - name: GPU
-  api: ai
+  domain: ai-impact
   id_field: gpuId
   notes: GPU hardware profile used in energy/impact modeling.
 - name: Impact
-  api: ai
+  domain: ai-impact
   notes: Computed environmental impact (energy Wh, gCO2e, mLH2O) for an inference row.
-- name: Advertiser
-  api: agentic
-  notes: Buyer entity with conversionEvents, creativeSets, audiences, catalogs, propertyLists.
-- name: Campaign
-  api: agentic
-  notes: Discovery/performance campaign with creatives and media buys.
-- name: Bundle
-  api: agentic
-  notes: Product bundle discovered/browsed and attached to a campaign.
-- name: Storefront
-  api: agentic
-  notes: Publisher/seller entity with inventorySources, agents, billing.
 - name: Segment
-  api: measurement
+  domain: measurement
   id_field: segmentId
   notes: Organization data segment.
 - name: SavedList
-  api: measurement
+  domain: measurement
   id_field: saved_list_id
   notes: Property list with domain-level media-quality signals.
 relationships:
-- from: Model
-  type: has_many
-  to: Alias
-  via: alias
-- from: Impact
-  type: belongs_to
-  to: Model
-  via: modelId
-- from: Advertiser
-  type: has_many
-  to: Campaign
-  via: advertiserId
-- from: Campaign
-  type: has_many
-  to: Creative
-  via: campaignId
-- from: Campaign
-  type: belongs_to
-  to: Bundle
-  via: bundleId
-- from: Storefront
-  type: has_many
-  to: InventorySource
-  via: storefrontId
-- from: SavedList
-  type: has_many
-  to: Signal
-  via: saved_list_id
-- from: Segment
-  type: belongs_to
-  to: Organization
-  via: organization
+- {from: Account, type: has_many, to: Advertiser, via: accountId}
+- {from: Advertiser, type: has_many, to: Campaign, via: advertiserId}
+- {from: Campaign, type: has_many, to: MediaBuy, via: campaignId}
+- {from: Campaign, type: has_many, to: Creative, via: campaignId}
+- {from: Campaign, type: has_many, to: Product, via: 'selection set (cart)'}
+- {from: MediaBuy, type: belongs_to, to: Storefront, via: storefrontId}
+- {from: MediaBuy, type: belongs_to, to: Product, via: productId}
+- {from: Discovery, type: has_many, to: Product, via: 'discovery selection'}
+- {from: Storefront, type: has_many, to: InventorySource, via: storefrontId}
+- {from: Storefront, type: has_many, to: Agent, via: agentId}
+- {from: Storefront, type: has_many, to: Product, via: sourceId}
+- {from: InventorySource, type: has_many, to: Signal, via: sourceId}
+- {from: InventorySource, type: belongs_to, to: Contract, via: contractId}
+- {from: Product, type: has_many, to: PricingOption, via: pricing_option_id}
+- {from: Account, type: has_one, to: RateCard, via: rateCardId}
+- {from: RateCard, type: has_many, to: Plan, via: planId}
+- {from: CommercialOffer, type: belongs_to, to: RateCard, via: commercialOfferId}
+- {from: Model, type: has_many, to: Alias, via: alias}
+- {from: Impact, type: belongs_to, to: Model, via: modelId}
+- {from: SavedList, type: has_many, to: Signal, via: saved_list_id}
+- {from: Segment, type: belongs_to, to: Organization, via: organization}
+id_reference_census:
+  note: >-
+    Top id-suffixed fields across both Interchange specs' components.schemas, with occurrence
+    counts. Useful as an objective read of what the model is actually about.
+  fields:
+  - {field: signal_id, count: 68}
+  - {field: pricing_option_id, count: 61}
+  - {field: sourceId, count: 60}
+  - {field: feature_id, count: 57}
+  - {field: planId, count: 55}
+  - {field: rateCardId, count: 50}
+  - {field: mediaBuyId, count: 46}
+  - {field: storefrontId, count: 43}
+  - {field: advertiserId, count: 34}
+  - {field: productId, count: 32}
+  - {field: contractId, count: 30}
+  - {field: customerId, count: 29}
+  - {field: agentId, count: 21}
+  - {field: campaignId, count: 19}
+naming_note: >-
+  The Interchange specs mix camelCase (advertiserId, mediaBuyId) and snake_case (signal_id,
+  pricing_option_id) id fields, roughly along a buyer/AdCP boundary. Recorded as observed.
 ai_schema_inventory:
 - StatusResponse
 - ModelResponse

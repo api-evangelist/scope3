@@ -1,0 +1,442 @@
+{
+  "item": [
+    {
+      "id": "5f750381-6674-4dc5-928f-f5c5aa049cb6",
+      "name": "Data",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "da54625f-bd58-40bb-b92b-e09ec6537f8f",
+          "name": "Upload Data File",
+          "request": {
+            "name": "Upload Data File",
+            "description": {
+              "content": "Returns the uploaded data file status",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "data",
+                "upload"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": ""
+                },
+                {
+                  "key": "type",
+                  "value": "<string>",
+                  "type": "text",
+                  "description": "The type of data file being uploaded (This can only be one of MEDIA_DELIVERY,CUSTOMER_USAGE,CREATIVE_DELIVERY,ATP_TRAFFIC_SHAPING,ATP_SUPPLY,PUB_PROPERTY_METRICS,DP_INVENTORY_METRICS,SUSTAINABILITY_FACTS,CONTENT_METADATA,AI_INFERENCE)"
+                },
+                {
+                  "key": "fieldMapping",
+                  "value": "<string>",
+                  "type": "text",
+                  "description": "The field mapping type (This can only be one of CUSTOM)"
+                },
+                {
+                  "key": "version",
+                  "value": "<string>",
+                  "type": "text",
+                  "description": "The custom mapping version"
+                },
+                {
+                  "key": "dataSource",
+                  "value": "<string>",
+                  "type": "text",
+                  "description": "The custom mapping data source"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "cedf0740-3c5d-45b9-b3b1-4fb5e91b65e6",
+              "name": "success response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "data",
+                    "upload"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "key": "file",
+                      "value": "<binary>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The type of data file being uploaded (This can only be one of MEDIA_DELIVERY,CUSTOMER_USAGE,CREATIVE_DELIVERY,ATP_TRAFFIC_SHAPING,ATP_SUPPLY,PUB_PROPERTY_METRICS,DP_INVENTORY_METRICS,SUSTAINABILITY_FACTS,CONTENT_METADATA,AI_INFERENCE)",
+                        "type": "text/plain"
+                      },
+                      "key": "type",
+                      "value": "<string>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The field mapping type (This can only be one of CUSTOM)",
+                        "type": "text/plain"
+                      },
+                      "key": "fieldMapping",
+                      "value": "<string>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The custom mapping version",
+                        "type": "text/plain"
+                      },
+                      "key": "version",
+                      "value": "<string>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The custom mapping data source",
+                        "type": "text/plain"
+                      },
+                      "key": "dataSource",
+                      "value": "<string>",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 9528,\n  \"status\": \"PENDING\",\n  \"rowsFailed\": 5137,\n  \"rowsTotal\": 2634,\n  \"md5\": \"string\",\n  \"crc32c\": \"string\",\n  \"filename\": \"string\",\n  \"summary\": {},\n  \"comment\": \"string\",\n  \"error\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "382ab207-10b3-49e2-95d5-f663e4730533",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "data",
+                    "upload"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "key": "file",
+                      "value": "<binary>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The type of data file being uploaded (This can only be one of MEDIA_DELIVERY,CUSTOMER_USAGE,CREATIVE_DELIVERY,ATP_TRAFFIC_SHAPING,ATP_SUPPLY,PUB_PROPERTY_METRICS,DP_INVENTORY_METRICS,SUSTAINABILITY_FACTS,CONTENT_METADATA,AI_INFERENCE)",
+                        "type": "text/plain"
+                      },
+                      "key": "type",
+                      "value": "<string>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The field mapping type (This can only be one of CUSTOM)",
+                        "type": "text/plain"
+                      },
+                      "key": "fieldMapping",
+                      "value": "<string>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The custom mapping version",
+                        "type": "text/plain"
+                      },
+                      "key": "version",
+                      "value": "<string>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "The custom mapping data source",
+                        "type": "text/plain"
+                      },
+                      "key": "dataSource",
+                      "value": "<string>",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9affc344-a70b-423a-96fc-8777c62b1de4",
+          "name": "Get Data File Upload by ID",
+          "request": {
+            "name": "Get Data File Upload by ID",
+            "description": {
+              "content": "Returns requested data file upload information",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "data",
+                "upload",
+                ":uploadId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "uploadId",
+                  "description": "(Required) Numeric ID of the upload to get"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "1a361df7-df4d-47c9-8b39-71cacf23e1c8",
+              "name": "success response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "data",
+                    "upload",
+                    ":uploadId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "uploadId",
+                      "description": "(Required) Numeric ID of the upload to get"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 9528,\n  \"status\": \"PENDING\",\n  \"rowsFailed\": 5137,\n  \"rowsTotal\": 2634,\n  \"md5\": \"string\",\n  \"crc32c\": \"string\",\n  \"filename\": \"string\",\n  \"summary\": {},\n  \"comment\": \"string\",\n  \"error\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f181d898-b0b7-4509-b66e-e2fb4f4d8f98",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "data",
+                    "upload",
+                    ":uploadId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "uploadId",
+                      "description": "(Required) Numeric ID of the upload to get"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "fa5ae758-4b8d-4aaf-b223-58099e8a73dd",
+    "name": "AI Impact Measurement Data API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

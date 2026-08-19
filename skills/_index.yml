@@ -1,23 +1,46 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
+note: >-
+  Three of the five skills below are provider-published and saved verbatim. Scope3 is one of
+  the few providers in the catalog that ships Agent Skills as a first-class product surface —
+  the buyer and storefront skill.md files are served from the API host itself, and the
+  platform skill is referenced by the A2A agent card at
+  https://docs.interchange.io/.well-known/agent-card.json.
 skills:
-  - file: scope3-agentic-buyer.md
-    name: scope3-agentic-buyer
-    method: searched
-    source: https://api.agentic.scope3.com/api/v2/buyer/skill.md
-    description: Provider-published Agent Skill for the Scope3 Agentic Buyer API (AI-powered programmatic advertising, inventory discovery, campaign & creative orchestration via MCP).
-  - file: scope3-agentic-storefront.md
-    name: scope3-agentic-storefront
-    method: searched
-    source: https://api.agentic.scope3.com/api/v2/storefront/skill.md
-    description: Provider-published Agent Skill for the Scope3 Agentic Storefront API (publisher/seller integrations, inventory sources, approvals, billing).
-  - file: scope3-measure-campaign-emissions.md
-    name: Measure advertising campaign emissions
-    method: generated
-    api: openapi/scope3-measurement-openapi.yml
-    operations: [measure, creative, benchmarks]
-  - file: scope3-track-ai-impact.md
-    name: Track AI inference environmental impact
-    method: generated
-    api: openapi/scope3-ai-openapi-original.yml
-    operations: [getImpact, calculateImpactBigQuery, listModels, getModel]
+- file: scope3-interchange.md
+  name: Scope3
+  method: searched
+  source: https://docs.interchange.io/.well-known/agent-skills/scope3/skill.md
+  description: >-
+    Provider-published platform Agent Skill for Scope3 Interchange — the skill the A2A agent
+    card advertises. Covers buyer agents, storefront integrations and campaign management
+    workflows over AdCP, and names the REST bases, MCP endpoints and OpenAPI locations.
+  referenced_by: a2a/scope3-agent-card.json
+- file: scope3-agentic-buyer.md
+  name: scope3-agentic-buyer
+  method: searched
+  source: https://api.agentic.scope3.com/api/v2/buyer/skill.md
+  also_served_at: https://api.interchange.io/api/v2/buyer/skill.md
+  api: openapi/_original/scope3-buyer-openapi-original.yml
+  description: >-
+    Provider-published Agent Skill for the Scope3 Agentic Buyer API (AI-powered programmatic
+    advertising, inventory discovery, campaign and creative orchestration via MCP).
+- file: scope3-agentic-storefront.md
+  name: scope3-agentic-storefront
+  method: searched
+  source: https://api.agentic.scope3.com/api/v2/storefront/skill.md
+  also_served_at: https://api.interchange.io/api/v2/storefront/skill.md
+  api: openapi/_original/scope3-storefront-openapi-original.yml
+  description: >-
+    Provider-published Agent Skill for the Scope3 Agentic Storefront API (publisher/seller
+    integrations, inventory sources, approvals, billing).
+- file: scope3-measure-campaign-emissions.md
+  name: Measure advertising campaign emissions
+  method: generated
+  api: openapi/_original/scope3-measurement-openapi.yml
+  operations: [measure, creative, benchmarks]
+- file: scope3-track-ai-impact.md
+  name: Track AI inference environmental impact
+  method: generated
+  api: openapi/_original/scope3-ai-openapi-original.yml
+  operations: [getImpact, calculateImpactBigQuery, listModels, getModel]

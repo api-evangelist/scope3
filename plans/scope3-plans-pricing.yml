@@ -1,0 +1,82 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.interchange.io/v2/buyer/billing/how-iu-billing-works
+docs:
+- https://docs.interchange.io/v2/buyer/billing/how-iu-billing-works
+- https://docs.interchange.io/v2/buyer/billing/organization-iu-rate-card
+- https://docs.interchange.io/v2/buyer/billing/overview
+marketing_page: https://interchange.io/pricing
+marketing_page_note: >-
+  https://interchange.io/pricing and https://scope3.com/agentic-advertising/pricing/ both
+  return 200 but publish no tiers — the rendered copy is "Interchange Pricing. Get in touch
+  to learn more. Talk to us". The real, numbered price list is published in the developer
+  documentation, which is where these figures come from.
+plan_count: 3
+currency: USD
+billing_period: monthly
+unit: IU
+unit_name: Intelligence Unit
+metering_model: >-
+  One IU plan and wallet per billing organization, shared across buyer activity, storefront
+  work, and the Murph assistant. A monthly commitment buys a block of included IUs at a
+  discounted per-IU price; usage beyond the included block bills at the metered overage rate.
+plans:
+- name: Pay as you go
+  monthly_commitment: 0
+  included_units: 0
+  price_per_included_unit: null
+  overage_rate: 5.00
+  overage_unit: IU
+  note: No commitment and no included allocation; every IU bills at the metered rate.
+- name: '250'
+  monthly_commitment: 1000
+  included_units: 250
+  price_per_included_unit: 4.00
+  overage_rate: 5.00
+  overage_unit: IU
+  rollover: up to 50% of the next period's included quantity (max 125 IUs), expiring after one period
+  note: Cheaper than pay-as-you-go above 200 IUs per month.
+- name: '1,000'
+  monthly_commitment: 3000
+  included_units: 1000
+  price_per_included_unit: 3.00
+  overage_rate: 5.00
+  overage_unit: IU
+  rollover: up to 50% of the next period's included quantity (max 500 IUs), expiring after one period
+  note: Cheaper than the 250 plan above 650 IUs per month.
+free_of_charge:
+  note: Scope3 publishes an explicit zero-rated list — these never consume IUs on any plan.
+  items:
+  - connecting an account or an ad server
+  - discovering accounts and mapping them to advertisers
+  - reading, reporting, and exporting your own data
+  - approving something Scope3 proposed
+  - retries, routing, cache hits, and no-op work
+  - anything that failed
+  - work caused by a Scope3 defect
+  ordering: zero-rate first, then credits, then bill
+availability:
+  status: pilot
+  note: >-
+    Scope3 states the standard IU Rate Card is published in staging for a controlled pilot
+    visible only to invited organizations, and remains unpublished in production until the
+    pricing and governing terms are approved. An IU Rate Card is not a prerequisite for buyer
+    setup or media buying outside the invited pilot. The figures above are the published
+    standard list, not a per-customer effective rate.
+negotiated_pricing:
+  supported: true
+  note: >-
+    Corporate discounts, promotion/referral codes, negotiated private packages and customized
+    Offers replace the list figures; Plan & Billing shows list price and effective price side
+    by side before confirmation. The accepted Effective Rate Card, not this table, governs charges.
+api:
+  note: The rate card and its acceptance state are readable over the API.
+  operations:
+  - getOrganizationIuRateCardOffer
+  - getBillingAccount
+  reference: https://docs.interchange.io/v2/buyer-api-reference/buyer-billing/get-the-organization-iu-rate-card-offer-and-acceptance-state
+measurement_apis:
+  note: >-
+    The Carbon Calculator (api.scope3.com/v2) and AI Impact Measurement (aiapi.scope3.com)
+    APIs publish no plans or prices; access is granted per customer by a Scope3
+    representative. plan_count above covers the Interchange agentic platform only.

@@ -6,6 +6,9 @@ security:
 - bearerAuth: []
 tags:
 - name: Signals
+servers:
+- url: https://api.scope3.com/v2
+  description: Carbon Calculator (Measurement) API server
 paths:
   /signals/saved_list/{saved_list_id}:
     get:

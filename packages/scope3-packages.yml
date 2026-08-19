@@ -1,29 +1,89 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
 source: https://github.com/scope3data
+registries_checked: [npm, pypi, pkg.go.dev, crates.io, rubygems, maven-central, nuget, packagist]
 packages:
-  - language: javascript
-    registry: npm
-    name: scope3
-    url: https://www.npmjs.com/package/scope3
-    install: npm install scope3
-    version: 2.1.0
-    official: true
-    description: Scope3 SDK - REST and MCP client for the Agentic Platform (ships the `scope3` CLI and Scope3McpClient).
-    repository: https://github.com/scope3data/agentic-client
-  - language: python
-    registry: pypi
-    name: scope3ai
-    url: https://pypi.org/project/scope3ai/
-    install: pip install scope3ai
-    version: 0.3.0
-    official: true
-    description: Scope3AI Python SDK - track the environmental impact of AI inference across OpenAI, Anthropic, Cohere, HuggingFace, LiteLLM, Mistral.
-    repository: https://github.com/scope3data/scope3ai-py
-  - language: go
-    registry: pkg.go.dev
-    name: scope3-segment-api-golang
-    url: https://github.com/scope3data/scope3-segment-api-golang
-    official: true
-    description: First-party Go helper library for the Scope3 Segment API.
-    repository: https://github.com/scope3data/scope3-segment-api-golang
+- language: javascript
+  registry: npm
+  name: scope3
+  url: https://www.npmjs.com/package/scope3
+  install: npm install scope3
+  version: 2.1.0
+  published: '2026-02-24'
+  official: true
+  description: >-
+    Scope3 SDK - REST and MCP client for the Agentic Platform (ships the `scope3` CLI, the
+    Scope3McpClient connection helper, and the WebhookServer class).
+  repository: https://github.com/scope3data/agentic-client
+  currency_note: >-
+    Registry metadata read from registry.npmjs.org on 2026-08-13. Latest release 2.1.0
+    (2026-02-24) predates the platform's move to the Interchange domain — the API base the
+    provider now documents is https://api.interchange.io/api/v2/*, and the published
+    Interchange API changelog is on version 5.148.0 as of 2026-08-13. The GitHub repository
+    was last updated 2026-07-21, so source work is more recent than the published package.
+- language: python
+  registry: pypi
+  name: scope3ai
+  url: https://pypi.org/project/scope3ai/
+  install: pip install scope3ai
+  version: 0.3.0
+  published: '2025-01-29'
+  official: true
+  description: >-
+    Scope3AI Python SDK - track the environmental impact of AI inference across OpenAI,
+    Anthropic, Cohere, HuggingFace, LiteLLM, Mistral.
+  repository: https://github.com/scope3data/scope3ai-py
+  status: stale
+  currency_note: >-
+    Registry metadata read from pypi.org on 2026-08-13: latest release 0.3.0 published
+    2025-01-29, over eighteen months old. The sibling repository scope3data/scope3ai-python is
+    ARCHIVED on GitHub (archived flag set, last update 2026-02-07); scope3data/scope3ai-py, the
+    repo this package builds from, was last updated 2025-03-27. Recorded as an abandonment
+    signal, not a judgement.
+- language: go
+  registry: pkg.go.dev
+  name: scope3-segment-api-golang
+  url: https://github.com/scope3data/scope3-segment-api-golang
+  install: go get github.com/scope3data/scope3-segment-api-golang
+  version: null
+  published: null
+  official: true
+  description: First-party Go helper library for the Scope3 Segment API.
+  repository: https://github.com/scope3data/scope3-segment-api-golang
+  status: stale
+  currency_note: >-
+    Checked 2026-08-13: the repository publishes no semver tags, so proxy.golang.org has no
+    release to report and version/published are honestly null. The repository itself was last
+    updated 2023-10-01 — nearly three years before the v2 Segment API it wraps.
+- language: javascript
+  registry: npm
+  name: '@scope3/observability-js'
+  url: https://www.npmjs.com/package/@scope3/observability-js
+  install: npm install @scope3/observability-js
+  version: 2.1.1
+  published: '2026-07-29'
+  official: true
+  first_party_but_not_a_client: true
+  description: >-
+    Unified observability (Sentry, OpenTelemetry, Pyroscope) for Node.js services. A
+    first-party Scope3 infrastructure library, not a client for any Scope3 API.
+  repository: https://github.com/scope3data/observability-js
+  currency_note: >-
+    Registry metadata read from registry.npmjs.org on 2026-08-13. The most currently maintained
+    package Scope3 publishes, but it does not wrap a Scope3 API and should not be counted as an
+    API SDK.
+absent:
+  note: Checked and not published; recorded so a later round does not re-search.
+  registries:
+  - {registry: crates.io, result: no first-party crate}
+  - {registry: rubygems, result: no first-party gem}
+  - {registry: maven-central, result: no first-party artifact}
+  - {registry: nuget, result: no first-party package}
+  - {registry: packagist, result: no first-party package}
+sdk_gap:
+  note: >-
+    Scope3 ships no client library for the Interchange Buyer or Storefront v2 APIs — the 481
+    published operations at api.interchange.io have no first-party SDK in any language. The
+    documented integration paths are the hosted MCP endpoints (OAuth connectors) and raw REST.
+    The `scope3` npm package predates the Interchange move and targets the older
+    api.agentic.scope3.com base.

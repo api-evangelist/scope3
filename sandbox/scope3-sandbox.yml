@@ -1,16 +1,59 @@
-generated: '2026-07-21'
+generated: '2026-08-13'
 method: searched
-source: https://github.com/scope3data/agentic-client
+source:
+- https://docs.interchange.io/v2/quickstart
+- https://docs.interchange.io/v2/buyer/billing/organization-iu-rate-card
+- https://github.com/scope3data/agentic-client
 environments:
-  - name: production
-    base_url: https://api.agentic.scope3.com
-    dashboard: https://agentic.scope3.com
-  - name: staging
-    base_url: https://api.agentic.staging.scope3.com
-    note: Dedicated staging environment for the Agentic Platform; select via `scope3 config set environment staging` or the SDK environment option.
-notes: >-
-  Scope3 separates production and staging Agentic Platform environments, each with its own
-  API keys obtained from the dashboard. No published magic test values, test cards, or
-  fixture tokens were found for the measurement or AI APIs (API access is granted per
-  customer by a Scope3 representative). Never invent test values.
+- name: production
+  base_url: https://api.interchange.io/api/v2
+  legacy_base_url: https://api.agentic.scope3.com
+  dashboard: https://interchange.io
+  mcp:
+  - https://api.interchange.io/mcp/buyer
+  - https://api.interchange.io/mcp/storefront
+- name: staging
+  base_url: https://api.agentic.staging.scope3.com
+  note: >-
+    Dedicated staging environment with its own API keys, selected via
+    `scope3 config set environment staging` or the SDK environment option. Scope3 also states
+    the standard IU Rate Card is published in staging for a controlled pilot visible only to
+    invited organizations, so staging is where commercial terms are exercised before production.
+key_separation:
+  prefix: scope3_
+  note: >-
+    Keys are prefixed `scope3_` and issued at https://interchange.io/user-api-keys. There is no
+    published test-vs-live key prefix pair (no sk_test / sk_live equivalent); separation is by
+    environment and account, not by key prefix.
+connectivity_check:
+  note: >-
+    Scope3 publishes a two-step sanity check that a developer can run before wiring an agent.
+    The first step needs no credentials at all.
+  steps:
+  - description: Reach the platform (no auth needed)
+    command: curl https://api.interchange.io/health
+    expected: '{"status":"ok", ...}'
+    verified: {status: 200, checked: '2026-08-13'}
+  - description: Confirm your key resolves to your account
+    command: 'curl https://api.interchange.io/api/v2/accounts/current -H "Authorization: Bearer scope3_your_api_key_here"'
+    expected: 'your account — id, company, name, role'
+    failure_modes:
+    - {status: 401, meaning: key is wrong or revoked}
+    - {status: 403, code: TOS_ACCEPTANCE_REQUIRED, meaning: 'organization has not accepted the latest Platform Service Agreement; read endpoints still work'}
+dry_run_facilities:
+  note: >-
+    Interchange publishes several non-committing modes that function as a sandbox inside
+    production. Captured verbatim from the docs and specs; no values invented.
+  facilities:
+  - {name: stage mode, detail: 'campaign product selection accepts mode "stage" to update DRAFT media buys without contacting sellers; mode "execute" is required to actually buy'}
+  - {name: preview / commit, detail: 'modular source feeds can be previewed (pasted or uploaded static avails) and only committed once a signed preview looks correct'}
+  - {name: product draft validation, detail: 'validate a product draft for an ad server source before creating it'}
+  - {name: dry-run signals, detail: 'create-or-dry-run a signal for an ad server source'}
+  - {name: catalog activation plan preview, detail: 'preview a catalog activation plan before executing it'}
+  - {name: display-only forecast, detail: 'Plan & Billing shows list price and effective price side by side before an IU Rate Card is confirmed'}
 test_values: []
+test_values_note: >-
+  No magic test values, test cards, test identifiers, or fixture tokens are published for any
+  Scope3 API. Access to the measurement APIs is granted per customer by a Scope3
+  representative, and Interchange buyer admission is staged (closed beta / waitlist as of
+  2026-08-13, per https://scope3.com/agentic-advertising/pricing/). Nothing was invented.

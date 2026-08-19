@@ -1,0 +1,38 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Scope3 Interchange Storefront API
+  version: 1.0.0
+extends: openapi/_original/scope3-storefront-openapi-original.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provenance: >-
+        Verbatim published spec, fetched 2026-08-13 from
+        https://api.interchange.io/api/v2/storefront/openapi.yaml (HTTP 200). Ownership
+        confirmed from the document itself: info.title "Scope3 Storefront API" and
+        servers[0].url https://api.interchange.io/api/v2/storefront.
+      x-api-base-url: https://api.interchange.io/api/v2/storefront
+      x-authentication: authentication/scope3-authentication.yml
+      x-oauth-scopes: scopes/scope3-scopes.yml
+      x-error-catalog: errors/scope3-problem-types.yml
+      x-conventions: conventions/scope3-conventions.yml
+      x-rate-limits: rate-limits/scope3-rate-limits.yml
+      x-plans: plans/scope3-plans-pricing.yml
+      x-data-model: data-model/scope3-data-model.yml
+      x-lifecycle: lifecycle/scope3-lifecycle.yml
+      x-mcp-server: https://api.interchange.io/mcp/storefront
+      x-tool-crosswalk: mcp/scope3-tool-crosswalk.yml
+      x-agent-card: a2a/scope3-a2a.yml
+      x-agent-skill: skills/scope3-agentic-storefront.md
+      x-idempotency: >-
+        Body-level idempotencyKey (minLength 8, maxLength 128, pattern ^[A-Za-z0-9._:-]+$),
+        required on storefront rate-card acceptance.
+      x-response-envelope: '{"data": <result>, "error": null}'
+      x-adcp-agent-endpoint: 'https://api.interchange.io/storefront/{platformId}/mcp'
+      x-domain-model-note: >-
+        Registered domain, operator domain and publisher domains are distinct; only publisher
+        domains (authorized via each domain''s adagents.json) represent sellable inventory.
+  - target: $.servers
+    update:
+      - url: https://api.interchange.io/api/v2/storefront
+        description: Production server

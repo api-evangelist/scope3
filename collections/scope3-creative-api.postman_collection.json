@@ -1,0 +1,239 @@
+{
+  "item": [
+    {
+      "id": "6fbe8de3-f1eb-43ca-aaab-396e569046c8",
+      "name": "Creative",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7ab29867-6bbb-469e-807e-534c1fc6da15",
+          "name": "Creative emissions",
+          "request": {
+            "name": "Creative emissions",
+            "description": {
+              "content": "Calculates the carbon footprint of running a creative",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "creative"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "includeRows",
+                  "value": "<boolean>",
+                  "description": "Whether to include all rows in the response"
+                },
+                {
+                  "disabled": false,
+                  "key": "latest",
+                  "value": "<boolean>",
+                  "description": "Whether to use latest available data"
+                },
+                {
+                  "disabled": false,
+                  "key": "framework",
+                  "value": "<string>",
+                  "description": "Default is scope3"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": [\n    {\n      \"impressions\": \"<integer>\",\n      \"utcDatetime\": \"<string>\",\n      \"country\": \"<string>\",\n      \"channel\": \"<string>\",\n      \"creative\": {\n        \"adFormat\": \"<string>\",\n        \"vendor\": \"<string>\",\n        \"totalImageDataTransferBytes\": \"<integer>\",\n        \"imageSizesPixels\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"renderedWidthPixels\": \"<integer>\",\n        \"renderedHeightPixels\": \"<integer>\",\n        \"totalAudioDataTransferBytes\": \"<integer>\",\n        \"audioDurationSeconds\": \"<double>\",\n        \"totalVideoDataTransferBytes\": \"<integer>\",\n        \"videoVastBytes\": \"<integer>\",\n        \"videoBitrateKbps\": \"<integer>\",\n        \"videoSizeBytes\": \"<integer>\",\n        \"videoDurationSeconds\": \"<double>\",\n        \"videoViewTimeSeconds\": \"<double>\",\n        \"videoViewRate\": \"<double>\",\n        \"timeInViewSeconds\": \"<double>\",\n        \"adTechPlatformVideoPlayerDomain\": \"<string>\",\n        \"adTechPlatformCreativeAdserverDomains\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"otherAssetsBytes\": \"<integer>\",\n        \"is3PServed\": \"<boolean>\"\n      },\n      \"rowIdentifier\": \"<string>\",\n      \"region\": \"<string>\",\n      \"network\": \"<string>\",\n      \"deviceType\": \"<string>\",\n      \"views\": \"<integer>\",\n      \"plays\": \"<integer>\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"<string>\",\n      \"mediaOwner\": \"<string>\",\n      \"displayDurationDays\": \"<integer>\",\n      \"campaignStartDate\": \"<string>\",\n      \"campaignEndDate\": \"<string>\",\n      \"shareOfTimePct\": \"<double>\",\n      \"physicalWidthMeters\": \"<double>\",\n      \"physicalHeightMeters\": \"<double>\",\n      \"printMedium\": \"<string>\",\n      \"printCirculations\": \"<integer>\"\n    },\n    {\n      \"impressions\": \"<integer>\",\n      \"utcDatetime\": \"<string>\",\n      \"country\": \"<string>\",\n      \"channel\": \"<string>\",\n      \"creative\": {\n        \"adFormat\": \"<string>\",\n        \"vendor\": \"<string>\",\n        \"totalImageDataTransferBytes\": \"<integer>\",\n        \"imageSizesPixels\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"renderedWidthPixels\": \"<integer>\",\n        \"renderedHeightPixels\": \"<integer>\",\n        \"totalAudioDataTransferBytes\": \"<integer>\",\n        \"audioDurationSeconds\": \"<double>\",\n        \"totalVideoDataTransferBytes\": \"<integer>\",\n        \"videoVastBytes\": \"<integer>\",\n        \"videoBitrateKbps\": \"<integer>\",\n        \"videoSizeBytes\": \"<integer>\",\n        \"videoDurationSeconds\": \"<double>\",\n        \"videoViewTimeSeconds\": \"<double>\",\n        \"videoViewRate\": \"<double>\",\n        \"timeInViewSeconds\": \"<double>\",\n        \"adTechPlatformVideoPlayerDomain\": \"<string>\",\n        \"adTechPlatformCreativeAdserverDomains\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"otherAssetsBytes\": \"<integer>\",\n        \"is3PServed\": \"<boolean>\"\n      },\n      \"rowIdentifier\": \"<string>\",\n      \"region\": \"<string>\",\n      \"network\": \"<string>\",\n      \"deviceType\": \"<string>\",\n      \"views\": \"<integer>\",\n      \"plays\": \"<integer>\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"<string>\",\n      \"mediaOwner\": \"<string>\",\n      \"displayDurationDays\": \"<integer>\",\n      \"campaignStartDate\": \"<string>\",\n      \"campaignEndDate\": \"<string>\",\n      \"shareOfTimePct\": \"<double>\",\n      \"physicalWidthMeters\": \"<double>\",\n      \"physicalHeightMeters\": \"<double>\",\n      \"printMedium\": \"<string>\",\n      \"printCirculations\": \"<integer>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "49faf97e-1f56-4341-a340-7b99743f0baa",
+              "name": "success response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "creative"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "includeRows",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "latest",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "framework",
+                      "value": "scope3"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"impressions\": 13821,\n      \"utcDatetime\": \"2023-03-01\",\n      \"country\": \"US\",\n      \"channel\": \"web\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"rowIdentifier\": \"1\",\n      \"region\": \"NY\",\n      \"network\": \"fixed\",\n      \"deviceType\": \"pc\",\n      \"views\": 10,\n      \"plays\": 10,\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"mediaOwner\": \"<string>\",\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    },\n    {\n      \"impressions\": 13821,\n      \"utcDatetime\": \"2023-03-01\",\n      \"country\": \"US\",\n      \"channel\": \"web\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"rowIdentifier\": \"1\",\n      \"region\": \"NY\",\n      \"network\": \"fixed\",\n      \"deviceType\": \"pc\",\n      \"views\": 10,\n      \"plays\": 10,\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"mediaOwner\": \"<string>\",\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"totalEmissions\": 0.45,\n  \"coverage\": {\n    \"adFormats\": {\n      \"metric\": \"rows\",\n      \"vendorSpecific\": 8,\n      \"generic\": 25,\n      \"unknown\": 2\n    },\n    \"totalImpressions\": {\n      \"metric\": \"uniqueCount\",\n      \"modeled\": 8132,\n      \"skipped\": 48\n    },\n    \"totalRows\": {\n      \"metric\": \"uniqueCount\",\n      \"modeled\": 8132,\n      \"skipped\": 48\n    },\n    \"channels\": {\n      \"metric\": \"uniqueCount\",\n      \"modeled\": 5,\n      \"unknown\": 2,\n      \"deprecated\": 1\n    }\n  },\n  \"totalEmissionsBreakdown\": {\n    \"framework\": \"scope3\",\n    \"totals\": {\n      \"creativeDelivery\": 123.45,\n      \"techManipulation\": 7.89\n    }\n  },\n  \"requestId\": \"string\",\n  \"rows\": [\n    {\n      \"rowIdentifier\": \"1\",\n      \"totalEmissions\": 0.45,\n      \"error\": \"string\",\n      \"coverage\": {\n        \"adFormat\": {\n          \"value\": \"string\",\n          \"name\": \"string\",\n          \"vendor\": \"string\",\n          \"verified\": true\n        }\n      },\n      \"emissionsBreakdown\": {\n        \"framework\": \"scope3\",\n        \"breakdown\": {\n          \"creativeDelivery\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"techManipulation\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        }\n      }\n    },\n    {\n      \"rowIdentifier\": \"1\",\n      \"totalEmissions\": 0.45,\n      \"error\": \"string\",\n      \"coverage\": {\n        \"adFormat\": {\n          \"value\": \"string\",\n          \"name\": \"string\",\n          \"vendor\": \"string\",\n          \"verified\": true\n        }\n      },\n      \"emissionsBreakdown\": {\n        \"framework\": \"scope3\",\n        \"breakdown\": {\n          \"creativeDelivery\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"techManipulation\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        }\n      }\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6fa32c0d-f4ae-4352-b5d8-b407b9a2b8b8",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "creative"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "includeRows",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "latest",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "framework",
+                      "value": "scope3"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"impressions\": 13821,\n      \"utcDatetime\": \"2023-03-01\",\n      \"country\": \"US\",\n      \"channel\": \"web\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"rowIdentifier\": \"1\",\n      \"region\": \"NY\",\n      \"network\": \"fixed\",\n      \"deviceType\": \"pc\",\n      \"views\": 10,\n      \"plays\": 10,\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"mediaOwner\": \"<string>\",\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    },\n    {\n      \"impressions\": 13821,\n      \"utcDatetime\": \"2023-03-01\",\n      \"country\": \"US\",\n      \"channel\": \"web\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"rowIdentifier\": \"1\",\n      \"region\": \"NY\",\n      \"network\": \"fixed\",\n      \"deviceType\": \"pc\",\n      \"views\": 10,\n      \"plays\": 10,\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"mediaOwner\": \"<string>\",\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "94054c6b-50f8-4cc2-8074-ed48059d4546",
+    "name": "AI Impact Measurement Creative API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

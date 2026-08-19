@@ -1,0 +1,267 @@
+{
+  "item": [
+    {
+      "id": "5efd0bbd-bd6f-4cae-9cc6-27335ceea91a",
+      "name": "Measure",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "994bf51f-4fa2-4500-bea9-5436ff370947",
+          "name": "Emissions Measurement",
+          "request": {
+            "name": "Emissions Measurement",
+            "description": {
+              "content": "Calculates the carbon footprint for advertising media",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "measure"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "includeRows",
+                  "value": "<boolean>",
+                  "description": "Whether to include all rows in the response"
+                },
+                {
+                  "disabled": false,
+                  "key": "latest",
+                  "value": "<boolean>",
+                  "description": "Whether to use latest available data"
+                },
+                {
+                  "disabled": false,
+                  "key": "fields",
+                  "value": "<string>",
+                  "description": "Comma separated list of fields to include in the row level response"
+                },
+                {
+                  "disabled": false,
+                  "key": "fields",
+                  "value": "<string>",
+                  "description": "Comma separated list of fields to include in the row level response"
+                },
+                {
+                  "disabled": false,
+                  "key": "framework",
+                  "value": "<string>",
+                  "description": "Default is scope3"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rows\": [\n    {\n      \"utcDatetime\": \"<string>\",\n      \"rowIdentifier\": \"<string>\",\n      \"impressions\": \"<integer>\",\n      \"inventoryId\": \"<string>\",\n      \"appStore\": \"<string>\",\n      \"country\": \"<string>\",\n      \"region\": \"<string>\",\n      \"deviceType\": \"<string>\",\n      \"channel\": \"<string>\",\n      \"network\": \"<string>\",\n      \"creative\": {\n        \"adFormat\": \"<string>\",\n        \"vendor\": \"<string>\",\n        \"totalImageDataTransferBytes\": \"<integer>\",\n        \"imageSizesPixels\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"renderedWidthPixels\": \"<integer>\",\n        \"renderedHeightPixels\": \"<integer>\",\n        \"totalAudioDataTransferBytes\": \"<integer>\",\n        \"audioDurationSeconds\": \"<double>\",\n        \"totalVideoDataTransferBytes\": \"<integer>\",\n        \"videoVastBytes\": \"<integer>\",\n        \"videoBitrateKbps\": \"<integer>\",\n        \"videoSizeBytes\": \"<integer>\",\n        \"videoDurationSeconds\": \"<double>\",\n        \"videoViewTimeSeconds\": \"<double>\",\n        \"videoViewRate\": \"<double>\",\n        \"timeInViewSeconds\": \"<double>\",\n        \"adTechPlatformVideoPlayerDomain\": \"<string>\",\n        \"adTechPlatformCreativeAdserverDomains\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"otherAssetsBytes\": \"<integer>\",\n        \"is3PServed\": \"<boolean>\"\n      },\n      \"sellerDomain\": \"<string>\",\n      \"sellerName\": \"<string>\",\n      \"buyingMethod\": \"<string>\",\n      \"dealId\": \"<string>\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"<string>\",\n      \"plays\": \"<integer>\",\n      \"views\": \"<integer>\",\n      \"playDuration\": \"<double>\",\n      \"mediaOwner\": \"<string>\",\n      \"compensationRate\": \"<double>\",\n      \"isApp\": \"<boolean>\",\n      \"broadcastMethod\": \"<string>\",\n      \"uniqueReach\": \"<integer>\",\n      \"averageFrequency\": \"<number>\",\n      \"displayDurationDays\": \"<integer>\",\n      \"campaignStartDate\": \"<string>\",\n      \"campaignEndDate\": \"<string>\",\n      \"shareOfTimePct\": \"<double>\",\n      \"physicalWidthMeters\": \"<double>\",\n      \"physicalHeightMeters\": \"<double>\",\n      \"printMedium\": \"<string>\",\n      \"printCirculations\": \"<integer>\"\n    },\n    {\n      \"utcDatetime\": \"<string>\",\n      \"rowIdentifier\": \"<string>\",\n      \"impressions\": \"<integer>\",\n      \"inventoryId\": \"<string>\",\n      \"appStore\": \"<string>\",\n      \"country\": \"<string>\",\n      \"region\": \"<string>\",\n      \"deviceType\": \"<string>\",\n      \"channel\": \"<string>\",\n      \"network\": \"<string>\",\n      \"creative\": {\n        \"adFormat\": \"<string>\",\n        \"vendor\": \"<string>\",\n        \"totalImageDataTransferBytes\": \"<integer>\",\n        \"imageSizesPixels\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"renderedWidthPixels\": \"<integer>\",\n        \"renderedHeightPixels\": \"<integer>\",\n        \"totalAudioDataTransferBytes\": \"<integer>\",\n        \"audioDurationSeconds\": \"<double>\",\n        \"totalVideoDataTransferBytes\": \"<integer>\",\n        \"videoVastBytes\": \"<integer>\",\n        \"videoBitrateKbps\": \"<integer>\",\n        \"videoSizeBytes\": \"<integer>\",\n        \"videoDurationSeconds\": \"<double>\",\n        \"videoViewTimeSeconds\": \"<double>\",\n        \"videoViewRate\": \"<double>\",\n        \"timeInViewSeconds\": \"<double>\",\n        \"adTechPlatformVideoPlayerDomain\": \"<string>\",\n        \"adTechPlatformCreativeAdserverDomains\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"otherAssetsBytes\": \"<integer>\",\n        \"is3PServed\": \"<boolean>\"\n      },\n      \"sellerDomain\": \"<string>\",\n      \"sellerName\": \"<string>\",\n      \"buyingMethod\": \"<string>\",\n      \"dealId\": \"<string>\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"<string>\",\n      \"plays\": \"<integer>\",\n      \"views\": \"<integer>\",\n      \"playDuration\": \"<double>\",\n      \"mediaOwner\": \"<string>\",\n      \"compensationRate\": \"<double>\",\n      \"isApp\": \"<boolean>\",\n      \"broadcastMethod\": \"<string>\",\n      \"uniqueReach\": \"<integer>\",\n      \"averageFrequency\": \"<number>\",\n      \"displayDurationDays\": \"<integer>\",\n      \"campaignStartDate\": \"<string>\",\n      \"campaignEndDate\": \"<string>\",\n      \"shareOfTimePct\": \"<double>\",\n      \"physicalWidthMeters\": \"<double>\",\n      \"physicalHeightMeters\": \"<double>\",\n      \"printMedium\": \"<string>\",\n      \"printCirculations\": \"<integer>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "9454d30f-8032-4bb1-9ff3-c57b753d69b3",
+              "name": "Success response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "measure"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "includeRows",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "latest",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "fields",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "fields",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "framework",
+                      "value": "scope3"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utcDatetime\": \"2023-03-01\",\n      \"rowIdentifier\": \"nytimes\",\n      \"impressions\": 13821,\n      \"inventoryId\": \"nytimes.com\",\n      \"appStore\": \"apple-app-store\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"deviceType\": \"pc\",\n      \"channel\": \"web\",\n      \"network\": \"fixed\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"sellerDomain\": \"xandr.com\",\n      \"sellerName\": \"Xandr\",\n      \"buyingMethod\": \"programmatic-open\",\n      \"dealId\": \"12345\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"plays\": 10,\n      \"views\": 10,\n      \"playDuration\": 10,\n      \"mediaOwner\": \"<string>\",\n      \"compensationRate\": 0.05,\n      \"isApp\": true,\n      \"broadcastMethod\": \"ota\",\n      \"uniqueReach\": 203043,\n      \"averageFrequency\": 176,\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    },\n    {\n      \"utcDatetime\": \"2023-03-01\",\n      \"rowIdentifier\": \"nytimes\",\n      \"impressions\": 13821,\n      \"inventoryId\": \"nytimes.com\",\n      \"appStore\": \"apple-app-store\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"deviceType\": \"pc\",\n      \"channel\": \"web\",\n      \"network\": \"fixed\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"sellerDomain\": \"xandr.com\",\n      \"sellerName\": \"Xandr\",\n      \"buyingMethod\": \"programmatic-open\",\n      \"dealId\": \"12345\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"plays\": 10,\n      \"views\": 10,\n      \"playDuration\": 10,\n      \"mediaOwner\": \"<string>\",\n      \"compensationRate\": 0.05,\n      \"isApp\": true,\n      \"broadcastMethod\": \"ota\",\n      \"uniqueReach\": 203043,\n      \"averageFrequency\": 176,\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"totalEmissions\": 2823.9,\n  \"totalEmissionsBreakdown\": {\n    \"framework\": \"scope3\",\n    \"totals\": {\n      \"mediaDistribution\": 0.15,\n      \"adSelection\": 0.15,\n      \"creativeDelivery\": 0.15,\n      \"compensated\": 0.15,\n      \"techManipulation\": 0.15,\n      \"disposal\": 0.15\n    }\n  },\n  \"coverage\": {\n    \"totalImpressions\": {\n      \"metric\": \"impressions\",\n      \"modeled\": 8132,\n      \"skipped\": 48\n    },\n    \"totalRows\": {\n      \"metric\": \"uniqueCount\",\n      \"modeled\": 8132,\n      \"skipped\": 48\n    },\n    \"sellers\": {\n      \"metric\": \"impressions\",\n      \"modeled\": 8132,\n      \"unknown\": 48,\n      \"verifiedRate\": 25\n    },\n    \"properties\": {\n      \"metric\": \"rows\",\n      \"modeled\": 8132,\n      \"unknown\": 48,\n      \"verifiedRate\": 25\n    },\n    \"channels\": {\n      \"metric\": \"uniqueCount\",\n      \"modeled\": 5,\n      \"unknown\": 2,\n      \"deprecated\": 1\n    },\n    \"mediaOwners\": {\n      \"metric\": \"uniqueCount\",\n      \"modeled\": 8132,\n      \"unknown\": 48,\n      \"verifiedRate\": 25\n    },\n    \"adFormats\": {\n      \"metric\": \"rows\",\n      \"vendorSpecific\": 8,\n      \"generic\": 25,\n      \"unknown\": 2\n    }\n  },\n  \"requestId\": \"string\",\n  \"rows\": [\n    {\n      \"inventoryCoverage\": \"unknown\",\n      \"rowIdentifier\": \"1\",\n      \"totalEmissions\": 0.45,\n      \"error\": {\n        \"message\": \"string\"\n      },\n      \"coverage\": {\n        \"impressions\": {\n          \"modeled\": 80,\n          \"skipped\": 10,\n          \"processed\": 80\n        },\n        \"seller\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"property\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"channel\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"mediaOwner\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"venueCategory\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"adFormat\": {\n          \"value\": \"string\",\n          \"name\": \"string\",\n          \"vendor\": \"string\",\n          \"verified\": true\n        },\n        \"supplyGraph\": {\n          \"logical\": {\n            \"minDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"maxDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"averageDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"technical\": {\n            \"minDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"maxDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"averageDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"totalCount\": 8\n        },\n        \"compensationProvider\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"inventoryClassification\": {\n          \"value\": \"string\",\n          \"verified\": true\n        }\n      },\n      \"emissionsBreakdown\": {\n        \"framework\": \"scope3\",\n        \"breakdown\": {\n          \"compensated\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"mediaDistribution\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"adSelection\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"creativeDelivery\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"techManipulation\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"disposal\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        }\n      },\n      \"policies\": [\n        {\n          \"policy\": \"climateRisk\",\n          \"policyOwner\": \"Scope3\",\n          \"compliant\": true\n        },\n        {\n          \"policy\": \"climateRisk\",\n          \"policyOwner\": \"Scope3\",\n          \"compliant\": true\n        }\n      ]\n    },\n    {\n      \"inventoryCoverage\": \"missing\",\n      \"rowIdentifier\": \"1\",\n      \"totalEmissions\": 0.45,\n      \"error\": {\n        \"message\": \"string\"\n      },\n      \"coverage\": {\n        \"impressions\": {\n          \"modeled\": 80,\n          \"skipped\": 10,\n          \"processed\": 80\n        },\n        \"seller\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"property\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"channel\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"mediaOwner\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"venueCategory\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"adFormat\": {\n          \"value\": \"string\",\n          \"name\": \"string\",\n          \"vendor\": \"string\",\n          \"verified\": true\n        },\n        \"supplyGraph\": {\n          \"logical\": {\n            \"minDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"maxDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"averageDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"technical\": {\n            \"minDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"maxDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"averageDepth\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"totalCount\": 8\n        },\n        \"compensationProvider\": {\n          \"value\": \"string\",\n          \"verified\": true\n        },\n        \"inventoryClassification\": {\n          \"value\": \"string\",\n          \"verified\": true\n        }\n      },\n      \"emissionsBreakdown\": {\n        \"framework\": \"scope3\",\n        \"breakdown\": {\n          \"compensated\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"mediaDistribution\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"adSelection\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"creativeDelivery\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"techManipulation\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"disposal\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        }\n      },\n      \"policies\": [\n        {\n          \"policy\": \"climateRisk\",\n          \"policyOwner\": \"Scope3\",\n          \"compliant\": true\n        },\n        {\n          \"policy\": \"climateRisk\",\n          \"policyOwner\": \"Scope3\",\n          \"compliant\": true\n        }\n      ]\n    }\n  ],\n  \"policies\": [\n    {\n      \"policy\": \"climateRisk\",\n      \"policyOwner\": \"Scope3\",\n      \"compliant\": 123,\n      \"noncompliant\": 4321\n    },\n    {\n      \"policy\": \"climateRisk\",\n      \"policyOwner\": \"Scope3\",\n      \"compliant\": 123,\n      \"noncompliant\": 4321\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5b17fcfa-3c49-4c75-8434-8a42c8565f9e",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "measure"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "includeRows",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "latest",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "fields",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "fields",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "framework",
+                      "value": "scope3"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rows\": [\n    {\n      \"utcDatetime\": \"2023-03-01\",\n      \"rowIdentifier\": \"nytimes\",\n      \"impressions\": 13821,\n      \"inventoryId\": \"nytimes.com\",\n      \"appStore\": \"apple-app-store\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"deviceType\": \"pc\",\n      \"channel\": \"web\",\n      \"network\": \"fixed\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"sellerDomain\": \"xandr.com\",\n      \"sellerName\": \"Xandr\",\n      \"buyingMethod\": \"programmatic-open\",\n      \"dealId\": \"12345\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"plays\": 10,\n      \"views\": 10,\n      \"playDuration\": 10,\n      \"mediaOwner\": \"<string>\",\n      \"compensationRate\": 0.05,\n      \"isApp\": true,\n      \"broadcastMethod\": \"ota\",\n      \"uniqueReach\": 203043,\n      \"averageFrequency\": 176,\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    },\n    {\n      \"utcDatetime\": \"2023-03-01\",\n      \"rowIdentifier\": \"nytimes\",\n      \"impressions\": 13821,\n      \"inventoryId\": \"nytimes.com\",\n      \"appStore\": \"apple-app-store\",\n      \"country\": \"US\",\n      \"region\": \"NY\",\n      \"deviceType\": \"pc\",\n      \"channel\": \"web\",\n      \"network\": \"fixed\",\n      \"creative\": {\n        \"adFormat\": \"generic-instream-video\",\n        \"vendor\": \"YouTube\",\n        \"totalImageDataTransferBytes\": 150000,\n        \"imageSizesPixels\": [\n          \"300x250\",\n          \"970x250\"\n        ],\n        \"renderedWidthPixels\": 300,\n        \"renderedHeightPixels\": 250,\n        \"totalAudioDataTransferBytes\": 15,\n        \"audioDurationSeconds\": 90.1,\n        \"totalVideoDataTransferBytes\": 72800,\n        \"videoVastBytes\": 12000,\n        \"videoBitrateKbps\": 500,\n        \"videoSizeBytes\": 150000,\n        \"videoDurationSeconds\": 30.5,\n        \"videoViewTimeSeconds\": 15,\n        \"videoViewRate\": 0.8,\n        \"timeInViewSeconds\": 15,\n        \"adTechPlatformVideoPlayerDomain\": \"seenthis.co\",\n        \"otherAssetsBytes\": 15000,\n        \"is3PServed\": true\n      },\n      \"sellerDomain\": \"xandr.com\",\n      \"sellerName\": \"Xandr\",\n      \"buyingMethod\": \"programmatic-open\",\n      \"dealId\": \"12345\",\n      \"globalPlacementId\": \"<string>\",\n      \"venueCategory\": \"transit.airports.arrival\",\n      \"plays\": 10,\n      \"views\": 10,\n      \"playDuration\": 10,\n      \"mediaOwner\": \"<string>\",\n      \"compensationRate\": 0.05,\n      \"isApp\": true,\n      \"broadcastMethod\": \"ota\",\n      \"uniqueReach\": 203043,\n      \"averageFrequency\": 176,\n      \"displayDurationDays\": 30,\n      \"campaignStartDate\": \"2023-03-01\",\n      \"campaignEndDate\": \"2023-03-01\",\n      \"shareOfTimePct\": 50,\n      \"physicalWidthMeters\": 2.5,\n      \"physicalHeightMeters\": 3,\n      \"printMedium\": \"newspaper\",\n      \"printCirculations\": 50000\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "d0d07f1d-29aa-49bd-bc61-0c7f2119c304",
+    "name": "AI Impact Measurement Measure API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

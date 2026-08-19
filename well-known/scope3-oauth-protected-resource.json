@@ -1,0 +1,1 @@
+{"resource":"https://api.interchange.io/mcp","authorization_servers":["https://api.interchange.io","https://identity.scope3.com"],"bearer_methods_supported":["header"],"resource_name":"Interchange API","logo_uri":"https://api.interchange.io/icons/icon-512x512.png"}

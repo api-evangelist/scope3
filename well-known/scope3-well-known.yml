@@ -1,31 +1,83 @@
-generated: '2026-07-21'
-method: searched
-source: probed /.well-known/ on all Scope3 hosts
-note: No /.well-known/ discovery documents are published on any Scope3 host. Absence is valid, recorded data.
+generated: '2026-08-13'
+method: probed
+source: probed /.well-known/ across every Scope3 and Scope3-operated Interchange host
+note: >-
+  Round 1 (2026-07-21) probed only the scope3.com family and recorded a clean 404 sweep.
+  This round found a real /.well-known/ discovery surface on the Interchange hosts:
+  api.interchange.io serves RFC 9728 OAuth protected-resource metadata pointing at its MCP
+  endpoint, RFC 8414 authorization-server metadata (with dynamic client registration and
+  PKCE S256), and OIDC discovery; identity.scope3.com serves full OIDC discovery with a
+  published scopes_supported list. docs.interchange.io serves an A2A agent card (see
+  a2a/scope3-a2a.yml). No host serves a security.txt, api-catalog, or ai-plugin.json.
 hosts:
-  - host: https://scope3.com
-    documents:
-      - {path: /.well-known/security.txt, status: 404}
-      - {path: /.well-known/openid-configuration, status: 404}
-      - {path: /.well-known/oauth-authorization-server, status: 404}
-      - {path: /.well-known/api-catalog, status: 404}
-      - {path: /.well-known/ai-plugin.json, status: 404}
-  - host: https://api.scope3.com
-    documents:
-      - {path: /.well-known/security.txt, status: 404}
-      - {path: /.well-known/openid-configuration, status: 404}
-      - {path: /.well-known/oauth-authorization-server, status: 404}
-      - {path: /.well-known/api-catalog, status: 404}
-      - {path: /.well-known/ai-plugin.json, status: 404}
-  - host: https://aiapi.scope3.com
-    documents:
-      - {path: /.well-known/security.txt, status: 404}
-      - {path: /.well-known/openid-configuration, status: 404}
-      - {path: /.well-known/oauth-authorization-server, status: 404}
-      - {path: /.well-known/api-catalog, status: 404}
-      - {path: /.well-known/ai-plugin.json, status: 404}
-  - host: https://docs.scope3.com
-    documents:
-      - {path: /.well-known/security.txt, status: 404}
-      - {path: /.well-known/openid-configuration, status: 404}
-      - {path: /.well-known/api-catalog, status: 404}
+- host: https://api.interchange.io
+  documents:
+  - {path: /.well-known/oauth-protected-resource, status: 200, file: scope3-oauth-protected-resource.json, spec: RFC 9728}
+  - {path: /.well-known/oauth-authorization-server, status: 200, file: scope3-oauth-authorization-server.json, spec: RFC 8414}
+  - {path: /.well-known/openid-configuration, status: 200, file: scope3-openid-configuration.json, spec: OIDC Discovery 1.0}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+- host: https://identity.scope3.com
+  documents:
+  - {path: /.well-known/openid-configuration, status: 200, file: scope3-identity-openid-configuration.json, spec: OIDC Discovery 1.0}
+  - {path: /.well-known/oauth-authorization-server, status: 200, spec: RFC 8414, note: same document body as the OIDC discovery response}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+- host: https://docs.interchange.io
+  documents:
+  - {path: /.well-known/agent-card.json, status: 200, file: ../a2a/scope3-agent-card.json, spec: A2A 1.0.0}
+  - {path: /.well-known/agent-skills/scope3/skill.md, status: 200, file: ../skills/scope3-interchange.md, spec: Agent Skill}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+- host: https://interchange.io
+  documents:
+  - {path: /.well-known/oauth-protected-resource, status: 200, note: mirrors the api.interchange.io document with resource https://interchange.io/mcp}
+  - {path: /.well-known/oauth-authorization-server, status: 200}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /.well-known/adagents.json, status: 404, note: AdCP seller-authorization file; Interchange documents adagents.json as a publisher-side file, not one it serves for itself}
+  - {path: /.well-known/security.txt, status: 404}
+- host: https://scope3.com
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+- host: https://api.scope3.com
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+- host: https://aiapi.scope3.com
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+- host: https://api.agentic.scope3.com
+  documents:
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /.well-known/security.txt, status: 404}
+- host: https://docs.scope3.com
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+security_txt:
+  served: false
+  note: No Scope3 or Interchange host serves /.well-known/security.txt; no SecurityTxt pointer is emitted.

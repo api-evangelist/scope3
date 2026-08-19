@@ -1,0 +1,167 @@
+generated: '2026-08-13'
+method: derived
+source: >-
+  mcp/scope3-mcp.yml, openapi/_original/scope3-buyer-openapi-original.yml,
+  openapi/_original/scope3-storefront-openapi-original.yml,
+  https://docs.interchange.io/v2/setup/built-for-agents
+surfaces:
+  openapi:
+  - {file: openapi/_original/scope3-buyer-openapi-original.yml, title: Scope3 Buyer API, version: 2.0.0, base: 'https://api.interchange.io/api/v2/buyer', operations: 212}
+  - {file: openapi/_original/scope3-storefront-openapi-original.yml, title: Scope3 Storefront API, version: 2.0.0, base: 'https://api.interchange.io/api/v2/storefront', operations: 269}
+  - {file: openapi/_original/scope3-measurement-openapi.yml, title: Scope3 Carbon Calculator API, base: 'https://api.scope3.com/v2', note: not reachable through the Interchange MCP server}
+  - {file: openapi/_original/scope3-ai-openapi-original.yml, title: AI impact measurement, base: 'https://aiapi.scope3.com', note: not reachable through the Interchange MCP server}
+  mcp:
+  - {url: 'https://api.interchange.io/mcp/buyer', gated: true, probe_status: 401}
+  - {url: 'https://api.interchange.io/mcp/storefront', gated: true, probe_status: 401}
+  graphql: null
+  graphql_note: No GraphQL endpoint is published on any Scope3 or Interchange host.
+binding_model: >-
+  Scope3 does not expose one MCP tool per REST operation. The Interchange MCP server is a
+  GATEWAY: three core tools cover the entire REST surface, and the operation is selected by
+  the `operation` argument to api_call rather than by tool name. Each core tool therefore
+  binds to a whole family of operationIds, and the real inputSchema for any given call is the
+  backing OpenAPI operation's parameters + requestBody. Every core tool also has a first-class
+  REST twin under the `MCP` tag in the buyer and storefront specs, which is what makes this
+  crosswalk high-confidence despite tools/list being auth-gated.
+crosswalk:
+- tool: api_call
+  category: gateway
+  rest: [mcpApiCall]
+  binding: rest
+  confidence: high
+  note: >-
+    Documented as "Make authenticated REST API calls to any endpoint"; requires a named
+    `operation`, with no raw method+endpoint mode. Transitively binds all 481 published
+    buyer + storefront operations. mcpApiCall (POST /api-call) is its REST twin in both specs.
+- tool: ask_about_capability
+  category: discovery
+  rest: [mcpAskAboutCapability]
+  binding: rest
+  confidence: high
+  note: >-
+    Queries the skill documentation to discover endpoints and their schemas. The documented
+    agent workflow is ask_about_capability first, then api_call. REST twin
+    mcpAskAboutCapability (POST /ask-about-capability) exists in both specs.
+- tool: initialize
+  category: session
+  rest: [mcpInitialize]
+  binding: rest
+  confidence: high
+  note: Starts an MCP session; REST twin mcpInitialize (POST /) in both specs.
+- tool: health
+  category: diagnostics
+  rest: []
+  binding: http
+  confidence: high
+  note: >-
+    No operationId in either v2 spec, but it maps to the unauthenticated platform endpoint
+    GET https://api.interchange.io/health, which returns status, version, commitSha and a
+    services map (database, agenticDatabase, mcp, a2a, electric). Verified 200 on 2026-08-13.
+- tool: customer_switch
+  category: session
+  rest: [listAvailableAccounts]
+  binding: rest
+  confidence: medium
+  note: >-
+    Published skill.md states session-level customer switching uses a dedicated tool and must
+    not be routed through api_call. Mapped by semantics to the account-listing/selection
+    surface (Account tag); the exact backing operation is not published, so confidence is medium.
+- tool: ask_murph
+  category: assistant
+  rest: []
+  binding: none
+  confidence: high
+  note: >-
+    Conversational assistant tool ("Murph"), enabled per account. No REST equivalent is
+    published; it is a server-side assistant, not a data operation.
+mcp_only:
+- tool: ask_murph
+  reason: >-
+    Server-side conversational assistant with no public REST operation. Also IU-rated billing
+    activity in its own right (see plans/scope3-plans-pricing.yml).
+- tool: health
+  reason: >-
+    Backed by a platform-level HTTP endpoint that is not modelled in either v2 OpenAPI document.
+- tool: customer_switch
+  reason: >-
+    Session/context mutation on the MCP connection itself; the published docs explicitly route
+    it around api_call, so it has no exact REST twin.
+- surface: MCP Apps (interactive UI)
+  reason: >-
+    Product-discovery and reporting tools return interactive MCP App HTML components rather
+    than the JSON their REST twins return. The rendering contract is MCP-only; the underlying
+    data operations are not.
+rest_only:
+  note: >-
+    Every operation below is reachable through api_call, so "rest_only" here means "has no
+    dedicated tool of its own" rather than "unreachable by an agent". Grouped by spec tag.
+  buyer:
+  - {capability: Creatives, operations: 39}
+  - {capability: Advertisers, operations: 22}
+  - {capability: Campaigns, operations: 21}
+  - {capability: Storefronts, operations: 19}
+  - {capability: Account, operations: 17}
+  - {capability: Measurement, operations: 16}
+  - {capability: Buyer Billing, operations: 15}
+  - {capability: Product Discovery, operations: 9}
+  - {capability: Property Lists, operations: 9}
+  - {capability: Media Billing, operations: 8}
+  - {capability: Optimization Suggestions, operations: 4}
+  - {capability: Supply Requests, operations: 4}
+  - {capability: Notifications, operations: 4}
+  - {capability: Webhook Subscriptions, operations: 3}
+  - {capability: Event Sources, operations: 3}
+  - {capability: Activity, operations: 2}
+  - {capability: Reporting, operations: 2}
+  - {capability: Release Updates, operations: 2}
+  - {capability: Syndication, operations: 2}
+  - {capability: Update Proposals, operations: 2}
+  - {capability: Signup, operations: 1}
+  - {capability: Brands, operations: 1}
+  - {capability: Audit Logs, operations: 1}
+  - {capability: Asks, operations: 1}
+  - {capability: Moderation, operations: 1}
+  - {capability: Tasks, operations: 1}
+  storefront:
+  - {capability: Storefront, operations: 159}
+  - {capability: Storefront Ad Server Catalog, operations: 18}
+  - {capability: Account, operations: 15}
+  - {capability: Storefront Ad Server Buyer Routing, operations: 14}
+  - {capability: Buyer Billing, operations: 13}
+  - {capability: Storefront Billing, operations: 9}
+  - {capability: Signals, operations: 6}
+  - {capability: Storefront Proposals, operations: 5}
+  - {capability: Storefront Agents, operations: 5}
+  - {capability: Supply Requests, operations: 4}
+  - {capability: Notifications, operations: 4}
+  - {capability: Activity, operations: 2}
+  - {capability: Reporting, operations: 2}
+  - {capability: AI Usage, operations: 2}
+  - {capability: Release Updates, operations: 2}
+  - {capability: Storefront Ad Server Diagnostics, operations: 2}
+  - {capability: Asks, operations: 1}
+  - {capability: Moderation, operations: 1}
+  - {capability: Storefront Activity, operations: 1}
+  - {capability: Products, operations: 1}
+  not_reachable_via_mcp:
+  - {api: Carbon Calculator, base: 'https://api.scope3.com/v2', note: separate measurement API; no MCP tool binds to it}
+  - {api: AI Impact Measurement, base: 'https://aiapi.scope3.com', note: separate measurement API; no MCP tool binds to it}
+coverage:
+  tools_named: 6
+  tools_bound_to_rest: 4
+  mcp_only: 3
+  rest_operations_total: 481
+  rest_operations_with_a_dedicated_tool: 3
+  rest_operations_reachable_via_api_call: 481
+  note: >-
+    3 of 481 operations (mcpInitialize, mcpApiCall, mcpAskAboutCapability) have a dedicated
+    tool. The remaining 478 are reachable only through the api_call gateway, which is the
+    provider's deliberate design, not a coverage gap.
+gated:
+  tools_list: true
+  detail: >-
+    POST tools/list to either endpoint returns 308 to the versioned alias then 401
+    {"error":"Authentication required"}. Tool names and purposes are taken from
+    provider-published documentation (built-for-agents, skill.md, and both OpenAPI
+    info.description blocks); per-tool inputSchema requires authenticated introspection.
+    Nothing here was inferred beyond what the provider publishes.

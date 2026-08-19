@@ -1,52 +1,160 @@
-generated: '2026-07-21'
-method: derived
-source: openapi/scope3-measurement-openapi.yml, openapi/scope3-ai-openapi-original.yml
-format: plain-error-schema
-note: Responses use a plain Error object (not RFC 9457 problem+json). Status codes observed across the
-  measurement and AI APIs.
+generated: '2026-08-13'
+method: searched
+source:
+- https://docs.interchange.io/v2/reference/errors
+- openapi/_original/scope3-measurement-openapi.yml
+- openapi/_original/scope3-ai-openapi-original.yml
+format: envelope-error-code
+rfc9457: false
+note: >-
+  Scope3 does not use RFC 9457 application/problem+json anywhere. The Interchange v2 APIs use a
+  single documented envelope with a machine-readable `code`; the older measurement and AI APIs
+  use a plain Error object with no code vocabulary. Both are catalogued below.
+envelope:
+  regime: interchange-v2
+  shape: '{"data": null, "error": {"code": "...", "message": "...", "field": "...", "details": {...}}}'
+  fields:
+  - {name: code, type: string, always_present: true, description: Machine-readable error code}
+  - {name: message, type: string, always_present: true, description: Human-readable message safe to surface to end users}
+  - {name: field, type: string, always_present: false, description: 'Field path for validation errors (e.g. start_date, targeting.geos)'}
+  - {name: details, type: object, always_present: false, description: 'Structured payload — Zod issues, conflict resource ids, retry hints'}
+  machine_code_field: code
+status_codes:
+  regime: interchange-v2
+  entries:
+  - {status: 400, meaning: Malformed request, codes: [BAD_REQUEST, VALIDATION_ERROR, CURRENCY_MISMATCH]}
+  - {status: 401, meaning: Missing or invalid auth, codes: [UNAUTHORIZED]}
+  - {status: 402, meaning: Payment required — committed spend would exceed your credit, codes: [CREDIT_LIMIT_EXCEEDED]}
+  - {status: 403, meaning: Authenticated but not allowed, codes: [FORBIDDEN, ACCESS_DENIED, ALPHA_OPT_IN_REQUIRED, TOS_ACCEPTANCE_REQUIRED]}
+  - {status: 404, meaning: Resource does not exist or is not visible to you, codes: [NOT_FOUND]}
+  - {status: 409, meaning: Conflicting state (duplicate, wrong state, budget short), codes: [CONFLICT, PRICING_NOT_CONFIGURED, INSUFFICIENT_MEDIA_BUDGET]}
+  - {status: 422, meaning: Semantically invalid (rare — most things use 400), codes: [VALIDATION_ERROR, CAPABILITY_NOT_SUPPORTED]}
+  - {status: 429, meaning: Rate limit hit, codes: [RATE_LIMITED]}
+  - {status: 500, meaning: Unhandled server error, codes: [INTERNAL_ERROR]}
+  - {status: 501, meaning: Endpoint exists but not yet implemented, codes: [NOT_IMPLEMENTED]}
+  - {status: 503, meaning: Upstream / dependency unavailable, codes: [SERVICE_UNAVAILABLE]}
 problems:
-- status: 400
+- code: VALIDATION_ERROR
+  status: [400, 422]
+  title: Request validation failed
+  when: Zod schema rejected the request body, query, or params
+  remediation: Read details.issues[] for the failing path and message; fix the input.
+  regime: interchange-v2
+- code: BAD_REQUEST
+  status: 400
   title: Bad request
-  description: Bad request
-  spec: measurement
-  example_operation: getSignalsBySavedList
-- status: 401
+  when: Generic 400 — usually a malformed param that did not reach validation
+  regime: interchange-v2
+- code: UNAUTHORIZED
+  status: 401
   title: Unauthorized
-  description: Unauthorized
-  spec: ai
-  example_operation: listModels
-- status: 403
+  when: No bearer token, expired token, or unknown API key
+  remediation: Supply a scope3_ API key via Authorization Bearer or x-scope3-api-key, or complete the OAuth connector flow.
+  regime: interchange-v2
+- code: FORBIDDEN
+  status: 403
   title: Forbidden
-  description: Forbidden
-  spec: measurement
-  example_operation: getSavedLists
-- status: 404
+  when: Auth succeeded but you lack the role or permission
+  regime: interchange-v2
+- code: ACCESS_DENIED
+  status: 403
+  title: Access denied
+  when: Resource exists but is owned by a different account or advertiser
+  regime: interchange-v2
+- code: ALPHA_OPT_IN_REQUIRED
+  status: 403
+  title: Alpha opt-in required
+  when: The capability is gated behind an alpha the organization has not opted into
+  regime: interchange-v2
+- code: TOS_ACCEPTANCE_REQUIRED
+  status: 403
+  title: Terms of service acceptance required
+  when: >-
+    Returned on a write call when the organization has not accepted the latest Platform Service
+    Agreement. Read endpoints continue to work.
+  remediation: Complete the acceptance flow documented under Buyer Onboarding.
+  regime: interchange-v2
+- code: NOT_FOUND
+  status: 404
   title: Not found
-  description: Model not found
-  spec: ai
-  example_operation: getModel
-- status: 406
-  title: Not acceptable
-  description: Not acceptable response
-  spec: ai
-  example_operation: listModels
-- status: 409
+  when: Resource ID does not exist, or is hidden from your scope
+  regime: interchange-v2
+- code: CONFLICT
+  status: 409
   title: Conflict
-  description: Model ID already exists
-  spec: ai
-  example_operation: createModel
-- status: 415
-  title: Unsupported media type
-  description: Unsupported media type
-  spec: ai
-  example_operation: listModels
-- status: 429
+  when: Duplicate resource, illegal state transition, or invariant violated
+  regime: interchange-v2
+- code: PRICING_NOT_CONFIGURED
+  status: 409
+  title: Pricing not configured
+  when: >-
+    Advertiser has no pricing rule for the selected sales agent; also returned when a campaign
+    budget change involves media buys whose fee terms cannot be determined
+  remediation: details.unpricedBuyIds names the affected buys; resolve pricing for those buys first.
+  regime: interchange-v2
+- code: INSUFFICIENT_MEDIA_BUDGET
+  status: 409
+  title: Insufficient media budget
+  when: >-
+    The campaign's budget.total cannot cover its media buys — e.g. lowering the total below what
+    live buys already allocate
+  remediation: The error names the requested total and the committed allocation.
+  regime: interchange-v2
+- code: CURRENCY_MISMATCH
+  status: 400
+  title: Currency mismatch
+  when: Budget currency does not match the agent or storefront currency
+  regime: interchange-v2
+- code: CREDIT_LIMIT_EXCEEDED
+  status: 402
+  title: Credit limit exceeded
+  when: Committed spend would exceed your credit
+  regime: interchange-v2
+- code: CAPABILITY_NOT_SUPPORTED
+  status: 422
+  title: Capability not supported
+  when: A seller capability explicitly marks the requested value unsupported
+  regime: interchange-v2
+- code: RATE_LIMITED
+  status: 429
   title: Too many requests
-  description: Too many requests
-  spec: ai
-  example_operation: listModels
-- status: 500
+  when: Too many requests in the window
+  remediation: Back off and retry after Retry-After; read RateLimit-Remaining preemptively.
+  see: rate-limits/scope3-rate-limits.yml
+  regime: interchange-v2
+- code: INTERNAL_ERROR
+  status: 500
   title: Internal server error
-  description: Internal server error
-  spec: ai
-  example_operation: calculateImpactBigQuery
+  when: Unhandled exception
+  remediation: Documented as safe to retry once.
+  regime: interchange-v2
+- code: NOT_IMPLEMENTED
+  status: 501
+  title: Not implemented
+  when: Endpoint exists but is not yet implemented
+  regime: interchange-v2
+- code: SERVICE_UNAVAILABLE
+  status: 503
+  title: Service unavailable
+  when: A dependency (downstream agent, billing, signal provider) is temporarily down
+  regime: interchange-v2
+measurement_problems:
+  regime: measurement
+  format: plain-error-schema
+  note: >-
+    No error-code vocabulary is published for the Carbon Calculator or AI Impact Measurement
+    APIs; these are the status codes declared in the specs. Derived, not searched.
+  entries:
+  - {status: 400, title: Bad request, spec: measurement, example_operation: getSignalsBySavedList}
+  - {status: 401, title: Unauthorized, spec: ai, example_operation: listModels}
+  - {status: 403, title: Forbidden, spec: measurement, example_operation: getSavedLists}
+  - {status: 404, title: Not found, description: Model not found, spec: ai, example_operation: getModel}
+  - {status: 406, title: Not acceptable, spec: ai, example_operation: listModels}
+  - {status: 409, title: Conflict, description: Model ID already exists, spec: ai, example_operation: createModel}
+  - {status: 415, title: Unsupported media type, spec: ai, example_operation: listModels}
+  - {status: 429, title: Too many requests, spec: ai, example_operation: listModels}
+  - {status: 500, title: Internal server error, spec: ai, example_operation: calculateImpactBigQuery}
+mcp_errors:
+  format: AdCP error object in structuredContent
+  spec: https://adcontextprotocol.org/schemas/3.0.0-rc.3/core/error.json
+  note: MCP tool errors do not use HTTP status codes.

@@ -1,0 +1,355 @@
+{
+  "item": [
+    {
+      "id": "9ffa5fb3-b545-43cd-b08e-503fa0e99735",
+      "name": "Segment",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "8b39b48a-6184-40d6-91cc-46775c587d21",
+          "name": "Get All Organization Segment Information",
+          "request": {
+            "name": "Get All Organization Segment Information",
+            "description": {
+              "content": "Returns filtered list of organization segments",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "segment",
+                "list"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "<number>",
+                  "description": "Which page number being requested"
+                },
+                {
+                  "disabled": false,
+                  "key": "segmentId",
+                  "value": "<string>",
+                  "description": "specify the client segment id to fuzzy search filter on"
+                },
+                {
+                  "disabled": false,
+                  "key": "includeDeactivated",
+                  "value": "<boolean>",
+                  "description": "whether to filter out deactivated segments"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "96aebfcd-30e7-48f4-a76d-649f78ca8a4f",
+              "name": "success response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "segment",
+                    "list"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "segmentId",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "includeDeactivated",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"segments\": [\n    {\n      \"id\": 9355,\n      \"name\": \"string\",\n      \"segmentId\": \"string\",\n      \"distributionMethod\": \"API_PULL\",\n      \"updateFrequency\": \"DAILY\",\n      \"propertyLists\": [\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ],\n          \"isInclusion\": false\n        },\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ],\n          \"isInclusion\": false\n        }\n      ],\n      \"placementLists\": [\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ]\n        },\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ]\n        }\n      ],\n      \"createdAt\": \"2021-01-30T08:30:00Z\",\n      \"partners\": [\n        {\n          \"name\": \"string\",\n          \"segmentId\": \"string\",\n          \"seatId\": \"string\"\n        },\n        {\n          \"name\": \"string\",\n          \"segmentId\": \"string\",\n          \"seatId\": \"string\"\n        }\n      ],\n      \"channels\": [\n        \"string\",\n        \"string\"\n      ],\n      \"fileName\": \"string\",\n      \"deactivatedAt\": \"2021-01-30T08:30:00Z\"\n    },\n    {\n      \"id\": 8907,\n      \"name\": \"string\",\n      \"segmentId\": \"string\",\n      \"distributionMethod\": \"INTEGRATION\",\n      \"updateFrequency\": \"MONTHLY\",\n      \"propertyLists\": [\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ],\n          \"isInclusion\": false\n        },\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ],\n          \"isInclusion\": false\n        }\n      ],\n      \"placementLists\": [\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ]\n        },\n        {\n          \"name\": \"string\",\n          \"countries\": [\n            \"string\",\n            \"string\"\n          ]\n        }\n      ],\n      \"createdAt\": \"2021-01-30T08:30:00Z\",\n      \"partners\": [\n        {\n          \"name\": \"string\",\n          \"segmentId\": \"string\",\n          \"seatId\": \"string\"\n        },\n        {\n          \"name\": \"string\",\n          \"segmentId\": \"string\",\n          \"seatId\": \"string\"\n        }\n      ],\n      \"channels\": [\n        \"string\",\n        \"string\"\n      ],\n      \"fileName\": \"string\",\n      \"deactivatedAt\": \"2021-01-30T08:30:00Z\"\n    }\n  ],\n  \"paging\": {\n    \"totalRecords\": 1794,\n    \"next\": \"string\",\n    \"previous\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c7edec17-b680-4bbd-ba32-8adcf2835a7f",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "segment",
+                    "list"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "segmentId",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "includeDeactivated",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "dea78b4d-9592-40f7-b8d4-6c6e20a351e9",
+          "name": "Get Organization Segment Data by Segment ID",
+          "request": {
+            "name": "Get Organization Segment Data by Segment ID",
+            "description": {
+              "content": "Returns requested data for the segment",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "segment",
+                "data"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "segmentId",
+                  "value": "<string>",
+                  "description": "client segment id"
+                },
+                {
+                  "disabled": false,
+                  "key": "id",
+                  "value": "<string>",
+                  "description": "scope3 internal segment id"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "148cf80c-42b5-44d6-8ac7-8a3376b27acf",
+              "name": "success response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "segment",
+                    "data"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "segmentId",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 7799,\n      \"segmentId\": \"string\",\n      \"type\": \"EXCLUDED_PROPERTY\",\n      \"property\": \"string\",\n      \"channel\": \"string\",\n      \"country\": \"string\",\n      \"inventoryId\": \"string\",\n      \"appStore\": \"string\",\n      \"gpids\": [\n        \"string\",\n        \"string\"\n      ]\n    },\n    {\n      \"id\": 2936,\n      \"segmentId\": \"string\",\n      \"type\": \"EXCLUDED_PROPERTY_PLACEMENTS\",\n      \"property\": \"string\",\n      \"channel\": \"string\",\n      \"country\": \"string\",\n      \"inventoryId\": \"string\",\n      \"appStore\": \"string\",\n      \"gpids\": [\n        \"string\",\n        \"string\"\n      ]\n    }\n  ],\n  \"paging\": {\n    \"totalRecords\": 2765,\n    \"next\": \"string\",\n    \"previous\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "db96b04e-5c65-4e2d-9761-d90778fa967b",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "segment",
+                    "data"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "segmentId",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "ac719762-ec7e-4e0d-b3ee-6bf0315b4fb4",
+    "name": "AI Impact Measurement Segment API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

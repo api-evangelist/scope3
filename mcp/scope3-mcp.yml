@@ -1,33 +1,117 @@
-generated: '2026-07-21'
-method: searched
+generated: '2026-08-13'
+method: probed
 status: published
-source: https://github.com/scope3data/agentic-client
+source: https://docs.interchange.io/v2/setup/built-for-agents
+docs:
+- https://docs.interchange.io/v2/setup/built-for-agents
+- https://docs.interchange.io/v2/reference/mcp-apps
+deployment:
+  mode: remote
+  endpoint: https://api.interchange.io/mcp/buyer
+  auth: oauth
+  verified: probed
+  note: >-
+    Two hosted, unversioned remote endpoints. POSTing tools/list to each returns HTTP 308 to
+    the versioned alias (/mcp/v2/buyer, /mcp/v2/storefront) and then HTTP 401
+    {"error":"Authentication required"} — the server is live and the tool schemas are
+    auth-gated, not absent. The unauthenticated health endpoint
+    https://api.interchange.io/health reports services.mcp "ready" and services.a2a "ready".
+    Auth is OAuth (Claude/ChatGPT connectors, with RFC 8414 metadata + dynamic client
+    registration + PKCE S256 published at /.well-known/oauth-authorization-server) or a
+    `scope3_` API key via Authorization: Bearer / x-scope3-api-key.
+  install: null
+  package: null
 server:
-  name: scope3-agentic
+  name: scope3-interchange
   transport: http
-  description: >-
-    The Scope3 Agentic Platform ships a hosted MCP server for AI agents. The npm
-    `scope3` package exposes Scope3McpClient, a thin connection helper that wires up
-    bearer auth and the MCP URL and exposes callTool(), readResource(), and listTools()
-    as direct passthroughs. Two agent personas are served (buyer, storefront), each with
-    a published skill.md operating guide.
-  base_url: https://api.agentic.scope3.com
+  protocol: JSON-RPC 2.0
+  endpoints:
+  - persona: buyer
+    url: https://api.interchange.io/mcp/buyer
+    versioned_alias: https://api.interchange.io/mcp/v2/buyer
+    rest_base: https://api.interchange.io/api/v2/buyer
+    openapi: openapi/_original/scope3-buyer-openapi-original.yml
+    probe: {status: 401, checked: '2026-08-13'}
+  - persona: storefront
+    url: https://api.interchange.io/mcp/storefront
+    versioned_alias: https://api.interchange.io/mcp/v2/storefront
+    rest_base: https://api.interchange.io/api/v2/storefront
+    openapi: openapi/_original/scope3-storefront-openapi-original.yml
+    probe: {status: 401, checked: '2026-08-13'}
+  - persona: storefront-adcp-agent
+    url: https://api.interchange.io/storefront/{platformId}/mcp
+    note: >-
+      Buyer-facing AdCP endpoint a hosted storefront exposes when configured to advertise as
+      an agent. Templated per platformId; distinct from the operator management connector above.
   auth:
-    type: bearer
-    obtain: https://agentic.scope3.com  # Manage API Keys
-personas:
-  - name: buyer
-    skill: https://api.agentic.scope3.com/api/v2/buyer/skill.md
-  - name: storefront
-    skill: https://api.agentic.scope3.com/api/v2/storefront/skill.md
+    type: oauth
+    alternatives: [api-key]
+    api_key_headers: [Authorization, x-scope3-api-key]
+    api_key_prefix: scope3_
+    obtain: https://interchange.io/user-api-keys
+    oauth_metadata:
+      protected_resource: https://api.interchange.io/.well-known/oauth-protected-resource
+      authorization_server: https://api.interchange.io/.well-known/oauth-authorization-server
+      identity_provider: https://identity.scope3.com
+      dynamic_client_registration: true
+      pkce: S256
+  versioning_note: >-
+    The REST URLs are pinned to v2 and keep serving v2 after a future major version ships.
+    The buyer and storefront-management MCP URLs are unversioned aliases that auto-redirect
+    to whatever is currently stable (today v2).
 tools:
-  - name: api_call
-    description: Invoke a named buyer/storefront REST operation via the MCP server (operation field required; no raw method+endpoint mode).
-  - name: ask_about_capability
-    description: Query the platform for what a capability supports.
-  - name: customer_switch
-    description: Session-level customer/context switch (dedicated tool, not routed through api_call).
+- name: api_call
+  description: >-
+    Make authenticated REST API calls to any Interchange endpoint. Every call must supply a
+    named `operation`; there is no raw method + endpoint mode. This tool is the gateway to
+    the full REST surface (212 buyer + 269 storefront operations).
+  covers: openapi/_original/scope3-buyer-openapi-original.yml, openapi/_original/scope3-storefront-openapi-original.yml
+- name: ask_about_capability
+  description: >-
+    Query the skill documentation to discover which endpoints exist and their schemas. The
+    documented agent workflow is ask_about_capability first, then api_call.
+- name: health
+  description: Check API health and verify connectivity.
+  rest_equivalent: GET https://api.interchange.io/health
+- name: ask_murph
+  description: >-
+    Ask Murph, the Interchange AI guide, a plain-English question or file a support report.
+    Available only once the assistant is enabled for the account; otherwise returns a
+    "not enabled" message.
+  conditional: true
+- name: customer_switch
+  description: Session-level customer/context switch; a dedicated tool, not routed through api_call.
+  source: https://api.interchange.io/api/v2/buyer/skill.md
+- name: initialize
+  description: Start an MCP session.
+  source: openapi info.description on both published specs
+mcp_apps:
+  supported: true
+  note: >-
+    Product-discovery and reporting tools return interactive UI components (MCP App HTML)
+    rather than plain JSON; the published skill instructs agents to display those as-is.
+  docs: https://docs.interchange.io/v2/reference/mcp-apps
+skills:
+  published: true
+  files:
+  - {persona: buyer, url: 'https://api.interchange.io/api/v2/buyer/skill.md', local: skills/scope3-agentic-buyer.md}
+  - {persona: storefront, url: 'https://api.interchange.io/api/v2/storefront/skill.md', local: skills/scope3-agentic-storefront.md}
+  - {persona: platform, url: 'https://docs.interchange.io/.well-known/agent-skills/scope3/skill.md', local: skills/scope3-interchange.md}
 notes: >-
-  Tool list captured from the published SDK README and skill.md guides. The MCP server
-  performs routing/validation server-side; the full tool catalog is enumerable at runtime
-  via listTools(). This is a genuinely published (hosted) MCP server, not a derived candidate.
+  Supersedes the 2026-07-21 manifest, which named api.agentic.scope3.com as the server base
+  and was later marked deployment.mode "none / probe: dead" by the catalog MCP census. The
+  platform has since moved to the Interchange domain: api.agentic.scope3.com still serves the
+  buyer/storefront skill.md files, but those files now declare api.interchange.io as the API
+  base and the live MCP endpoints are the interchange.io ones probed above. The earlier
+  "dead" reading was a moved endpoint, not a retired server.
+history:
+- {date: '2026-07-21', claim: 'https://api.agentic.scope3.com', outcome: server base, method: searched}
+- {date: '2026-08-12', claim: 'https://api.agentic.scope3.com', outcome: probe dead, method: probed}
+- {date: '2026-08-13', claim: 'https://api.interchange.io/mcp/buyer', outcome: 'HTTP 308 -> 401 auth-gated, live', method: probed}
+tool_schemas_gated: true
+tool_schemas_note: >-
+  The live tools/list response requires authentication, so per-tool inputSchema was not
+  captured. The tool names and purposes above are provider-published (built-for-agents docs,
+  skill.md files, and both OpenAPI info.description blocks). The real input contract for
+  anything reached through api_call is the backing OpenAPI operation — see
+  mcp/scope3-tool-crosswalk.yml.

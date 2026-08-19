@@ -1,0 +1,69 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AI Impact Measurement Measure API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Measure",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Emissions Measurement",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/measure",
+            "params": [
+              {
+                "name": "includeRows",
+                "value": "",
+                "type": "query",
+                "description": "Whether to include all rows in the response"
+              },
+              {
+                "name": "latest",
+                "value": "",
+                "type": "query",
+                "description": "Whether to use latest available data"
+              },
+              {
+                "name": "fields",
+                "value": "",
+                "type": "query",
+                "description": "Comma separated list of fields to include in the row level response"
+              },
+              {
+                "name": "framework",
+                "value": "",
+                "type": "query",
+                "description": "Default is scope3"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Calculates the carbon footprint for advertising media"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

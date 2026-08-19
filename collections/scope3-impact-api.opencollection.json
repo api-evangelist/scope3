@@ -1,0 +1,51 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AI Measurement Impact API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Impact",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get impact metrics for a task",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/impact",
+            "params": [
+              {
+                "name": "debug",
+                "value": "",
+                "type": "query",
+                "description": "Return debug information"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Get impact metrics for a task"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
