@@ -44,6 +44,21 @@ tags:
 - Carbon Emissions
 - Sustainability
 - AdTech
+- Measurements
+- Artificial Intelligence
+- Agentic
+- AdCP
+- MCP
+- Programmatic
+- Media Buying
+- Publishing
+tags_raw:
+- Company
+- Enterprise
+- Advertising
+- Carbon Emissions
+- Sustainability
+- AdTech
 - Measurement
 - Artificial Intelligence
 - Agentic
@@ -163,6 +178,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - GPU
+  tags_raw:
   - Gpu
   properties:
   - type: OpenAPI
