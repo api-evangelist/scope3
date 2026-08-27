@@ -73,65 +73,6 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 apis:
-- aid: scope3:scope3-interchange-buyer-api
-  name: Scope3 Interchange Buyer API
-  description: >-
-    The buyer side of Scope3 Interchange, the Interchange for agent-to-agent advertising: 212
-    published operations covering advertisers, campaigns, product discovery, creatives, media
-    buys, measurement, syndication, webhook subscriptions and buyer billing. Built for AI
-    agents as primary callers — the same surface is reachable over REST or through a hosted
-    remote MCP endpoint, and Scope3 publishes an Agent Skill for it.
-  humanURL: https://docs.interchange.io/v2/buyer-introduction
-  baseURL: https://api.interchange.io/api/v2/buyer
-  tags:
-  - Agentic
-  - Advertising
-  - AdTech
-  - AdCP
-  - MCP
-  properties:
-  - type: OpenAPI
-    url: openapi/_original/scope3-buyer-openapi-original.yml
-  - type: Overlay
-    url: overlays/scope3-buyer-overlay.yaml
-  - type: MCPServer
-    url: mcp/scope3-mcp.yml
-  - type: ToolCrosswalk
-    url: mcp/scope3-tool-crosswalk.yml
-  - type: AgentSkill
-    url: skills/scope3-agentic-buyer.md
-  - type: Webhooks
-    url: asyncapi/scope3-webhooks.yml
-  - type: APIReference
-    url: https://docs.interchange.io/v2/buyer-api-reference
-- aid: scope3:scope3-interchange-storefront-api
-  name: Scope3 Interchange Storefront API
-  description: >-
-    The seller side of Scope3 Interchange: 269 published operations covering storefronts,
-    inventory sources, ad-server catalog and buyer routing, signals, proposals, approvals,
-    storefront agents and payouts. Publishers register once to reach every buyer agent
-    transacting on AdCP, over REST or a hosted remote MCP endpoint.
-  humanURL: https://docs.interchange.io/v2/storefront-introduction
-  baseURL: https://api.interchange.io/api/v2/storefront
-  tags:
-  - Agentic
-  - Advertising
-  - AdTech
-  - AdCP
-  - MCP
-  properties:
-  - type: OpenAPI
-    url: openapi/_original/scope3-storefront-openapi-original.yml
-  - type: Overlay
-    url: overlays/scope3-storefront-overlay.yaml
-  - type: MCPServer
-    url: mcp/scope3-mcp.yml
-  - type: ToolCrosswalk
-    url: mcp/scope3-tool-crosswalk.yml
-  - type: AgentSkill
-    url: skills/scope3-agentic-storefront.md
-  - type: APIReference
-    url: https://docs.interchange.io/v2/storefront-api-reference
 - aid: scope3:scope3-ai-impact-measurement-api
   name: Scope3 AI Impact Measurement API
   description: The AI Impact Measurement API from Scope3 — 1 operation(s) for ai impact measurement.
@@ -275,6 +216,14 @@ apis:
   - type: OpenAPI
     url: openapi/scope3-status-api-openapi.yml
 common:
+- type: Overlay
+  url: overlays/scope3-buyer-overlay.yaml
+- type: AgentSkill
+  url: skills/scope3-agentic-buyer.md
+- type: Overlay
+  url: overlays/scope3-storefront-overlay.yaml
+- type: AgentSkill
+  url: skills/scope3-agentic-storefront.md
 - type: Overlay
   url: overlays/scope3-ai-overlay.yaml
 - type: AgentCard
