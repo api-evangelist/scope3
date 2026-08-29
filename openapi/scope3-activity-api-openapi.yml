@@ -1,0 +1,1203 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Activity API
+  version: 2.0.0
+  description: 'Operations tagged Activity across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Activity
+paths:
+  /activity/calls:
+    servers:
+    - url: /api/v2
+      description: Shared customer API base URL
+    get:
+      operationId: listActivityCalls
+      summary: List API calls
+      description: List normalized customer API calls with stable workload, run, outcome, latency, and correlation metadata.
+      tags:
+      - Activity
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: startTime
+        schema:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      - in: query
+        name: endTime
+        schema:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      - in: query
+        name: workloadUid
+        schema:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+      - in: query
+        name: runUid
+        schema:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+      - in: query
+        name: clientRunId
+        schema:
+          description: Caller-supplied correlation identifier. Cross-check workloadUid, runUid, apiVersion, and time bounds for provenance.
+          type: string
+          pattern: ^[A-Za-z0-9._:-]{1,128}$
+      - in: query
+        name: advertiserId
+        schema:
+          type: string
+          pattern: ^\d+$
+      - in: query
+        name: environment
+        schema:
+          type: string
+          enum:
+          - production
+          - sandbox
+          - unknown
+          - not_applicable
+      - in: query
+        name: outcome
+        schema:
+          type: string
+          enum:
+          - succeeded
+          - accepted
+          - denied
+          - failed
+          - cancelled
+          - unknown
+      - in: query
+        name: operation
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 240
+      - in: query
+        name: surface
+        schema:
+          type: string
+          enum:
+          - rest
+          - mcp
+          - a2a
+      - in: query
+        name: includeDiagnostics
+        schema:
+          default: 'false'
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+      - in: query
+        name: includeProtocol
+        schema:
+          default: 'false'
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+      - in: query
+        name: limit
+        schema:
+          default: 50
+          type: integer
+          maximum: 200
+          minimum: 1
+      - in: query
+        name: cursor
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      responses:
+        '200':
+          description: List API calls
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListActivityCallsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /activity/calls/{activityUid}:
+    servers:
+    - url: /api/v2
+      description: Shared customer API base URL
+    get:
+      operationId: getActivityCall
+      summary: Get API call detail
+      description: Get one authorized customer API call and its safe timing and diagnostic detail.
+      tags:
+      - Activity
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: activityUid
+        schema:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        required: true
+      responses:
+        '200':
+          description: Get API call detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityCallDetailResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    ListActivityCallsResponse:
+      description: Cursor-paginated customer API calls
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityCall'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+      - nextCursor
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ActivityCall:
+      description: One normalized, customer-authorized API call
+      type: object
+      properties:
+        activityUid:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        idempotencyReplayOfActivityUid:
+          type:
+          - string
+          - 'null'
+        requestId:
+          type: string
+        transportRequestId:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        durationMs:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 9007199254740991
+        completionState:
+          type: string
+          enum:
+          - started
+          - complete
+          - incomplete
+        outcome:
+          type:
+          - string
+          - 'null'
+          enum:
+          - succeeded
+          - accepted
+          - denied
+          - failed
+          - cancelled
+          - unknown
+        decisionDisposition:
+          type: string
+          enum:
+          - not_evaluated
+        surface:
+          type: string
+          enum:
+          - rest
+          - mcp
+          - a2a
+        visibility:
+          type: string
+          enum:
+          - customer
+          - diagnostic
+          - protocol
+        operation:
+          type: string
+        operationDispatches:
+          description: Server-observed v3 facade dispatches in invocation order. Null means capture was unavailable or could not produce a complete snapshot; a captured empty envelope means no facade operation ran.
+          type:
+          - object
+          - 'null'
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  sequence:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                  accountKind:
+                    type: string
+                    enum:
+                    - buyer
+                    - storefront
+                  operation:
+                    type: string
+                    maxLength: 100
+                    pattern: ^[a-z][a-z0-9_]*$
+                  startedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                  completedAt:
+                    type:
+                    - string
+                    - 'null'
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                  completionState:
+                    type: string
+                    enum:
+                    - started
+                    - complete
+                  outcome:
+                    type:
+                    - string
+                    - 'null'
+                    enum:
+                    - succeeded
+                    - failed
+                required:
+                - sequence
+                - accountKind
+                - operation
+                - startedAt
+                - completedAt
+                - completionState
+                - outcome
+                additionalProperties: false
+            totalCount:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            truncated:
+              type: boolean
+          required:
+          - items
+          - totalCount
+          - truncated
+          additionalProperties: false
+        contractVersion:
+          type:
+          - string
+          - 'null'
+        docsRevision:
+          type:
+          - string
+          - 'null'
+        method:
+          type: string
+        httpStatus:
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        protocolStatus:
+          type:
+          - string
+          - 'null'
+        environment:
+          type: string
+          enum:
+          - production
+          - sandbox
+          - unknown
+          - not_applicable
+        dryRun:
+          type:
+          - boolean
+          - 'null'
+        apiVersion:
+          description: API version observed by the server for this call
+          type:
+          - string
+          - 'null'
+          enum:
+          - v1
+          - v2
+          - v3
+        operationClass:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        operationRegistryVersion:
+          type:
+          - string
+          - 'null'
+        platformSafetyResult:
+          type: string
+          enum:
+          - not_applicable
+        platformSafetyReasonCode:
+          type:
+          - string
+          - 'null'
+        administrativeReviewUid:
+          type:
+          - string
+          - 'null'
+        governanceSummary:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        advertiserId:
+          type:
+          - string
+          - 'null'
+        principalType:
+          type: string
+          enum:
+          - human
+          - workload
+          - system
+          - unknown
+        userId:
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        userName:
+          type:
+          - string
+          - 'null'
+        userEmail:
+          type:
+          - string
+          - 'null'
+        workloadUid:
+          type:
+          - string
+          - 'null'
+        workloadName:
+          type:
+          - string
+          - 'null'
+        credentialId:
+          type:
+          - string
+          - 'null'
+        credentialName:
+          type:
+          - string
+          - 'null'
+        credentialVersion:
+          type:
+          - integer
+          - 'null'
+          maximum: 9007199254740991
+          minimum: 1
+        credentialScope:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        credentialRole:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        runUid:
+          type:
+          - string
+          - 'null'
+        clientRunId:
+          description: Caller-supplied correlation identifier; not independent provenance
+          type:
+          - string
+          - 'null'
+        sessionId:
+          type:
+          - string
+          - 'null'
+        conversationUid:
+          type:
+          - string
+          - 'null'
+        taskUids:
+          type: array
+          items:
+            type: string
+        traceId:
+          type:
+          - string
+          - 'null'
+        error:
+          type:
+          - object
+          - 'null'
+          properties:
+            code:
+              type: string
+            class:
+              type: string
+            faultDomain:
+              type: string
+            retryDisposition:
+              type: string
+            retryAfterSeconds:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+            documentationUrl:
+              type:
+              - string
+              - 'null'
+            message:
+              type:
+              - string
+              - 'null'
+          required:
+          - code
+          - class
+          - faultDomain
+          - retryDisposition
+          - retryAfterSeconds
+          - documentationUrl
+          - message
+          additionalProperties: false
+        resources:
+          type: array
+          items:
+            type: object
+            properties:
+              resourceType:
+                type: string
+              resourceId:
+                type: string
+              label:
+                type:
+                - string
+                - 'null'
+              href:
+                type:
+                - string
+                - 'null'
+            required:
+            - resourceType
+            - resourceId
+            - label
+            - href
+            additionalProperties: false
+        credits:
+          type:
+          - object
+          - 'null'
+          properties:
+            reserved:
+              type: number
+            settled:
+              type: number
+          required:
+          - reserved
+          - settled
+          additionalProperties: false
+        detailAvailability:
+          type: string
+          enum:
+          - available
+          - expired
+          - not_captured
+      required:
+      - activityUid
+      - idempotencyReplayOfActivityUid
+      - requestId
+      - transportRequestId
+      - startedAt
+      - completedAt
+      - durationMs
+      - completionState
+      - outcome
+      - decisionDisposition
+      - surface
+      - visibility
+      - operation
+      - operationDispatches
+      - contractVersion
+      - docsRevision
+      - method
+      - httpStatus
+      - protocolStatus
+      - environment
+      - dryRun
+      - apiVersion
+      - operationClass
+      - operationRegistryVersion
+      - platformSafetyResult
+      - platformSafetyReasonCode
+      - administrativeReviewUid
+      - governanceSummary
+      - advertiserId
+      - principalType
+      - userId
+      - userName
+      - userEmail
+      - workloadUid
+      - workloadName
+      - credentialId
+      - credentialName
+      - credentialVersion
+      - credentialScope
+      - credentialRole
+      - runUid
+      - clientRunId
+      - sessionId
+      - conversationUid
+      - taskUids
+      - traceId
+      - error
+      - resources
+      - credits
+      - detailAvailability
+      additionalProperties: false
+    ActivityCallDetailResponse:
+      description: Authorized customer API call detail and safe diagnostics
+      type: object
+      properties:
+        call:
+          type: object
+          properties:
+            activityUid:
+              type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            idempotencyReplayOfActivityUid:
+              type:
+              - string
+              - 'null'
+            requestId:
+              type: string
+            transportRequestId:
+              type: string
+            startedAt:
+              type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            completedAt:
+              type:
+              - string
+              - 'null'
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            durationMs:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+            completionState:
+              type: string
+              enum:
+              - started
+              - complete
+              - incomplete
+            outcome:
+              type:
+              - string
+              - 'null'
+              enum:
+              - succeeded
+              - accepted
+              - denied
+              - failed
+              - cancelled
+              - unknown
+            decisionDisposition:
+              type: string
+              enum:
+              - not_evaluated
+            surface:
+              type: string
+              enum:
+              - rest
+              - mcp
+              - a2a
+            visibility:
+              type: string
+              enum:
+              - customer
+              - diagnostic
+              - protocol
+            operation:
+              type: string
+            operationDispatches:
+              description: Server-observed v3 facade dispatches in invocation order. Null means capture was unavailable or could not produce a complete snapshot; a captured empty envelope means no facade operation ran.
+              type:
+              - object
+              - 'null'
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sequence:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      accountKind:
+                        type: string
+                        enum:
+                        - buyer
+                        - storefront
+                      operation:
+                        type: string
+                        maxLength: 100
+                        pattern: ^[a-z][a-z0-9_]*$
+                      startedAt:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      completedAt:
+                        type:
+                        - string
+                        - 'null'
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      completionState:
+                        type: string
+                        enum:
+                        - started
+                        - complete
+                      outcome:
+                        type:
+                        - string
+                        - 'null'
+                        enum:
+                        - succeeded
+                        - failed
+                    required:
+                    - sequence
+                    - accountKind
+                    - operation
+                    - startedAt
+                    - completedAt
+                    - completionState
+                    - outcome
+                    additionalProperties: false
+                totalCount:
+                  type: integer
+                  minimum: 0
+                  maximum: 9007199254740991
+                truncated:
+                  type: boolean
+              required:
+              - items
+              - totalCount
+              - truncated
+              additionalProperties: false
+            contractVersion:
+              type:
+              - string
+              - 'null'
+            docsRevision:
+              type:
+              - string
+              - 'null'
+            method:
+              type: string
+            httpStatus:
+              type:
+              - integer
+              - 'null'
+              minimum: -9007199254740991
+              maximum: 9007199254740991
+            protocolStatus:
+              type:
+              - string
+              - 'null'
+            environment:
+              type: string
+              enum:
+              - production
+              - sandbox
+              - unknown
+              - not_applicable
+            dryRun:
+              type:
+              - boolean
+              - 'null'
+            apiVersion:
+              description: API version observed by the server for this call
+              type:
+              - string
+              - 'null'
+              enum:
+              - v1
+              - v2
+              - v3
+            operationClass:
+              type:
+              - string
+              - 'null'
+              enum:
+              - null
+            operationRegistryVersion:
+              type:
+              - string
+              - 'null'
+            platformSafetyResult:
+              type: string
+              enum:
+              - not_applicable
+            platformSafetyReasonCode:
+              type:
+              - string
+              - 'null'
+            administrativeReviewUid:
+              type:
+              - string
+              - 'null'
+            governanceSummary:
+              type:
+              - string
+              - 'null'
+              enum:
+              - null
+            advertiserId:
+              type:
+              - string
+              - 'null'
+            principalType:
+              type: string
+              enum:
+              - human
+              - workload
+              - system
+              - unknown
+            userId:
+              type:
+              - integer
+              - 'null'
+              minimum: -9007199254740991
+              maximum: 9007199254740991
+            userName:
+              type:
+              - string
+              - 'null'
+            userEmail:
+              type:
+              - string
+              - 'null'
+            workloadUid:
+              type:
+              - string
+              - 'null'
+            workloadName:
+              type:
+              - string
+              - 'null'
+            credentialId:
+              type:
+              - string
+              - 'null'
+            credentialName:
+              type:
+              - string
+              - 'null'
+            credentialVersion:
+              type:
+              - integer
+              - 'null'
+              maximum: 9007199254740991
+              minimum: 1
+            credentialScope:
+              type:
+              - string
+              - 'null'
+              enum:
+              - null
+            credentialRole:
+              type:
+              - string
+              - 'null'
+              enum:
+              - null
+            runUid:
+              type:
+              - string
+              - 'null'
+            clientRunId:
+              description: Caller-supplied correlation identifier; not independent provenance
+              type:
+              - string
+              - 'null'
+            sessionId:
+              type:
+              - string
+              - 'null'
+            conversationUid:
+              type:
+              - string
+              - 'null'
+            taskUids:
+              type: array
+              items:
+                type: string
+            traceId:
+              type:
+              - string
+              - 'null'
+            error:
+              type:
+              - object
+              - 'null'
+              properties:
+                code:
+                  type: string
+                class:
+                  type: string
+                faultDomain:
+                  type: string
+                retryDisposition:
+                  type: string
+                retryAfterSeconds:
+                  type:
+                  - integer
+                  - 'null'
+                  minimum: 0
+                  maximum: 9007199254740991
+                documentationUrl:
+                  type:
+                  - string
+                  - 'null'
+                message:
+                  type:
+                  - string
+                  - 'null'
+              required:
+              - code
+              - class
+              - faultDomain
+              - retryDisposition
+              - retryAfterSeconds
+              - documentationUrl
+              - message
+              additionalProperties: false
+            resources:
+              type: array
+              items:
+                type: object
+                properties:
+                  resourceType:
+                    type: string
+                  resourceId:
+                    type: string
+                  label:
+                    type:
+                    - string
+                    - 'null'
+                  href:
+                    type:
+                    - string
+                    - 'null'
+                required:
+                - resourceType
+                - resourceId
+                - label
+                - href
+                additionalProperties: false
+            credits:
+              type:
+              - object
+              - 'null'
+              properties:
+                reserved:
+                  type: number
+                settled:
+                  type: number
+              required:
+              - reserved
+              - settled
+              additionalProperties: false
+            detailAvailability:
+              type: string
+              enum:
+              - available
+              - expired
+              - not_captured
+            routeTemplate:
+              type:
+              - string
+              - 'null'
+          required:
+          - activityUid
+          - idempotencyReplayOfActivityUid
+          - requestId
+          - transportRequestId
+          - startedAt
+          - completedAt
+          - durationMs
+          - completionState
+          - outcome
+          - decisionDisposition
+          - surface
+          - visibility
+          - operation
+          - operationDispatches
+          - contractVersion
+          - docsRevision
+          - method
+          - httpStatus
+          - protocolStatus
+          - environment
+          - dryRun
+          - apiVersion
+          - operationClass
+          - operationRegistryVersion
+          - platformSafetyResult
+          - platformSafetyReasonCode
+          - administrativeReviewUid
+          - governanceSummary
+          - advertiserId
+          - principalType
+          - userId
+          - userName
+          - userEmail
+          - workloadUid
+          - workloadName
+          - credentialId
+          - credentialName
+          - credentialVersion
+          - credentialScope
+          - credentialRole
+          - runUid
+          - clientRunId
+          - sessionId
+          - conversationUid
+          - taskUids
+          - traceId
+          - error
+          - resources
+          - credits
+          - detailAvailability
+          - routeTemplate
+          additionalProperties: false
+        timing:
+          type: object
+          properties:
+            totalMs:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+            scope3ProcessingMs:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+            queueMs:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+            downstreamWaitMs:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+          required:
+          - totalMs
+          - scope3ProcessingMs
+          - queueMs
+          - downstreamWaitMs
+          additionalProperties: false
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              seq:
+                type: integer
+                minimum: 0
+                maximum: 9007199254740991
+              at:
+                type: string
+                format: date-time
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+              kind:
+                type: string
+                enum:
+                - validation
+                - response
+              status:
+                type: string
+                enum:
+                - ok
+                - error
+              name:
+                type: string
+              detail: {}
+            required:
+            - seq
+            - at
+            - kind
+            - status
+            - name
+            additionalProperties: false
+        redactedInput:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        redactedOutput:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        safeHeaders:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: string
+        detailExpiresAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        governanceDecisions:
+          type: array
+          items: {}
+        administrativeReview:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+      required:
+      - call
+      - timing
+      - steps
+      - redactedInput
+      - redactedOutput
+      - safeHeaders
+      - detailExpiresAt
+      - governanceDecisions
+      - administrativeReview
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

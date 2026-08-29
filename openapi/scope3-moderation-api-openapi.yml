@@ -1,0 +1,161 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Moderation API
+  version: 2.0.0
+  description: 'Operations tagged Moderation across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Moderation
+paths:
+  /moderation/check:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: checkModeration
+      summary: Pre-check content against moderation policy
+      description: Runs the content-moderation engine against the supplied text WITHOUT blocking. Returns structured findings (category, severity, suggestion) so buyer agents can validate input before submitting it to a campaign create or other blocking surface. Mirrors the engine that powers `POST /v2/campaigns` brief screening.
+      tags:
+      - Moderation
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  description: The text to evaluate. Up to 10,000 characters; longer text is truncated server-side.
+                  type: string
+                  minLength: 1
+                  maxLength: 10000
+                direction:
+                  description: Which pattern set to apply. "input" runs the brief/jailbreak/policy patterns; "output" runs the LLM-output (refusal/identity/PII) patterns.
+                  default: input
+                  type: string
+                  enum:
+                  - input
+                  - output
+                surface:
+                  description: Optional surface label for metric attribution. Defaults to "moderation.check".
+                  default: moderation.check
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+              required:
+              - text
+      responses:
+        '200':
+          description: Pre-check content against moderation policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    description: True when no moderation patterns matched.
+                    type: boolean
+                  wouldBlock:
+                    description: True when at least one finding would trigger a 422 if this content were submitted to a blocking surface.
+                    type: boolean
+                  findings:
+                    description: All matching findings. Empty when `passed` is true. Both blocking and non-blocking findings are reported so callers can observe medium-severity signals.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category:
+                          description: Moderation category (e.g. "jailbreak_attempt", "pii_leak").
+                          type: string
+                        severity:
+                          description: Severity tier. "high" and above is what blocks at default thresholds.
+                          type: string
+                          enum:
+                          - low
+                          - medium
+                          - high
+                          - critical
+                        suggestion:
+                          description: Human-readable remediation guidance for the buyer agent to self-correct.
+                          type: string
+                      required:
+                      - category
+                      - severity
+                      - suggestion
+                      additionalProperties: false
+                required:
+                - passed
+                - wouldBlock
+                - findings
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

@@ -1,0 +1,1351 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront Storefront Ad Server Buyer Routing API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Storefront Ad Server Buyer Routing
+paths:
+  /esa/{esaId}/sandbox-account:
+    get:
+      operationId: getEsaSandboxAccountStatus
+      summary: Get ad server source sandbox-account readiness
+      description: Read the tenant-managed sandbox advertiser account readiness for no-spend buyer-stack tests against an ad server source.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: Get ad server source sandbox-account readiness
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaSandboxAccountStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Ad server source not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/sandbox-account/ensure:
+    post:
+      operationId: ensureEsaSandboxAccount
+      summary: Ensure ad server source sandbox account exists
+      description: Idempotently create, repair, or reuse the tenant-managed sandbox advertiser account for no-spend buyer-stack tests. An existing sandbox account that is not mapped to the tenant sandbox advertiser is re-ensured upstream so it becomes usable. The caller does not supply a GAM advertiser id; sandbox routing is managed by the source tenant.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: Ensure ad server source sandbox account exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaEnsureSandboxAccountResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Ad server source not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/advertisers:
+    get:
+      operationId: listEsaAdapterAdvertisers
+      summary: List adapter advertisers
+      description: Read a bounded provider-neutral advertiser roster for a Google Ad Manager, FreeWheel, or AdsWizz source. `authoritative` is true only after a complete source read; partial, truncated, or failed reads never authorize omission-based archival.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+      - in: query
+        name: cursor
+        schema:
+          type: string
+          minLength: 1
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List adapter advertisers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdapterAdvertiserList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Ad server source not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Ad-server adapter temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/gam/advertisers:
+    get:
+      operationId: listEsaGamAdvertisers
+      summary: List cached GAM advertisers
+      description: List cached Google Ad Manager advertiser records for a Google Ad Manager-backed ad server source. Use this to select a default advertiser or buyer-specific mapping target.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: q
+        schema:
+          description: Advertiser name substring or exact numeric advertiser id.
+          type: string
+        description: Advertiser name substring or exact numeric advertiser id.
+      - in: query
+        name: query
+        schema:
+          description: Alias for q.
+          type: string
+        description: Alias for q.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+      - in: query
+        name: cursor
+        schema:
+          type: string
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List cached GAM advertisers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamAdvertiserPage'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/gam/advertisers/ensure:
+    post:
+      operationId: ensureEsaGamAdvertiser
+      summary: Ensure a GAM advertiser exists
+      description: Create or find a Google Ad Manager advertiser by name for a Google Ad Manager-backed ad server source. The returned advertiser id can be used as the default advertiser or in buyer-specific mappings.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnsureGamAdvertiserBody'
+      responses:
+        '200':
+          description: Ensure a GAM advertiser exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnsureGamAdvertiserResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/default-advertiser:
+    put:
+      operationId: setEsaDefaultAdvertiser
+      summary: Set default advertiser
+      description: Set the catch-all advertiser every unmatched buyer routes to, for whichever ad server backs the embedded sales agent. Each adapter stores its default in its own place — Google Ad Manager on the tenant, AdsWizz on its adapter config — and this routes the write accordingly. Rejected for ad servers that cannot map an advertiser (FreeWheel, SpringServe). Pair with GET /esa/{esaId}/advertisers to find the id.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetDefaultAdvertiserBody'
+      responses:
+        '200':
+          description: Set default advertiser
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetDefaultAdvertiserResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/gam/default-advertiser:
+    put:
+      operationId: setEsaDefaultGamAdvertiser
+      summary: Set default GAM advertiser
+      description: Set the default Google Ad Manager advertiser used for buyer routing on a Google Ad Manager-backed ad server source. For an adapter-agnostic write, use PUT /esa/{esaId}/default-advertiser.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetDefaultGamAdvertiserBody'
+      responses:
+        '200':
+          description: Set default GAM advertiser
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetDefaultGamAdvertiserResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/gam-custom-targeting-keys/ensure:
+    post:
+      operationId: ensureEsaGamCustomTargetingKeys
+      summary: Ensure GAM custom-targeting keys exist
+      description: Idempotently create the named GAM custom-targeting keys on a Google Ad Manager-backed ad server source. Names already present in the source's synced GAM catalog are reported in `alreadyExisted` with no GAM call; truly-missing names are minted as FREEFORM, ACTIVE, `reportableType=ON` and returned in `created`. After minting, the source re-runs its custom-targeting sync inline so a follow-up `PUT /axe-keys` call (or equivalent for other signal protocols) sees the fresh key IDs on the same turn. Protocol-agnostic — currently used to mint AXE keys (axei / axex / axem) but reusable for TMP and future signal protocols.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnsureGamCustomTargetingKeysBody'
+      responses:
+        '200':
+          description: Ensure GAM custom-targeting keys exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnsureGamCustomTargetingKeysResponse'
+        '400':
+          description: Ad-server-side failure surfaced as `VALIDATION_ERROR`; the `details.upstreamCode` field distinguishes the cause. `ADAPTER_PERMISSION_DENIED` — the source's GAM service account lacks the `CustomTargetingKey.write` scope required to create keys; the operator must either grant the service account a role with that scope (Trafficker or an equivalent least-privilege custom role) OR create the keys manually in GAM (Admin → Custom Targeting) as FREEFORM, then retry. Other `ADAPTER_*` upstream codes (e.g. `ADAPTER_KEY_LIMIT_EXCEEDED` when the network is at its custom-targeting key cap) also surface via this path — always branch on `details.upstreamCode`, not on the HTTP status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: A key with the requested name was created between our sync and our create call (name-collision race) and the retry sync still can't see it. Refresh the ad server source and retry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/axe-keys:
+    put:
+      operationId: configureEsaAxeKeys
+      summary: Configure AXE custom-targeting key names
+      description: Declare which GAM custom-targeting key names carry Scope3 include, exclude, and emissions-macro targeting on a Google Ad Manager-backed ad server source. `axeMacroKey` MUST equal literally "axem" — the GAM creative macro %%PATTERN:axem%% only resolves against that exact key name; a rename silently breaks emissions attribution. All three names must already exist as FREEFORM keys in the source's synced GAM custom-targeting catalog; unknown names are rejected with the list of missing keys.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigureAxeKeysBody'
+      responses:
+        '200':
+          description: Configure AXE custom-targeting key names
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigureAxeKeysResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: One or more key names are not present in the source's synced GAM custom-targeting catalog. The error body includes a `missing` array naming the absent keys. Ensure they exist in GAM (Admin → Custom Targeting) as FREEFORM keys, refresh the ad server source, and retry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/buyer-advertiser-mappings:
+    get:
+      operationId: listEsaBuyerAdvertiserMappings
+      summary: List buyer advertiser mappings
+      description: List buyer-to-GAM advertiser routing mappings for a Google Ad Manager-backed ad server source.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: operatorDomain
+        schema:
+          type: string
+      - in: query
+        name: operator_domain
+        schema:
+          type: string
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List buyer advertiser mappings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerAdvertiserMappingList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createEsaBuyerAdvertiserMapping
+      summary: Create buyer advertiser mapping
+      description: Create a buyer-to-GAM advertiser routing mapping for a Google Ad Manager-backed ad server source.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuyerAdvertiserMappingBody'
+      responses:
+        '201':
+          description: Create buyer advertiser mapping
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerAdvertiserMapping'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/buyer-advertiser-mappings/{mappingId}:
+    patch:
+      operationId: updateEsaBuyerAdvertiserMapping
+      summary: Update buyer advertiser mapping
+      description: Update an existing buyer-to-GAM advertiser routing mapping for a Google Ad Manager-backed ad server source.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: mappingId
+        schema:
+          description: Buyer advertiser mapping id.
+          example: map-abc
+          type: string
+          minLength: 1
+        required: true
+        description: Buyer advertiser mapping id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuyerAdvertiserMappingPatchBody'
+      responses:
+        '200':
+          description: Update buyer advertiser mapping
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerAdvertiserMapping'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteEsaBuyerAdvertiserMapping
+      summary: Delete buyer advertiser mapping
+      description: Delete an existing buyer-to-GAM advertiser routing mapping for a Google Ad Manager-backed ad server source.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: mappingId
+        schema:
+          description: Buyer advertiser mapping id.
+          example: map-abc
+          type: string
+          minLength: 1
+        required: true
+        description: Buyer advertiser mapping id.
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/recent-buyers:
+    get:
+      operationId: listEsaRecentBuyers
+      summary: List recent buyers
+      description: List recent buyers seen by a Google Ad Manager-backed ad server source and show whether each resolved through the default advertiser or a specific mapping.
+      tags:
+      - Storefront Ad Server Buyer Routing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: days
+        schema:
+          type: integer
+          maximum: 365
+          minimum: 1
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          maximum: 1000
+          minimum: 1
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List recent buyers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecentBuyerList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    GamCustomTargetingKeyEntry:
+      type: object
+      properties:
+        name:
+          type: string
+        keyId:
+          type: string
+        displayName:
+          type: string
+      required:
+      - name
+      - keyId
+      - displayName
+      additionalProperties: false
+    AdapterAdvertiser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+      required:
+      - id
+      - name
+      - status
+      additionalProperties: false
+    EsaSandboxAccountSummary:
+      description: Sandbox account row from the managed ad-server source tenant. Sandbox accounts route to the tenant-managed sandbox advertiser and do not carry a caller-selected GAM advertiser id.
+      type: object
+      properties:
+        accountId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        advertiserMapped:
+          type: boolean
+        operator:
+          type:
+          - string
+          - 'null'
+        brand:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        billing:
+          type:
+          - string
+          - 'null'
+        gamAdvertiserId:
+          type:
+          - string
+          - 'null'
+        gamAdvertiserName:
+          type:
+          - string
+          - 'null'
+        buyerAgentPrincipalId:
+          type:
+          - string
+          - 'null'
+        sandbox:
+          type:
+          - boolean
+          - 'null'
+      required:
+      - accountId
+      - name
+      - status
+      - advertiserMapped
+      - operator
+      - brand
+      - billing
+      - gamAdvertiserId
+      - gamAdvertiserName
+      - buyerAgentPrincipalId
+      - sandbox
+      additionalProperties: false
+    EsaEnsureSandboxAccountResponse:
+      description: Result of idempotently ensuring the ESA tenant-managed sandbox account.
+      type: object
+      properties:
+        esaId:
+          type: string
+        tenantId:
+          type: string
+        ready:
+          type: boolean
+        account:
+          allOf:
+          - $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        missingReason:
+          type:
+          - string
+          - 'null'
+        ensured:
+          type: boolean
+      required:
+      - esaId
+      - tenantId
+      - ready
+      - account
+      - accounts
+      - missingReason
+      - ensured
+      additionalProperties: false
+    SetDefaultAdvertiserBody:
+      type: object
+      properties:
+        advertiserId:
+          type: string
+          minLength: 1
+          maxLength: 64
+      required:
+      - advertiserId
+    EnsureGamCustomTargetingKeysBody:
+      type: object
+      properties:
+        keys:
+          minItems: 1
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                minLength: 1
+              displayName:
+                type: string
+                minLength: 1
+            required:
+            - name
+            - displayName
+      required:
+      - keys
+    BuyerAdvertiserMappingBody:
+      type: object
+      properties:
+        operatorDomain:
+          type: string
+          minLength: 1
+        gamAdvertiserId:
+          type: string
+          minLength: 1
+        brandHouse:
+          type:
+          - string
+          - 'null'
+        brandId:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type:
+          - string
+          - 'null'
+      required:
+      - operatorDomain
+      - gamAdvertiserId
+    AxeKeysSetupTask:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        isComplete:
+          type: boolean
+        actionUrl:
+          type:
+          - string
+          - 'null'
+        details:
+          type:
+          - string
+          - 'null'
+      required:
+      - key
+      - name
+      - isComplete
+      additionalProperties: false
+    RecentBuyerList:
+      type: object
+      properties:
+        buyers:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecentBuyer'
+      required:
+      - buyers
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    ConfigureAxeKeysBody:
+      type: object
+      properties:
+        axeIncludeKey:
+          type: string
+          minLength: 1
+        axeExcludeKey:
+          type: string
+          minLength: 1
+        axeMacroKey:
+          type: string
+          enum:
+          - axem
+      required:
+      - axeIncludeKey
+      - axeExcludeKey
+      - axeMacroKey
+    RecentBuyer:
+      type: object
+      properties:
+        operatorDomain:
+          type: string
+        brandHouse:
+          type:
+          - string
+          - 'null'
+        brandId:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type:
+          - string
+          - 'null'
+        resolvedVia:
+          type:
+          - string
+          - 'null'
+        resolvedGamAdvertiserId:
+          type:
+          - string
+          - 'null'
+        lastSeenAt:
+          type:
+          - string
+          - 'null'
+      required:
+      - operatorDomain
+      additionalProperties: false
+    GamAdvertiser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        currencyCode:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - name
+      - status
+      additionalProperties: false
+    SetDefaultGamAdvertiserBody:
+      type: object
+      properties:
+        gamAdvertiserId:
+          type: string
+          minLength: 1
+      required:
+      - gamAdvertiserId
+    EnsureGamAdvertiserResponse:
+      type: object
+      properties:
+        advertiser:
+          $ref: '#/components/schemas/GamAdvertiser'
+        created:
+          type: boolean
+        dryRun:
+          type: boolean
+      required:
+      - advertiser
+      - created
+      additionalProperties: false
+    EnsureGamAdvertiserBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        dryRun:
+          type: boolean
+      required:
+      - name
+    BuyerAdvertiserMappingPatchBody:
+      type: object
+      properties:
+        brandHouse:
+          type:
+          - string
+          - 'null'
+        brandId:
+          type:
+          - string
+          - 'null'
+        gamAdvertiserId:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type:
+          - string
+          - 'null'
+    AdapterAdvertiserList:
+      type: object
+      properties:
+        adapterType:
+          type: string
+        advertisers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdapterAdvertiser'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+        syncedAt:
+          type:
+          - string
+          - 'null'
+        authoritative:
+          type: boolean
+        truncated:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+      required:
+      - adapterType
+      - advertisers
+      - nextCursor
+      - syncedAt
+      - authoritative
+      - truncated
+      - errors
+      additionalProperties: false
+    BuyerAdvertiserMappingList:
+      type: object
+      properties:
+        mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerAdvertiserMapping'
+      required:
+      - mappings
+      additionalProperties: false
+    SetDefaultGamAdvertiserResponse:
+      type: object
+      properties:
+        defaultGamAdvertiserId:
+          type: string
+      required:
+      - defaultGamAdvertiserId
+      additionalProperties: false
+    EsaSandboxAccountStatus:
+      description: Readiness of the ESA tenant-managed sandbox advertiser account used for no-spend buyer tests.
+      type: object
+      properties:
+        esaId:
+          type: string
+        tenantId:
+          type: string
+        ready:
+          type: boolean
+        account:
+          allOf:
+          - $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        missingReason:
+          type:
+          - string
+          - 'null'
+      required:
+      - esaId
+      - tenantId
+      - ready
+      - account
+      - accounts
+      - missingReason
+      additionalProperties: false
+    EnsureGamCustomTargetingKeysResponse:
+      type: object
+      properties:
+        created:
+          type: array
+          items:
+            $ref: '#/components/schemas/GamCustomTargetingKeyEntry'
+        alreadyExisted:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              keyId:
+                type: string
+              displayName:
+                type: string
+            required:
+            - name
+            - keyId
+            - displayName
+            additionalProperties: false
+      required:
+      - created
+      - alreadyExisted
+      additionalProperties: false
+    SetDefaultAdvertiserResponse:
+      type: object
+      properties:
+        advertiserId:
+          type: string
+      required:
+      - advertiserId
+      additionalProperties: false
+    BuyerAdvertiserMapping:
+      type: object
+      properties:
+        id:
+          type: string
+        operatorDomain:
+          type: string
+        brandHouse:
+          type:
+          - string
+          - 'null'
+        brandId:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type:
+          - string
+          - 'null'
+        gamAdvertiserId:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - id
+      - operatorDomain
+      - gamAdvertiserId
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    ConfigureAxeKeysResponse:
+      type: object
+      properties:
+        setupTask:
+          $ref: '#/components/schemas/AxeKeysSetupTask'
+      required:
+      - setupTask
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    GamAdvertiserPage:
+      type: object
+      properties:
+        advertisers:
+          type: array
+          items:
+            $ref: '#/components/schemas/GamAdvertiser'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+        syncedAt:
+          type:
+          - string
+          - 'null'
+      required:
+      - advertisers
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

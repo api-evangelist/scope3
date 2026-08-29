@@ -1,0 +1,719 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront Storefront Agents API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Storefront Agents
+  description: List and manage registered sales, signals, and outcomes agents
+paths:
+  /agents:
+    get:
+      operationId: listStorefrontAgents
+      summary: List registered agents
+      description: List sales, signals, and outcomes agents registered to this storefront, with capability metadata and per-agent account counts.
+      tags:
+      - Storefront Agents
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: type
+        schema:
+          description: Filter by agent type
+          type: string
+          enum:
+          - SALES
+          - SIGNAL
+          - CREATIVE
+          - OUTCOME
+        description: Filter by agent type
+      - in: query
+        name: status
+        schema:
+          description: Filter by agent status
+          type: string
+          enum:
+          - PENDING
+          - ACTIVE
+          - DISABLED
+        description: Filter by agent status
+      - in: query
+        name: relationship
+        schema:
+          description: 'Filter by relationship: SELF = owned by you, MARKETPLACE = all other marketplace agents'
+          type: string
+          enum:
+          - SELF
+          - MARKETPLACE
+        description: 'Filter by relationship: SELF = owned by you, MARKETPLACE = all other marketplace agents'
+      - in: query
+        name: name
+        schema:
+          description: Filter by agent name (partial match, case-insensitive)
+          type: string
+        description: Filter by agent name (partial match, case-insensitive)
+      - in: query
+        name: supportsRegistration
+        schema:
+          description: When true, return only agents that require operator authentication (require_operator_auth = true)
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+        description: When true, return only agents that require operator authentication (require_operator_auth = true)
+      - in: query
+        name: limit
+        schema:
+          description: 'Maximum number of agents to return per page (default: 20, max: 100)'
+          type: integer
+          maximum: 100
+          minimum: 1
+        description: 'Maximum number of agents to return per page (default: 20, max: 100)'
+      - in: query
+        name: offset
+        schema:
+          description: 'Number of agents to skip for pagination (default: 0)'
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: 'Number of agents to skip for pagination (default: 0)'
+      responses:
+        '200':
+          description: List registered agents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /agents/{agentId}:
+    get:
+      operationId: getStorefrontAgent
+      summary: Get agent details
+      description: Retrieve detailed information about a registered agent, including capabilities, master/customer account flags, and account counts.
+      tags:
+      - Storefront Agents
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: agentId
+        schema:
+          type: string
+          minLength: 1
+        required: true
+      responses:
+        '200':
+          description: Get agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDetail'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /agents/{agentId}/oauth/authorize:
+    post:
+      operationId: startAgentOAuth
+      summary: Start agent OAuth flow
+      description: Initiate the OAuth flow for agent-level setup. Tokens are stored in the agent configuration and used by the platform when calling the agent.
+      tags:
+      - Storefront Agents
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: agentId
+        schema:
+          type: string
+          minLength: 1
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                redirectUri:
+                  description: Override the OAuth redirect URI
+                  type: string
+                  maxLength: 2048
+                  format: uri
+      responses:
+        '200':
+          description: Start agent OAuth flow
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthAuthorizeResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /agents/{agentId}/accounts/oauth/authorize:
+    post:
+      operationId: startAgentAccountOAuth
+      summary: Start per-account OAuth flow
+      description: Initiate the OAuth flow for per-account agent registration. Tokens are stored against the buyer/operator account that the OAuth grant represents.
+      tags:
+      - Storefront Agents
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: agentId
+        schema:
+          type: string
+          minLength: 1
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                redirectUri:
+                  description: Override the OAuth redirect URI
+                  type: string
+                  maxLength: 2048
+                  format: uri
+                accountIdentifier:
+                  description: Account identifier for the OAuth flow
+                  type: string
+      responses:
+        '200':
+          description: Start per-account OAuth flow
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthAuthorizeResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /agents/{agentId}/capabilities/refresh:
+    post:
+      operationId: refreshStorefrontAgentCapabilities
+      summary: Refresh agent capabilities
+      description: Re-probe a registered agent and refresh its stored capabilities snapshot (protocols, tools, formats). Returns the refreshed capabilities.
+      tags:
+      - Storefront Agents
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: agentId
+        schema:
+          type: string
+          minLength: 1
+        required: true
+      responses:
+        '200':
+          description: Refresh agent capabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontAgentCapabilities'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    AgentList:
+      description: Paginated list of agent summaries
+      type: object
+      properties:
+        items:
+          description: Partner agents projected to the summary shape. Use the detail endpoint for the full resource.
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentSummary'
+        total:
+          description: Total number of agents matching the query
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        hasMore:
+          description: Whether there are more items available beyond this page. When true, use nextOffset to fetch the next page.
+          type: boolean
+        nextOffset:
+          description: The offset to use for the next page of results. Pass this as the offset parameter to get the next page. Null when there are no more results.
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - items
+      - total
+      - hasMore
+      - nextOffset
+      additionalProperties: false
+    AgentDetail:
+      description: Detailed agent info including account data
+      type: object
+      properties:
+        agentId:
+          description: Unique agent identifier
+          type: string
+        type:
+          description: 'Agent type: SALES = sales/media agent, SIGNAL = signal/data agent, CREATIVE = creative agent, OUTCOME = outcome measurement agent'
+          type: string
+          enum:
+          - SALES
+          - SIGNAL
+          - CREATIVE
+          - OUTCOME
+        name:
+          description: Agent display name
+          type: string
+        description:
+          description: Agent description
+          type:
+          - string
+          - 'null'
+        endpointUrl:
+          description: Agent endpoint URL (empty string for COMING_SOON agents)
+          type: string
+        protocol:
+          description: Agent protocol
+          type: string
+          enum:
+          - MCP
+          - A2A
+        authenticationType:
+          description: Authentication method
+          type: string
+          enum:
+          - API_KEY
+          - NO_AUTH
+          - JWT
+          - OAUTH
+          - BASIC_AUTH
+        requiresOperatorAuth:
+          description: Whether the agent requires the operator to provide credentials. When true, buyers must register their own credentials.
+          type: boolean
+        billingOptions:
+          description: Billing arrangement options supported by this partner, from its AdCP capabilities. Null when capabilities have not been fetched yet.
+          type:
+          - object
+          - 'null'
+          properties:
+            default:
+              type:
+              - string
+              - 'null'
+            supported:
+              type: array
+              items:
+                type: string
+          required:
+          - default
+          - supported
+          additionalProperties: false
+        status:
+          description: Agent status. COMING_SOON is returned for PENDING agents not owned by the caller.
+          type: string
+          enum:
+          - PENDING
+          - ACTIVE
+          - DISABLED
+          - COMING_SOON
+        relationship:
+          description: 'Relationship: SELF = owned by you, MARKETPLACE = all other marketplace agents'
+          type: string
+          enum:
+          - SELF
+          - MARKETPLACE
+        customerId:
+          description: Owner customer ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        reportingType:
+          description: Reporting type
+          type:
+          - string
+          - 'null'
+          enum:
+          - WEBHOOK
+          - BUCKET
+          - POLLING
+        reportingPollingCadence:
+          description: Polling cadence (when reportingType is POLLING)
+          type:
+          - string
+          - 'null'
+          enum:
+          - DAILY
+          - MONTHLY
+        customerAccountCount:
+          description: Number of customer accounts for this agent
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        hasCustomerAccount:
+          description: Whether the caller has an account for this agent
+          type: boolean
+        hasMasterAccount:
+          description: Whether a marketplace account exists for this agent
+          type: boolean
+        customerAccount:
+          description: Caller's account details, if any
+          type: object
+          properties:
+            id:
+              description: Account ID
+              type: string
+            accountIdentifier:
+              description: Unique account identifier
+              type: string
+            status:
+              description: Account status
+              type: string
+            registeredBy:
+              description: Who registered this account
+              type:
+              - string
+              - 'null'
+            createdAt:
+              description: When the account was created (ISO 8601)
+              type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          required:
+          - id
+          - accountIdentifier
+          - status
+          - registeredBy
+          - createdAt
+          additionalProperties: false
+        createdAt:
+          description: When the agent was created (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the agent was last updated (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        oauth:
+          description: Present for owner PENDING OAUTH agents without tokens
+          allOf:
+          - $ref: '#/components/schemas/OAuthInfo'
+      required:
+      - agentId
+      - type
+      - name
+      - endpointUrl
+      - protocol
+      - authenticationType
+      - requiresOperatorAuth
+      - status
+      - relationship
+      - customerId
+      - customerAccountCount
+      - hasCustomerAccount
+      - hasMasterAccount
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    OAuthInfo:
+      description: OAuth authorization info
+      type: object
+      properties:
+        authorizationUrl:
+          description: URL the user must visit to authorize
+          type: string
+          format: uri
+        agentId:
+          description: Agent identifier
+          type: string
+        agentName:
+          description: Agent display name
+          type: string
+      required:
+      - authorizationUrl
+      - agentId
+      - agentName
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    StorefrontAgentCapabilities:
+      type: object
+      properties:
+        version:
+          description: AdCP capabilities version reported by the agent.
+          type: string
+        protocols:
+          description: Protocols the agent speaks (e.g. mcp, a2a).
+          type: array
+          items:
+            type: string
+        tools:
+          description: Full list of tool names the agent reports.
+          type: array
+          items:
+            type: string
+        requireOperatorAuth:
+          description: Whether the agent requires operator-level auth.
+          type: boolean
+        defaultBilling:
+          description: Default billing type, or null when not reported.
+          type:
+          - string
+          - 'null'
+        supportedBillings:
+          description: Billing types the agent supports.
+          type: array
+          items:
+            type: string
+      required:
+      - version
+      - protocols
+      - tools
+      - requireOperatorAuth
+      - defaultBilling
+      - supportedBillings
+      additionalProperties: {}
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    AgentSummary:
+      description: Compact partner-agent view returned by list endpoints. Use the detail endpoint for the full resource.
+      type: object
+      properties:
+        agentId:
+          description: Unique agent identifier
+          type: string
+        type:
+          description: 'Agent type: SALES = sales/media agent, SIGNAL = signal/data agent, CREATIVE = creative agent, OUTCOME = outcome measurement agent'
+          type: string
+          enum:
+          - SALES
+          - SIGNAL
+          - CREATIVE
+          - OUTCOME
+        name:
+          description: Agent display name
+          type: string
+        protocol:
+          description: Agent protocol
+          type: string
+          enum:
+          - MCP
+          - A2A
+        status:
+          description: Agent status. COMING_SOON is returned for PENDING agents not owned by the caller.
+          type: string
+          enum:
+          - PENDING
+          - ACTIVE
+          - DISABLED
+          - COMING_SOON
+        relationship:
+          description: 'Relationship: SELF = owned by you, MARKETPLACE = all other marketplace agents'
+          type: string
+          enum:
+          - SELF
+          - MARKETPLACE
+        requiresOperatorAuth:
+          description: Whether the agent requires the operator to provide credentials. When true, buyers must register their own credentials.
+          type: boolean
+        requiresAccount:
+          description: True when agent supports per-account registration and caller has no accounts
+          type: boolean
+        authConfigured:
+          description: Whether the agent has working authentication configured
+          type: boolean
+        createdAt:
+          description: When the agent was created (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        customerAccountCount:
+          description: Number of caller-owned accounts on this agent. Replaces the embedded `customerAccounts[]` array on summary rows.
+          example: 2
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - agentId
+      - type
+      - name
+      - protocol
+      - status
+      - relationship
+      - requiresOperatorAuth
+      - requiresAccount
+      - authConfigured
+      - createdAt
+      - customerAccountCount
+      additionalProperties: false
+    OAuthAuthorizeResponse:
+      description: Response containing OAuth authorization URL
+      type: object
+      properties:
+        authorizationUrl:
+          description: URL to redirect the user to for OAuth authorization
+          type: string
+          format: uri
+        agentId:
+          description: Agent identifier
+          type: string
+        agentName:
+          description: Agent display name
+          type: string
+      required:
+      - authorizationUrl
+      - agentId
+      - agentName
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

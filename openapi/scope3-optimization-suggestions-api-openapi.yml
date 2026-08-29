@@ -1,0 +1,467 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Optimization Suggestions API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Optimization Suggestions
+paths:
+  /optimization-suggestions:
+    get:
+      operationId: listOptimizationSuggestions
+      summary: List optimization suggestions
+      description: List optimization suggestions for the caller, optionally filtered by status, campaign, or advertiser.
+      tags:
+      - Optimization Suggestions
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: campaignId
+        schema:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+      - in: query
+        name: mediaBuyId
+        schema:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - CREATED
+          - CREATED_FAILED
+          - INGESTED
+          - INGESTED_FAIL
+          - HIL_WAITING
+          - HIL_APPROVED
+          - HIL_REJECTED
+          - APPLIED
+          - APPLIED_FAIL
+          - REJECTED
+          - EXPIRED
+      - in: query
+        name: limit
+        schema:
+          default: 20
+          type: integer
+          minimum: 1
+          maximum: 100
+      - in: query
+        name: offset
+        schema:
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      responses:
+        '200':
+          description: List optimization suggestions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationSuggestionList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /optimization-suggestions/{suggestionId}:
+    get:
+      operationId: getOptimizationSuggestion
+      summary: Get optimization suggestion
+      description: Get a single optimization suggestion by its UUID.
+      tags:
+      - Optimization Suggestions
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: suggestionId
+        schema:
+          description: Optimization suggestion id.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        required: true
+        description: Optimization suggestion id.
+      responses:
+        '200':
+          description: Get optimization suggestion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationSuggestionDetail'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No suggestion with this id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /optimization-suggestions/{suggestionId}/approve:
+    post:
+      operationId: approveOptimizationSuggestion
+      summary: Approve optimization suggestion
+      description: Approve an optimization suggestion, queueing its proposed change for application.
+      tags:
+      - Optimization Suggestions
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: suggestionId
+        schema:
+          description: Optimization suggestion id.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        required: true
+        description: Optimization suggestion id.
+      responses:
+        '200':
+          description: Approve optimization suggestion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationSuggestionStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /optimization-suggestions/{suggestionId}/reject:
+    post:
+      operationId: rejectOptimizationSuggestion
+      summary: Reject optimization suggestion
+      description: Reject an optimization suggestion. An optional `reason` may be supplied in the body.
+      tags:
+      - Optimization Suggestions
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: suggestionId
+        schema:
+          description: Optimization suggestion id.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        required: true
+        description: Optimization suggestion id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 1000
+      responses:
+        '200':
+          description: Reject optimization suggestion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationSuggestionStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    OptimizationSuggestionStatus:
+      type: object
+      properties:
+        suggestionId:
+          type: string
+        status:
+          type: string
+      required:
+      - suggestionId
+      - status
+      additionalProperties: false
+    OptimizationSuggestionDetail:
+      type: object
+      properties:
+        suggestionId:
+          type: string
+        optimizerRunId:
+          type:
+          - string
+          - 'null'
+        campaignId:
+          type: string
+        mediaBuyId:
+          type: string
+        suggestionTimestamp:
+          type:
+          - string
+          - 'null'
+        modelVersion:
+          type:
+          - string
+          - 'null'
+        optimizationMetric:
+          type:
+          - string
+          - 'null'
+        mediaBuyScalingFactor:
+          type:
+          - number
+          - 'null'
+        mediaBuyScalingRationale:
+          type:
+          - string
+          - 'null'
+        pacingRecommendation:
+          description: Advisory pacing signal from the optimizer. Null on suggestions produced before the field existed, or when the optimizer had no pacing recommendation to make.
+          type:
+          - object
+          - 'null'
+          properties:
+            status:
+              description: Whether the media buy is on track, under-spending, or over-spending against its pacing target.
+              type: string
+              enum:
+              - on_pace
+              - under_spending
+              - over_spending
+            errorRatio:
+              description: Signed magnitude of pacing deviation. 0 means on-pace; positive values indicate the direction and size of the miss.
+              type: number
+            currentDailyRate:
+              description: Observed average daily spend at the time the suggestion was produced.
+              type: number
+            recommendedDailySpend:
+              description: Daily spend the optimizer recommends to return to pace.
+              type: number
+            message:
+              description: Human-readable summary of the pacing recommendation.
+              type: string
+          required:
+          - status
+          - errorRatio
+          - currentDailyRate
+          - recommendedDailySpend
+          - message
+          additionalProperties: false
+        status:
+          type: string
+        statusReason:
+          type:
+          - string
+          - 'null'
+        statusError:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+        statusUpdatedAt:
+          type: string
+      required:
+      - suggestionId
+      - optimizerRunId
+      - campaignId
+      - mediaBuyId
+      - suggestionTimestamp
+      - modelVersion
+      - optimizationMetric
+      - mediaBuyScalingFactor
+      - mediaBuyScalingRationale
+      - pacingRecommendation
+      - status
+      - statusReason
+      - statusError
+      - createdAt
+      - statusUpdatedAt
+      additionalProperties: {}
+    OptimizationSuggestionListItem:
+      type: object
+      properties:
+        suggestionId:
+          type: string
+        campaignId:
+          type: string
+        mediaBuyId:
+          type: string
+        optimizationMetric:
+          type:
+          - string
+          - 'null'
+        status:
+          type: string
+        productAdjustmentCount:
+          type: number
+        bidAdjustmentCount:
+          type: number
+        createdAt:
+          type: string
+        statusUpdatedAt:
+          type: string
+      required:
+      - suggestionId
+      - campaignId
+      - mediaBuyId
+      - optimizationMetric
+      - status
+      - productAdjustmentCount
+      - bidAdjustmentCount
+      - createdAt
+      - statusUpdatedAt
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    OptimizationSuggestionList:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptimizationSuggestionListItem'
+        totalCount:
+          type: number
+        hasMore:
+          type: boolean
+      required:
+      - suggestions
+      - totalCount
+      - hasMore
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

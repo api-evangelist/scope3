@@ -1,0 +1,871 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Media Billing API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Media Billing
+paths:
+  /billing/media-entities:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listMediaBillingEntities
+      summary: List media billing entities
+      description: List the org's media billing entities — the legal entities Scope3 invoices for media spend.
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List media billing entities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListMediaBillingEntitiesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createMediaBillingEntity
+      summary: Create media billing entity (admin)
+      description: Create a media billing entity. An org's FIRST entity always becomes PRIMARY (the mandatory backstop every media-transacting org must have) regardless of `isPrimary`. Admin-only.
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMediaBillingEntityBody'
+      responses:
+        '200':
+          description: Create media billing entity (admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMediaBillingEntityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ACCESS_DENIED (not an account admin).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: CONFLICT (an entity with this name and currency already exists).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /billing/media-entities/{entityId}:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    put:
+      operationId: updateMediaBillingEntity
+      summary: Update media billing entity (admin)
+      description: 'Update fields on an existing media billing entity. Setting `isPrimary: false` on the current primary is refused unless another entity is promoted in its place — an org always has exactly one primary once it has any entity. Admin-only.'
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: entityId
+        schema:
+          description: Surrogate id of the media billing entity.
+          anyOf:
+          - type: number
+          - type: string
+        required: true
+        description: Surrogate id of the media billing entity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entityName:
+                  description: Legal name of the media billing entity (e.g. "WPP South Africa (Pty) Ltd").
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                countryCode:
+                  description: Country of the billing entity, as an ISO 3166-1 alpha-2 code. Metadata only — drives tax treatment and bank/address formatting, never invoice routing (money-streams.md §6.4).
+                  example: US
+                  type: string
+                  pattern: ^[A-Z]{2}$
+                currency:
+                  description: ISO 4217 currency code
+                  example: USD
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                billingEmails:
+                  description: Invoicing contact email(s) for this entity. At least one is required.
+                  minItems: 1
+                  maxItems: 20
+                  type: array
+                  items:
+                    type: string
+                    format: email
+                    pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+                addressLine1:
+                  description: Entity street address, line 1.
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                addressLine2:
+                  description: Entity street address, line 2 (optional).
+                  type: string
+                  maxLength: 255
+                city:
+                  description: Entity city.
+                  type: string
+                  minLength: 1
+                  maxLength: 128
+                state:
+                  description: Entity state/province/region (optional).
+                  type: string
+                  maxLength: 128
+                postalCode:
+                  description: Entity postal/ZIP code.
+                  type: string
+                  minLength: 1
+                  maxLength: 32
+                taxId:
+                  description: Tax identifier for this entity (e.g. VAT number, EIN), when applicable.
+                  type: string
+                  maxLength: 64
+                isPrimary:
+                  description: Set true to promote this entity to PRIMARY (demoting any other primary entity in the same transaction), or false to demote it. Demoting the current primary is refused unless another entity is promoted in its place — an org always has exactly one primary once it has any entity.
+                  type: boolean
+      responses:
+        '200':
+          description: Update media billing entity (admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateMediaBillingEntityResponse'
+        '400':
+          description: VALIDATION_ERROR (demoting the primary without a replacement).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ACCESS_DENIED (not an account admin).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: NOT_FOUND (no such entity in this organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: CONFLICT (renaming onto an existing name/currency pair).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteMediaBillingEntity
+      summary: Delete media billing entity (admin)
+      description: Delete a media billing entity. Refused while the entity has advertiser or account attachments — remove those first. Deleting the primary entity auto-promotes the oldest remaining entity, when one exists. Admin-only.
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: entityId
+        schema:
+          description: Surrogate id of the media billing entity.
+          anyOf:
+          - type: number
+          - type: string
+        required: true
+        description: Surrogate id of the media billing entity.
+      responses:
+        '200':
+          description: Delete media billing entity (admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMediaBillingEntityResponse'
+        '400':
+          description: VALIDATION_ERROR (entity still has attachments).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ACCESS_DENIED (not an account admin).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: NOT_FOUND (no such entity in this organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /billing/media-entities/attachments:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listMediaBillingAttachments
+      summary: List media billing attachments
+      description: List the advertiser/account attachments that route the org's media billing entities.
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List media billing attachments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListMediaBillingAttachmentsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createMediaBillingAttachment
+      summary: Attach media billing entity (admin)
+      description: Attach a media billing entity to an advertiser or an account (child customer) — exactly one of advertiserId/childCustomerId. Refused when the org has zero media billing entities (create one first; the org backstop is mandatory). Admin-only.
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entityId:
+                  description: Media billing entity to route this advertiser/account to.
+                  anyOf:
+                  - type: number
+                  - type: string
+                advertiserId:
+                  description: Advertiser to attach — its media is invoiced to `entityId`. Exactly one of advertiserId/childCustomerId must be set.
+                  anyOf:
+                  - type: integer
+                    format: int64
+                  - type: string
+                  - type: number
+                childCustomerId:
+                  description: Account (child customer) to attach — its media rolls up to `entityId` for advertisers with no more specific attachment. Exactly one of advertiserId/childCustomerId must be set.
+                  anyOf:
+                  - type: number
+                  - type: string
+              required:
+              - entityId
+      responses:
+        '200':
+          description: Attach media billing entity (admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMediaBillingAttachmentResponse'
+        '400':
+          description: VALIDATION_ERROR (the org has zero media billing entities).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ACCESS_DENIED (not an account admin, or the advertiser/account is outside the org).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: NOT_FOUND (entityId, or the advertiser, does not exist).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: CONFLICT (this advertiser or account is already attached).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /billing/media-entities/attachments/{attachmentId}:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    delete:
+      operationId: deleteMediaBillingAttachment
+      summary: Delete media billing attachment (admin)
+      description: Remove an advertiser/account media billing attachment. Admin-only.
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: attachmentId
+        schema:
+          description: Surrogate id of the media billing attachment.
+          anyOf:
+          - type: number
+          - type: string
+        required: true
+        description: Surrogate id of the media billing attachment.
+      responses:
+        '200':
+          description: Delete media billing attachment (admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMediaBillingAttachmentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ACCESS_DENIED (not an account admin).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: NOT_FOUND (no such attachment in this organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /billing/media-entities/resolve:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: resolveMediaBillingEntity
+      summary: Resolve media billing entity
+      description: 'Answer "who gets this invoice" for an advertiser or account (exactly one of advertiserId/childCustomerId): the advertiser''s own attachment wins, else its owning account''s attachment, else the org PRIMARY entity (the mandatory backstop), else unresolved. Purely structural — no geo/country input.'
+      tags:
+      - Media Billing
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: advertiserId
+        schema:
+          description: Resolve the media billing entity for this advertiser. Exactly one of advertiserId/childCustomerId must be provided.
+          anyOf:
+          - type: integer
+            format: int64
+          - type: string
+          - type: number
+        description: Resolve the media billing entity for this advertiser. Exactly one of advertiserId/childCustomerId must be provided.
+      - in: query
+        name: childCustomerId
+        schema:
+          description: Resolve the media billing entity for this account (child customer). Exactly one of advertiserId/childCustomerId must be provided.
+          anyOf:
+          - type: number
+          - type: string
+        description: Resolve the media billing entity for this account (child customer). Exactly one of advertiserId/childCustomerId must be provided.
+      responses:
+        '200':
+          description: Resolve media billing entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveMediaBillingEntityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ACCESS_DENIED (the advertiser or account is outside your organization; for accounts this is also returned when the account does not exist, so existence cannot be probed).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: NOT_FOUND (the advertiser does not exist).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    MediaBillingAttachment:
+      description: Routes one advertiser or account (child customer) to a media billing entity.
+      type: object
+      properties:
+        id:
+          description: Attachment ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        entityId:
+          description: Attached entity ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        advertiserId:
+          description: Attached advertiser ID (string — advertiser IDs are 64-bit), or null when this attachment targets an account instead.
+          type:
+          - string
+          - 'null'
+        childCustomerId:
+          description: Attached account (child customer) ID, or null when this attachment targets an advertiser instead.
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        createdAt:
+          description: Creation timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: Last update timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - entityId
+      - advertiserId
+      - childCustomerId
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    ListMediaBillingEntitiesResponse:
+      description: Media billing entities configured for the org.
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaBillingEntity'
+      required:
+      - entities
+      additionalProperties: false
+    CreateMediaBillingEntityBody:
+      description: Create a media billing entity — a legal entity Scope3 invoices for media spend.
+      type: object
+      properties:
+        entityName:
+          description: Legal name of the media billing entity (e.g. "WPP South Africa (Pty) Ltd").
+          type: string
+          minLength: 1
+          maxLength: 255
+        countryCode:
+          description: Country of the billing entity, as an ISO 3166-1 alpha-2 code. Metadata only — drives tax treatment and bank/address formatting, never invoice routing (money-streams.md §6.4).
+          example: US
+          type: string
+          pattern: ^[A-Z]{2}$
+        currency:
+          description: ISO 4217 currency code
+          example: USD
+          type: string
+          pattern: ^[A-Z]{3}$
+        billingEmails:
+          description: Invoicing contact email(s) for this entity. At least one is required.
+          minItems: 1
+          maxItems: 20
+          type: array
+          items:
+            type: string
+            format: email
+            pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+        addressLine1:
+          description: Entity street address, line 1.
+          type: string
+          minLength: 1
+          maxLength: 255
+        addressLine2:
+          description: Entity street address, line 2 (optional).
+          type: string
+          maxLength: 255
+        city:
+          description: Entity city.
+          type: string
+          minLength: 1
+          maxLength: 128
+        state:
+          description: Entity state/province/region (optional).
+          type: string
+          maxLength: 128
+        postalCode:
+          description: Entity postal/ZIP code.
+          type: string
+          minLength: 1
+          maxLength: 32
+        taxId:
+          description: Tax identifier for this entity (e.g. VAT number, EIN), when applicable.
+          type: string
+          maxLength: 64
+        isPrimary:
+          description: Set true to make this the org's PRIMARY media billing entity (the mandatory backstop every media-transacting org must have), demoting any other primary entity. Omit to leave the current primary/non-primary status unchanged. An org's FIRST entity always becomes primary regardless of this field.
+          type: boolean
+      required:
+      - entityName
+      - countryCode
+      - currency
+      - billingEmails
+      - addressLine1
+      - city
+      - postalCode
+    DeleteMediaBillingAttachmentResponse:
+      type: object
+      properties: {}
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    MediaBillingEntity:
+      description: A media billing entity — a legal entity Scope3 invoices for media spend.
+      type: object
+      properties:
+        id:
+          description: Media billing entity ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        entityName:
+          description: Legal name of the media billing entity (e.g. "WPP South Africa (Pty) Ltd").
+          type: string
+          minLength: 1
+          maxLength: 255
+        countryCode:
+          description: Country of the billing entity, as an ISO 3166-1 alpha-2 code. Metadata only — drives tax treatment and bank/address formatting, never invoice routing (money-streams.md §6.4).
+          example: US
+          type: string
+          pattern: ^[A-Z]{2}$
+        currency:
+          description: ISO 4217 currency code
+          example: USD
+          type: string
+          pattern: ^[A-Z]{3}$
+        billingEmails:
+          description: Invoicing contact email(s) for this entity. At least one is required.
+          minItems: 1
+          maxItems: 20
+          type: array
+          items:
+            type: string
+            format: email
+            pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+        addressLine1:
+          description: Entity street address, line 1.
+          type: string
+          minLength: 1
+          maxLength: 255
+        addressLine2:
+          description: Entity street address, line 2 (optional).
+          type:
+          - string
+          - 'null'
+          maxLength: 255
+        city:
+          description: Entity city.
+          type: string
+          minLength: 1
+          maxLength: 128
+        state:
+          description: Entity state/province/region (optional).
+          type:
+          - string
+          - 'null'
+          maxLength: 128
+        postalCode:
+          description: Entity postal/ZIP code.
+          type: string
+          minLength: 1
+          maxLength: 32
+        taxId:
+          description: Tax identifier for this entity (e.g. VAT number, EIN), when applicable.
+          type:
+          - string
+          - 'null'
+          maxLength: 64
+        isPrimary:
+          description: Whether this is the org's PRIMARY media billing entity — the mandatory backstop used when no advertiser or account attachment matches. At most one entity per org is primary.
+          type: boolean
+        createdAt:
+          description: Creation timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: Last update timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - entityName
+      - countryCode
+      - currency
+      - billingEmails
+      - addressLine1
+      - city
+      - postalCode
+      - isPrimary
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    ListMediaBillingAttachmentsResponse:
+      description: Media billing attachments configured for the org.
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaBillingAttachment'
+      required:
+      - attachments
+      additionalProperties: false
+    CreateMediaBillingAttachmentResponse:
+      type: object
+      properties:
+        attachment:
+          $ref: '#/components/schemas/MediaBillingAttachment'
+      required:
+      - attachment
+      additionalProperties: false
+    ResolveMediaBillingEntityResponse:
+      description: 'Answers "who gets this invoice" for an advertiser or account: the resolved media billing entity and which level of the hierarchy it came from.'
+      type: object
+      properties:
+        entity:
+          description: The resolved media billing entity, or null when the org has no media billing entity at all (not even a primary backstop).
+          allOf:
+          - $ref: '#/components/schemas/MediaBillingEntity'
+        resolvedVia:
+          description: '"advertiser" (the advertiser has its own attachment), "account" (its owning account does), "org" (the org primary/backstop), or "none" (the org has no entity yet).'
+          type: string
+          enum:
+          - advertiser
+          - account
+          - org
+          - none
+      required:
+      - entity
+      - resolvedVia
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    UpdateMediaBillingEntityResponse:
+      type: object
+      properties:
+        entity:
+          $ref: '#/components/schemas/MediaBillingEntity'
+      required:
+      - entity
+      additionalProperties: false
+    DeleteMediaBillingEntityResponse:
+      type: object
+      properties: {}
+      additionalProperties: false
+    CreateMediaBillingEntityResponse:
+      type: object
+      properties:
+        entity:
+          $ref: '#/components/schemas/MediaBillingEntity'
+      required:
+      - entity
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

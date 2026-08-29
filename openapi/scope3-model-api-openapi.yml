@@ -1,14 +1,11 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
   version: 1.0.0
-  title: AI Impact Measurement Model API
+  title: AI impact measurement Model API
 security:
 - bearerAuth: []
 tags:
 - name: Model
-servers:
-- url: https://aiapi.scope3.com
-  description: AI Impact Measurement API server
 paths:
   /model:
     get:
@@ -339,168 +336,6 @@ paths:
       - Model
 components:
   schemas:
-    Task:
-      type: string
-      enum:
-      - text-generation
-      - chat
-      - text-embedding
-      - text-classification
-      - sentiment-analysis
-      - named-entity-recognition
-      - question-answering
-      - summarization
-      - translation
-      - image-classification
-      - object-detection
-      - image-segmentation
-      - image-generation
-      - image-to-text
-      - text-to-image
-      - style-transfer
-      - face-detection
-      - facial-recognition
-      - speech-to-text
-      - text-to-speech
-      - speaker-identification
-      - audio-classification
-      - music-generation
-      - multimodal-embedding
-      - multimodal-generation
-      - visual-question-answering
-      - recommendation-system
-      - reinforcement-learning
-      - anomaly-detection
-      - time-series-forecasting
-      - clustering
-      description: 'Common types of AI/ML models and their primary functions:
-
-        - Text-based models for natural language processing
-
-        - Vision models for image analysis and generation
-
-        - Audio models for speech and sound processing
-
-        - Multimodal models that combine different types of inputs/outputs
-
-        - Specialized models for specific use cases
-
-        '
-    ModelCreateRequest:
-      type: object
-      required:
-      - id
-      description: Create a new model
-      properties:
-        id:
-          type: string
-          example: gpt-4-turbo
-        name:
-          type: string
-          example: GPT-4 Turbo
-        family:
-          type: string
-          example: gpt
-        hugging_face_path:
-          type: string
-          example: EleutherAI/gpt-neo-2.7B
-        benchmark_model_id:
-          type: string
-          example: gpt-4-turbo
-        estimated_use_life_days:
-          type: number
-          example: 365
-          format: float
-          x-go-type: float64
-        estimated_requests_per_day:
-          type: number
-          example: 1000
-          format: float
-          x-go-type: float64
-        fine_tuned_from_model_id:
-          type: string
-          example: gpt-4-turbo
-        aliases:
-          type: array
-          items:
-            type: string
-          maxItems: 100
-          example:
-          - claude-latest
-        total_params_billions:
-          type: number
-          example: 175
-          format: float
-          x-go-type: float64
-        number_of_experts:
-          type: integer
-          x-go-type: int64
-          example: 7
-        params_per_expert_billions:
-          type: number
-          example: 8
-          format: float
-          x-go-type: float64
-        training_usage_energy_kwh:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_usage_emissions_kgco2e:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_usage_water_l:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_embodied_emissions_kgco2e:
-          type: number
-          example: 11013.1
-          format: float
-          x-go-type: float64
-        training_embodied_water_l:
-          type: number
-          example: 11013.1
-          format: float
-          x-go-type: float64
-    ModelResponse:
-      title: Model Response
-      type: object
-      additionalProperties: false
-      required:
-      - models
-      properties:
-        models:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/Model'
-    DataType:
-      type: string
-      enum:
-      - fp8
-      - fp8-e4m3
-      - fp8-e5m2
-      - fp16
-      - tf32
-      - fp32
-      - fp64
-      - bfloat8
-      - bfloat16
-      - bf16
-      - int4
-      - int8
-      - int16
-      - int32
-      - int64
-      - uint4
-      - uint8
-      - uint16
-      - uint32
-      - uint64
     Model:
       title: Model
       type: object
@@ -611,6 +446,18 @@ components:
         created_by:
           type: string
           description: ID of the user who created the node (admin or owner only)
+    ModelResponse:
+      title: Model Response
+      type: object
+      additionalProperties: false
+      required:
+      - models
+      properties:
+        models:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Model'
     ModelUpdateRequest:
       type: object
       description: Update an existing model
@@ -679,6 +526,156 @@ components:
           example: 11013.1
           format: float
           x-go-type: float64
+    ModelCreateRequest:
+      type: object
+      required:
+      - id
+      description: Create a new model
+      properties:
+        id:
+          type: string
+          example: gpt-4-turbo
+        name:
+          type: string
+          example: GPT-4 Turbo
+        family:
+          type: string
+          example: gpt
+        hugging_face_path:
+          type: string
+          example: EleutherAI/gpt-neo-2.7B
+        benchmark_model_id:
+          type: string
+          example: gpt-4-turbo
+        estimated_use_life_days:
+          type: number
+          example: 365
+          format: float
+          x-go-type: float64
+        estimated_requests_per_day:
+          type: number
+          example: 1000
+          format: float
+          x-go-type: float64
+        fine_tuned_from_model_id:
+          type: string
+          example: gpt-4-turbo
+        aliases:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          example:
+          - claude-latest
+        total_params_billions:
+          type: number
+          example: 175
+          format: float
+          x-go-type: float64
+        number_of_experts:
+          type: integer
+          x-go-type: int64
+          example: 7
+        params_per_expert_billions:
+          type: number
+          example: 8
+          format: float
+          x-go-type: float64
+        training_usage_energy_kwh:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_emissions_kgco2e:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_water_l:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_embodied_emissions_kgco2e:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        training_embodied_water_l:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+    Task:
+      type: string
+      enum:
+      - text-generation
+      - chat
+      - text-embedding
+      - text-classification
+      - sentiment-analysis
+      - named-entity-recognition
+      - question-answering
+      - summarization
+      - translation
+      - image-classification
+      - object-detection
+      - image-segmentation
+      - image-generation
+      - image-to-text
+      - text-to-image
+      - style-transfer
+      - face-detection
+      - facial-recognition
+      - speech-to-text
+      - text-to-speech
+      - speaker-identification
+      - audio-classification
+      - music-generation
+      - multimodal-embedding
+      - multimodal-generation
+      - visual-question-answering
+      - recommendation-system
+      - reinforcement-learning
+      - anomaly-detection
+      - time-series-forecasting
+      - clustering
+      description: 'Common types of AI/ML models and their primary functions:
+
+        - Text-based models for natural language processing
+
+        - Vision models for image analysis and generation
+
+        - Audio models for speech and sound processing
+
+        - Multimodal models that combine different types of inputs/outputs
+
+        - Specialized models for specific use cases
+
+        '
+    DataType:
+      type: string
+      enum:
+      - fp8
+      - fp8-e4m3
+      - fp8-e5m2
+      - fp16
+      - tf32
+      - fp32
+      - fp64
+      - bfloat8
+      - bfloat16
+      - bf16
+      - int4
+      - int8
+      - int16
+      - int32
+      - int64
+      - uint4
+      - uint8
+      - uint16
+      - uint32
+      - uint64
     Family:
       type: string
       enum:

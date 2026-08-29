@@ -1,0 +1,261 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Tasks API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Tasks
+  description: Track async operation status
+paths:
+  /tasks/{taskId}:
+    get:
+      operationId: getTask
+      summary: Get task status
+      description: Get the current status of an async task. AdCP polling fallback for when webhooks are unavailable.
+      tags:
+      - Tasks
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: taskId
+        schema:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        required: true
+      responses:
+        '200':
+          description: Get task status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    TaskOutput:
+      description: Async task resource representation
+      type: object
+      properties:
+        taskId:
+          description: Unique task identifier
+          example: 550e8400-e29b-41d4-a716-446655440000
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        taskType:
+          description: Type of async operation
+          example: audience_sync
+          type: string
+          enum:
+          - audience_sync
+          - media_buy_create
+          - creative_sync
+        status:
+          description: Current task status (AdCP states)
+          example: submitted
+          type: string
+          enum:
+          - submitted
+          - working
+          - completed
+          - failed
+          - input-required
+        resourceType:
+          description: Type of resource this task operates on
+          example: audience
+          type:
+          - string
+          - 'null'
+        resourceId:
+          description: Identifier of the resulting resource (set on completion)
+          example: aud_12345
+          type:
+          - string
+          - 'null'
+        error:
+          description: AdCP-compatible error object when status is "failed"
+          allOf:
+          - $ref: '#/components/schemas/TaskError'
+        response:
+          description: Original response payload from the downstream system
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        metadata:
+          description: Operation-specific context
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        retryAfterSeconds:
+          description: Suggested polling interval in seconds. Set based on task type to guide how frequently callers should poll.
+          example: 30
+          type:
+          - number
+          - 'null'
+        createdAt:
+          description: When the task was created (ISO 8601)
+          example: '2026-01-15T10:30:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the task was last updated (ISO 8601)
+          example: '2026-01-20T14:45:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - taskId
+      - taskType
+      - status
+      - resourceType
+      - resourceId
+      - error
+      - response
+      - metadata
+      - retryAfterSeconds
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    TaskResponse:
+      description: Response containing a single task
+      type: object
+      properties:
+        task:
+          $ref: '#/components/schemas/TaskOutput'
+      required:
+      - task
+      additionalProperties: false
+    TaskError:
+      description: AdCP-compatible error object
+      type: object
+      properties:
+        code:
+          description: Error code for programmatic handling
+          example: VALIDATION_ERROR
+          type: string
+        message:
+          description: Human-readable error message
+          example: Invalid budget value
+          type: string
+        field:
+          description: Field path associated with the error
+          example: packages[0].targeting
+          type: string
+        suggestion:
+          description: Suggested fix for the error
+          type: string
+        retryAfter:
+          description: Seconds to wait before retrying the operation
+          type: number
+        details:
+          description: Additional task-specific error details
+          type: object
+          additionalProperties: {}
+        recovery:
+          description: 'Agent recovery classification: transient (retry), correctable (fix and resend), terminal (requires human action)'
+          type: string
+          enum:
+          - transient
+          - correctable
+          - terminal
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

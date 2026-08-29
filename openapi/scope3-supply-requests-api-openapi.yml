@@ -1,0 +1,463 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Supply Requests API
+  version: 2.0.0
+  description: 'Operations tagged Supply Requests across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Supply Requests
+paths:
+  /supply-requests/suggestions:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: suggestSupplyRequests
+      summary: Suggest requested supply
+      description: Search the AAO registry for seller/operator/publisher domains to use when filing customer-requested supply.
+      tags:
+      - Supply Requests
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: q
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 120
+        required: true
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 25
+      responses:
+        '200':
+          description: Suggest requested supply
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplyRequestSuggestionsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /supply-requests:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listSupplyRequests
+      summary: List requested supply
+      description: List the authenticated customer's platform-scoped requested supply from DemandContext. A Linear customer association is optional and is not required for this operation.
+      tags:
+      - Supply Requests
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 250
+      responses:
+        '200':
+          description: List requested supply
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplyRequestListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: requestSupply
+      summary: Request supply
+      description: Record a customer-requested seller/operator/publisher domain and channel in DemandContext. The request is scoped to the authenticated platform customer, does not require or create a Linear customer, and de-dupes active asks for the same domain/channel.
+      tags:
+      - Supply Requests
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  minLength: 1
+                channel:
+                  type: string
+                  minLength: 1
+                geo:
+                  type: string
+                  minLength: 1
+                launchDate:
+                  type: string
+                  minLength: 1
+                desiredSupply:
+                  anyOf:
+                  - type: string
+                    minLength: 1
+                    maxLength: 4000
+                  - type:
+                    - string
+                    - 'null'
+                    enum:
+                    - null
+                notes:
+                  type: string
+                  minLength: 1
+                  maxLength: 4000
+              required:
+              - domain
+              - channel
+      responses:
+        '200':
+          description: Request supply
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestSupplyResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /supply-requests/remove:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: removeSupplyRequest
+      summary: Remove requested supply
+      description: Remove a specific seller/operator/publisher domain and channel from the authenticated customer's DemandContext asks. The operation is platform-customer scoped, does not require a Linear customer association, and is idempotent; if no active matching request exists, the response returns removed=false.
+      tags:
+      - Supply Requests
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  minLength: 1
+                channel:
+                  type: string
+                  minLength: 1
+              required:
+              - domain
+              - channel
+      responses:
+        '200':
+          description: Remove requested supply
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveSupplyRequestResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    SupplyRequestItem:
+      type: object
+      properties:
+        domain:
+          type: string
+        channel:
+          type: string
+        trackingSource:
+          type: string
+          enum:
+          - explicit
+          - shared_channel
+        removable:
+          type: boolean
+        market:
+          type:
+          - string
+          - 'null'
+        desiredSupply:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+        publicStatus:
+          $ref: '#/components/schemas/PublicSupplyRequestStatus'
+        customerNeed:
+          type:
+          - object
+          - 'null'
+          properties:
+            createdAt:
+              type:
+              - string
+              - 'null'
+            updatedAt:
+              type:
+              - string
+              - 'null'
+          required:
+          - createdAt
+          - updatedAt
+          additionalProperties: false
+      required:
+      - domain
+      - channel
+      - trackingSource
+      - removable
+      - market
+      - desiredSupply
+      - publicStatus
+      - customerNeed
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    PublicSupplyRequestStatus:
+      type: object
+      properties:
+        key:
+          type: string
+          enum:
+          - tracked
+          - available
+        label:
+          type: string
+        description:
+          type: string
+        asOf:
+          type:
+          - string
+          - 'null'
+      required:
+      - key
+      - label
+      - description
+      additionalProperties: false
+    SupplyRequestSuggestionItem:
+      type: object
+      properties:
+        domain:
+          type: string
+        name:
+          type:
+          - string
+          - 'null'
+        kind:
+          type: string
+          enum:
+          - brand
+          - publisher
+          - property
+        source:
+          type:
+          - string
+          - 'null'
+      required:
+      - domain
+      - name
+      - kind
+      - source
+      additionalProperties: false
+    RemoveSupplyRequestResponse:
+      type: object
+      properties:
+        removed:
+          type: boolean
+        request:
+          allOf:
+          - $ref: '#/components/schemas/SupplyRequestItem'
+      required:
+      - removed
+      - request
+      additionalProperties: false
+    SupplyRequestListResponse:
+      type: object
+      properties:
+        generatedAt:
+          type: string
+        matchedCustomer:
+          type:
+          - object
+          - 'null'
+          properties:
+            name:
+              type: string
+            match:
+              type: string
+              enum:
+              - customer_id
+          required:
+          - name
+          - match
+          additionalProperties: false
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupplyRequestItem'
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        returnedCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        truncated:
+          type: boolean
+        hasMore:
+          type: boolean
+      required:
+      - generatedAt
+      - matchedCustomer
+      - items
+      - total
+      - returnedCount
+      - truncated
+      - hasMore
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    RequestSupplyResponse:
+      type: object
+      properties:
+        created:
+          type: boolean
+        updated:
+          type: boolean
+        registryStatus:
+          type: string
+          enum:
+          - found
+          - missing
+          - unavailable
+        request:
+          $ref: '#/components/schemas/SupplyRequestItem'
+      required:
+      - created
+      - updated
+      - registryStatus
+      - request
+      additionalProperties: false
+    SupplyRequestSuggestionsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupplyRequestSuggestionItem'
+      required:
+      - items
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

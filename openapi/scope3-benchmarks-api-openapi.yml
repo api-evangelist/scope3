@@ -1,14 +1,14 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  version: 1.0.0
-  title: AI Impact Measurement Benchmarks API
+  title: calculator Scope3 Carbon Calculator Benchmarks API
+  description: API to calculate the carbon footprint of a campaign
+  version: 2.0.0
+servers:
+- url: https://api.scope3.com/v2
 security:
 - bearerAuth: []
 tags:
 - name: Benchmarks
-servers:
-- url: https://api.scope3.com/v2
-  description: Carbon Calculator (Measurement) API server
 paths:
   /benchmarks:
     post:
@@ -43,22 +43,24 @@ paths:
       - Benchmarks
 components:
   schemas:
-    ChannelWithBenchmarks:
+    RequestId:
       type: string
-      enum:
-      - app
-      - web
-      - streaming-video
-      - social
-      - ctv-bvod
-      example: web
+      description: Auto generated request identifier
     CountryInput:
       type: string
       description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
       example: US
-    RequestId:
-      type: string
-      description: Auto generated request identifier
+    BenchmarksResponse:
+      type: object
+      required:
+      - benchmarks
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        benchmarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenchmarkInformation'
     BenchmarkInformation:
       type: object
       required:
@@ -93,19 +95,16 @@ components:
           type: string
           description: 'Year-month which specifies which month''s benchmarks to use. (Supported Formats: YYYY-MM, YYYYMM, or YYYY/MM)'
           example: 2023-04
-    BenchmarksResponse:
-      type: object
-      required:
-      - benchmarks
-      properties:
-        requestId:
-          $ref: '#/components/schemas/RequestId'
-        benchmarks:
-          type: array
-          items:
-            $ref: '#/components/schemas/BenchmarkInformation'
+    ChannelWithBenchmarks:
+      type: string
+      enum:
+      - app
+      - web
+      - streaming-video
+      - social
+      - ctv-bvod
+      example: web
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT

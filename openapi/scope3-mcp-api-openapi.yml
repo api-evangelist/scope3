@@ -1,0 +1,426 @@
+openapi: 3.2.0
+info:
+  title: Scope3 MCP API
+  version: 2.0.0
+  description: 'Operations tagged MCP across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: MCP
+  description: Model Context Protocol endpoints for AI agents
+paths:
+  /:
+    servers:
+    - url: https://api.interchange.io/mcp/v2/buyer
+      description: Production MCP server
+    post:
+      operationId: mcpInitialize
+      summary: Initialize MCP session
+      description: "Start a new MCP (Model Context Protocol) session. This must be called before using any other MCP tools.\n\n## Request Format\n\nSend a JSON-RPC 2.0 request with:\n- `method`: \"initialize\"\n- `params.protocolVersion`: \"2024-11-05\"\n- `params.capabilities`: {} (empty object)\n- `params.clientInfo`: Your agent info\n\n## Example Request\n\n```json\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"initialize\",\n  \"params\": {\n    \"protocolVersion\": \"2024-11-05\",\n    \"capabilities\": {},\n    \"clientInfo\": { \"name\": \"your-agent\", \"version\": \"1.0\" }\n  }\n}\n```\n\n## Example Response\n\n```json\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"result\": {\n    \"protocolVersion\": \"2024-11-05\",\n    \"capabilities\": { \"tools\": {} },\n    \"serverInfo\": { \"name\": \"scope3-buyer-api\", \"version\": \"2.0.0\" }\n  }\n}\n```"
+      tags:
+      - MCP
+      parameters:
+      - name: mcp-session-id
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: MCP session identifier. Generate a new UUID for this request.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpInitializeRequest'
+            example:
+              jsonrpc: '2.0'
+              id: 1
+              method: initialize
+              params:
+                protocolVersion: '2024-11-05'
+                capabilities: {}
+                clientInfo:
+                  name: your-agent
+                  version: '1.0'
+      responses:
+        '200':
+          description: Session initialized successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpInitializeResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - bearerAuth: []
+  /api-call:
+    servers:
+    - url: https://api.interchange.io/mcp/v2/buyer
+      description: Production MCP server
+    post:
+      operationId: mcpApiCall
+      summary: Make API call via MCP
+      description: "Make REST API calls to any Buyer API endpoint through MCP.\n\n## Parameters\n\n- `method`: HTTP method (GET, POST, PUT, DELETE)\n- `path`: API path (e.g., \"/advertisers\", \"/campaigns/{id}\")\n- `body`: Request body for POST/PUT requests (optional)\n- `query`: Query parameters (optional)\n\n## Example: List Advertisers\n\n```json\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"api_call\",\n    \"arguments\": {\n      \"method\": \"GET\",\n      \"path\": \"/advertisers\",\n      \"query\": { \"take\": 10 }\n    }\n  }\n}\n```\n\n## Example Response\n\n```json\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"result\": {\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"{ \\\"advertisers\\\": [...], \\\"total\\\": 5 }\"\n      }\n    ]\n  }\n}\n```"
+      tags:
+      - MCP
+      parameters:
+      - name: mcp-session-id
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: MCP session identifier from the initialize call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpApiCallRequest'
+            example:
+              jsonrpc: '2.0'
+              id: 2
+              method: tools/call
+              params:
+                name: api_call
+                arguments:
+                  method: GET
+                  path: /advertisers
+                  query:
+                    take: 10
+      responses:
+        '200':
+          description: API call executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpToolResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - bearerAuth: []
+  /ask-about-capability:
+    servers:
+    - url: https://api.interchange.io/mcp/v2/buyer
+      description: Production MCP server
+    post:
+      operationId: mcpAskAboutCapability
+      summary: Ask about API capabilities
+      description: "Learn about Buyer API features and capabilities using natural language questions.\n\nThis tool helps AI agents understand what the API can do without needing to read documentation.\n\n## Parameters\n\n- `question`: A natural language question about API capabilities\n\n## Example Questions\n\n- \"How do I create a campaign?\"\n- \"What can I configure on a campaign?\"\n- \"What authentication is required?\"\n\n## Example Request\n\n```json\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"ask_about_capability\",\n    \"arguments\": {\n      \"question\": \"How do I create a campaign?\"\n    }\n  }\n}\n```\n\n## Example Response\n\n```json\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"result\": {\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"To create a campaign, use POST /campaigns with...\"\n      }\n    ]\n  }\n}\n```"
+      tags:
+      - MCP
+      parameters:
+      - name: mcp-session-id
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: MCP session identifier from the initialize call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpAskCapabilityRequest'
+            example:
+              jsonrpc: '2.0'
+              id: 4
+              method: tools/call
+              params:
+                name: ask_about_capability
+                arguments:
+                  question: How do I create a campaign?
+      responses:
+        '200':
+          description: Capability information returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpToolResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    McpInitializeRequest:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+          - '2.0'
+          description: JSON-RPC version
+        id:
+          oneOf:
+          - type: string
+          - type: number
+          description: Request ID
+        method:
+          type: string
+          enum:
+          - initialize
+          description: Method name
+        params:
+          type: object
+          properties:
+            protocolVersion:
+              type: string
+              description: MCP protocol version
+              example: '2024-11-05'
+            capabilities:
+              type: object
+              description: Client capabilities
+            clientInfo:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Client name
+                version:
+                  type: string
+                  description: Client version
+              required:
+              - name
+              - version
+          required:
+          - protocolVersion
+          - capabilities
+          - clientInfo
+      required:
+      - jsonrpc
+      - id
+      - method
+      - params
+    McpApiCallRequest:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+          - '2.0'
+          description: JSON-RPC version
+        id:
+          oneOf:
+          - type: string
+          - type: number
+          description: Request ID
+        method:
+          type: string
+          enum:
+          - tools/call
+          description: Method name
+        params:
+          type: object
+          properties:
+            name:
+              type: string
+              enum:
+              - api_call
+              description: Tool name
+            arguments:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  description: HTTP method
+                path:
+                  type: string
+                  description: API path (e.g., "/advertisers")
+                body:
+                  type: object
+                  description: Request body for POST/PUT
+                query:
+                  type: object
+                  description: Query parameters
+              required:
+              - method
+              - path
+          required:
+          - name
+          - arguments
+      required:
+      - jsonrpc
+      - id
+      - method
+      - params
+    McpAskCapabilityRequest:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+          - '2.0'
+          description: JSON-RPC version
+        id:
+          oneOf:
+          - type: string
+          - type: number
+          description: Request ID
+        method:
+          type: string
+          enum:
+          - tools/call
+          description: Method name
+        params:
+          type: object
+          properties:
+            name:
+              type: string
+              enum:
+              - ask_about_capability
+              description: Tool name
+            arguments:
+              type: object
+              properties:
+                question:
+                  type: string
+                  description: Natural language question about API capabilities
+              required:
+              - question
+          required:
+          - name
+          - arguments
+      required:
+      - jsonrpc
+      - id
+      - method
+      - params
+    McpToolResponse:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+          - '2.0'
+        id:
+          oneOf:
+          - type: string
+          - type: number
+        result:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                    - text
+                  text:
+                    type: string
+                    description: Response content
+    McpInitializeResponse:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+          - '2.0'
+        id:
+          oneOf:
+          - type: string
+          - type: number
+        result:
+          type: object
+          properties:
+            protocolVersion:
+              type: string
+            capabilities:
+              type: object
+            serverInfo:
+              type: object
+              properties:
+                name:
+                  type: string
+                version:
+                  type: string
+    McpApiCallRequest_2:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+          - '2.0'
+          description: JSON-RPC version
+        id:
+          oneOf:
+          - type: string
+          - type: number
+          description: Request ID
+        method:
+          type: string
+          enum:
+          - tools/call
+          description: Method name
+        params:
+          type: object
+          properties:
+            name:
+              type: string
+              enum:
+              - api_call
+              description: Tool name
+            arguments:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  description: HTTP method
+                path:
+                  type: string
+                  description: API path (e.g., "/inventory-sources")
+                body:
+                  type: object
+                  description: Request body for POST/PUT
+                query:
+                  type: object
+                  description: Query parameters
+              required:
+              - method
+              - path
+          required:
+          - name
+          - arguments
+      required:
+      - jsonrpc
+      - id
+      - method
+      - params
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

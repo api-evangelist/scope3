@@ -1,14 +1,11 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
   version: 1.0.0
-  title: AI Impact Measurement Gpu API
+  title: AI impact measurement Gpu API
 security:
 - bearerAuth: []
 tags:
 - name: Gpu
-servers:
-- url: https://aiapi.scope3.com
-  description: AI Impact Measurement API server
 paths:
   /gpu:
     get:
@@ -233,6 +230,54 @@ paths:
       - Gpu
 components:
   schemas:
+    GPUCreateRequest:
+      type: object
+      required:
+      - id
+      - name
+      - max_power_w
+      - embodied_emissions_kgco2e
+      - embodied_water_mlh2o
+      - performance_ratio_to_h200
+      - ols_intercept
+      - ols_coefficient_gpu_count
+      properties:
+        name:
+          type: string
+          example: NVIDIA A100 40GB
+        id:
+          type: string
+          example: a100_40gb
+        max_power_w:
+          type: number
+          example: 700
+          format: float
+          x-go-type: float64
+        embodied_emissions_kgco2e:
+          type: number
+          example: 282.1
+          format: float
+          x-go-type: float64
+        embodied_water_mlh2o:
+          type: number
+          example: 181.1
+          format: float
+          x-go-type: float64
+        performance_ratio_to_h200:
+          type: number
+          example: 1.5
+          format: float
+          x-go-type: float64
+        ols_coefficient_gpu_count:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+        ols_intercept:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
     GPU:
       type: object
       required:
@@ -299,6 +344,18 @@ components:
         created_by:
           type: string
           description: ID of the user who created the node (admin or owner only)
+    GPUResponse:
+      title: GPU Response
+      type: object
+      additionalProperties: false
+      required:
+      - gpus
+      properties:
+        gpus:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/GPU'
     GPUUpdateRequest:
       type: object
       properties:
@@ -335,18 +392,6 @@ components:
           example: 11.4
           format: float
           x-go-type: float64
-    GPUResponse:
-      title: GPU Response
-      type: object
-      additionalProperties: false
-      required:
-      - gpus
-      properties:
-        gpus:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/GPU'
     Error:
       type: object
       additionalProperties: false
@@ -364,54 +409,6 @@ components:
               type: string
             field:
               type: string
-    GPUCreateRequest:
-      type: object
-      required:
-      - id
-      - name
-      - max_power_w
-      - embodied_emissions_kgco2e
-      - embodied_water_mlh2o
-      - performance_ratio_to_h200
-      - ols_intercept
-      - ols_coefficient_gpu_count
-      properties:
-        name:
-          type: string
-          example: NVIDIA A100 40GB
-        id:
-          type: string
-          example: a100_40gb
-        max_power_w:
-          type: number
-          example: 700
-          format: float
-          x-go-type: float64
-        embodied_emissions_kgco2e:
-          type: number
-          example: 282.1
-          format: float
-          x-go-type: float64
-        embodied_water_mlh2o:
-          type: number
-          example: 181.1
-          format: float
-          x-go-type: float64
-        performance_ratio_to_h200:
-          type: number
-          example: 1.5
-          format: float
-          x-go-type: float64
-        ols_coefficient_gpu_count:
-          type: number
-          example: 11.4
-          format: float
-          x-go-type: float64
-        ols_intercept:
-          type: number
-          example: 11.4
-          format: float
-          x-go-type: float64
   securitySchemes:
     bearerAuth:
       type: http

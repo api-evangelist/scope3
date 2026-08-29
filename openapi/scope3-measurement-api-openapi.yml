@@ -1,0 +1,1627 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Measurement API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Measurement
+  description: Measurement sources, records, context, and freshness
+paths:
+  /advertisers/{advertiserId}/measurement-data/sync:
+    post:
+      operationId: syncMeasurementData
+      summary: Sync measurement data
+      description: Inbound sync_measurement_data endpoint. Advertisers or MMPs call this to provide performance data as an alternative to CAPI. Accepts time-series measurement data keyed by campaign, media buy, package, and/or creative.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncMeasurementDataRequest'
+      responses:
+        '200':
+          description: Sync measurement data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncMeasurementDataResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/test-cohorts:
+    get:
+      operationId: listTestCohorts
+      summary: List test cohorts
+      description: List test cohorts for an advertiser.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: advertiserId
+        schema:
+          description: Filter by advertiser ID
+          example: '12345'
+          type: string
+        description: Filter by advertiser ID
+      - in: query
+        name: role
+        schema:
+          description: Filter by cohort role
+          type: string
+          enum:
+          - TREATMENT
+          - CONTROL
+          - OBSERVATION
+        description: Filter by cohort role
+      - in: query
+        name: isActive
+        schema:
+          description: Filter by active status
+          type: boolean
+        description: Filter by active status
+      - in: query
+        name: take
+        schema:
+          description: Number of results to return (max 250)
+          example: 50
+          default: 50
+          type: integer
+          maximum: 250
+          minimum: 1
+        description: Number of results to return (max 250)
+      - in: query
+        name: skip
+        schema:
+          description: Number of results to skip for pagination
+          example: 0
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Number of results to skip for pagination
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: List test cohorts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestCohortListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createTestCohort
+      summary: Create test cohort
+      description: Create a new test cohort for measurement.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTestCohortInput'
+      responses:
+        '201':
+          description: Create test cohort
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestCohortResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/test-cohorts/{cohortId}:
+    get:
+      operationId: getTestCohort
+      summary: Get test cohort
+      description: Get a specific test cohort by ID.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: cohortId
+        schema:
+          description: Unique identifier for the test cohort
+          example: cohort_abc123
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the test cohort
+      responses:
+        '200':
+          description: Get test cohort
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestCohortResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateTestCohort
+      summary: Update test cohort
+      description: Update an existing test cohort.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: cohortId
+        schema:
+          description: Unique identifier for the test cohort
+          example: cohort_abc123
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the test cohort
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTestCohortInput'
+      responses:
+        '200':
+          description: Update test cohort
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestCohortResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteTestCohort
+      summary: Delete test cohort
+      description: Delete a test cohort.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: cohortId
+        schema:
+          description: Unique identifier for the test cohort
+          example: cohort_abc123
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the test cohort
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/measurement-config:
+    get:
+      operationId: getMeasurementConfig
+      summary: Get measurement configuration
+      description: Get the measurement configuration for an advertiser.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: Get measurement configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeasurementConfigResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateMeasurementConfig
+      summary: Update measurement configuration
+      description: Update the measurement configuration for an advertiser.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMeasurementConfigInput'
+      responses:
+        '200':
+          description: Update measurement configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeasurementConfigResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/measurement-sources:
+    get:
+      operationId: listMeasurementSources
+      summary: List measurement sources
+      description: List measurement sources for an advertiser.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: take
+        schema:
+          description: Number of results to return (max 250)
+          example: 50
+          default: 50
+          type: integer
+          maximum: 250
+          minimum: 1
+        description: Number of results to return (max 250)
+      - in: query
+        name: skip
+        schema:
+          description: Number of results to skip for pagination
+          example: 0
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Number of results to skip for pagination
+      - in: query
+        name: outcomeType
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - pending
+          - active
+          - paused
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: List measurement sources
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createMeasurementSource
+      summary: Create measurement source
+      description: Register a measurement data source (e.g. MMM, brand lift study) for an advertiser.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sourceKey:
+                  type: string
+                  minLength: 1
+                name:
+                  type: string
+                  minLength: 1
+                outcomeType:
+                  type: string
+                  minLength: 1
+                outcomeTypes:
+                  type: array
+                  items:
+                    type: string
+                granularity:
+                  type: string
+                  minLength: 1
+                lagWeeks:
+                  default: 1
+                  type: integer
+                  minimum: 0
+                  maximum: 9007199254740991
+                cadence:
+                  type: string
+                  enum:
+                  - continuous
+                  - daily
+                  - weekly
+                  - biweekly
+                  - monthly
+                  - quarterly
+                provider:
+                  type: string
+                  minLength: 1
+                ingestionMethod:
+                  type: string
+                attributionConfig:
+                  type: object
+                  additionalProperties: {}
+                signalWeight:
+                  default: 1
+                  type: number
+                  minimum: 0
+                  maximum: 1
+                status:
+                  default: pending
+                  type: string
+                  enum:
+                  - pending
+                  - active
+                  - paused
+                notes:
+                  type: string
+              required:
+              - sourceKey
+              - name
+              - outcomeType
+              - granularity
+              - cadence
+              - provider
+      responses:
+        '201':
+          description: Create measurement source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/measurement-sources/{sourceId}:
+    get:
+      operationId: getMeasurementSource
+      summary: Get measurement source
+      description: Get a specific measurement source by ID.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      - in: path
+        name: sourceId
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Get measurement source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: updateMeasurementSource
+      summary: Update measurement source
+      description: Update a measurement source.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      - in: path
+        name: sourceId
+        schema:
+          type: string
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                outcomeType:
+                  type: string
+                  minLength: 1
+                outcomeTypes:
+                  type: array
+                  items:
+                    type: string
+                granularity:
+                  type: string
+                  minLength: 1
+                lagWeeks:
+                  default: 1
+                  type: integer
+                  minimum: 0
+                  maximum: 9007199254740991
+                cadence:
+                  type: string
+                  enum:
+                  - continuous
+                  - daily
+                  - weekly
+                  - biweekly
+                  - monthly
+                  - quarterly
+                provider:
+                  type: string
+                  minLength: 1
+                ingestionMethod:
+                  type: string
+                attributionConfig:
+                  type: object
+                  additionalProperties: {}
+                signalWeight:
+                  default: 1
+                  type: number
+                  minimum: 0
+                  maximum: 1
+                status:
+                  default: pending
+                  type: string
+                  enum:
+                  - pending
+                  - active
+                  - paused
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Update measurement source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/measurement-records:
+    post:
+      operationId: uploadMeasurementRecords
+      summary: Upload measurement records
+      description: Upload outcome measurement records (sales, brand lift, etc). Upserts on (customer, advertiser, outcome_type, source, geo, time_window).
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                records:
+                  minItems: 1
+                  maxItems: 5000
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      outcomeType:
+                        type: string
+                        minLength: 1
+                      geo:
+                        type: string
+                        minLength: 1
+                      timeWindowStart:
+                        type: string
+                        format: date
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                      timeWindowEnd:
+                        type: string
+                        format: date
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                      value:
+                        type: number
+                      baselineValue:
+                        type: number
+                      confidenceInterval:
+                        type: number
+                      source:
+                        type: string
+                        minLength: 1
+                      lagDays:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                    required:
+                    - outcomeType
+                    - geo
+                    - timeWindowStart
+                    - timeWindowEnd
+                    - value
+                    - source
+              required:
+              - records
+      responses:
+        '201':
+          description: Upload measurement records
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      operationId: listMeasurementRecords
+      summary: List measurement records
+      description: List uploaded measurement records with optional filtering by outcome type and geo.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: take
+        schema:
+          description: Number of results to return (max 250)
+          example: 50
+          default: 50
+          type: integer
+          maximum: 250
+          minimum: 1
+        description: Number of results to return (max 250)
+      - in: query
+        name: skip
+        schema:
+          description: Number of results to skip for pagination
+          example: 0
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Number of results to skip for pagination
+      - in: query
+        name: outcomeType
+        schema:
+          type: string
+      - in: query
+        name: geo
+        schema:
+          type: string
+      - in: query
+        name: geos
+        schema:
+          type: string
+      - in: query
+        name: startDate
+        schema:
+          type: string
+          format: date
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+      - in: query
+        name: endDate
+        schema:
+          type: string
+          format: date
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: List measurement records
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/context-records:
+    post:
+      operationId: uploadContextRecords
+      summary: Upload context records
+      description: Upload exogenous context data (promos, weather, competitor activity) for measurement analysis.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                records:
+                  minItems: 1
+                  maxItems: 5000
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      geo:
+                        type: string
+                        minLength: 1
+                      timeWindowStart:
+                        type: string
+                        format: date
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                      timeWindowEnd:
+                        type: string
+                        format: date
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                      promoActive:
+                        default: false
+                        type: boolean
+                      promoType:
+                        type: string
+                      temperatureAvg:
+                        type: number
+                      competitorActivity:
+                        type: object
+                        additionalProperties: {}
+                      seasonalityIndex:
+                        type: number
+                      flightStatus:
+                        default: active
+                        type: string
+                        enum:
+                        - active
+                        - dark
+                        - pre_flight
+                        - post_flight
+                    required:
+                    - geo
+                    - timeWindowStart
+                    - timeWindowEnd
+              required:
+              - records
+      responses:
+        '201':
+          description: Upload context records
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/measurement-freshness:
+    get:
+      operationId: getMeasurementFreshness
+      summary: Check measurement freshness
+      description: Check for gaps in measurement data coverage relative to flight schedule and measurement source cadence.
+      tags:
+      - Measurement
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: flightStart
+        schema:
+          type: string
+          format: date
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+        required: true
+      - in: query
+        name: flightEnd
+        schema:
+          type: string
+          format: date
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+      - in: query
+        name: geos
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: Check measurement freshness
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    MeasurementConfigResponse:
+      description: Response containing measurement configuration
+      type: object
+      properties:
+        measurementConfig:
+          $ref: '#/components/schemas/MeasurementConfigOutput'
+      required:
+      - measurementConfig
+      additionalProperties: false
+    TestCohortSummary:
+      description: Compact test-cohort view returned by list endpoints. Use `get_test_cohort` for the full resource.
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the test cohort
+          example: cohort_abc123
+          type: string
+        advertiserId:
+          description: Advertiser ID that owns this cohort
+          example: '12345'
+          type: string
+        name:
+          description: Name of the test cohort
+          example: West Coast Treatment Group
+          type: string
+        cohortType:
+          description: Type classification for the cohort
+          example: geographic
+          type: string
+        role:
+          description: Role of the cohort in the test
+          type: string
+          enum:
+          - TREATMENT
+          - CONTROL
+          - OBSERVATION
+        estimatedSize:
+          description: Estimated number of users in this cohort
+          example: 50000
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        isActive:
+          description: Whether the cohort is currently active
+          type: boolean
+        createdAt:
+          description: When the cohort was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the cohort was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - advertiserId
+      - name
+      - cohortType
+      - role
+      - isActive
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    UpdateTestCohortInput:
+      description: Request body for updating a test cohort (all fields optional)
+      type: object
+      properties:
+        name:
+          description: Updated name of the test cohort
+          example: West Coast Treatment Group - Updated
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Updated description of the test cohort
+          type: string
+          maxLength: 1000
+        cohortType:
+          description: Updated type classification for the cohort
+          type: string
+          minLength: 1
+        role:
+          description: Updated role of the cohort in the test
+          type: string
+          enum:
+          - TREATMENT
+          - CONTROL
+          - OBSERVATION
+        definition:
+          description: Updated cohort targeting definition
+          allOf:
+          - $ref: '#/components/schemas/CohortDefinition'
+        estimatedSize:
+          description: Updated estimated number of users in this cohort
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+    SyncMeasurementDataRequest:
+      description: Request body for syncing measurement data (ADCP spec alternative to CAPI)
+      type: object
+      properties:
+        measurements:
+          description: Measurement data points to sync (up to 1000 per call)
+          minItems: 1
+          maxItems: 1000
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncMeasurementObject'
+      required:
+      - measurements
+    TestCohortOutput:
+      description: Test cohort resource representation
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the test cohort
+          example: cohort_abc123
+          type: string
+        advertiserId:
+          description: Advertiser ID that owns this cohort
+          example: '12345'
+          type: string
+        name:
+          description: Name of the test cohort
+          example: West Coast Treatment Group
+          type: string
+        description:
+          description: Description of the test cohort
+          type: string
+        cohortType:
+          description: Type classification for the cohort
+          example: geographic
+          type: string
+        role:
+          description: Role of the cohort in the test
+          type: string
+          enum:
+          - TREATMENT
+          - CONTROL
+          - OBSERVATION
+        definition:
+          description: Cohort targeting definition
+          allOf:
+          - $ref: '#/components/schemas/CohortDefinition'
+        estimatedSize:
+          description: Estimated number of users in this cohort
+          example: 50000
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        isActive:
+          description: Whether the cohort is currently active
+          type: boolean
+        createdAt:
+          description: When the cohort was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the cohort was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - advertiserId
+      - name
+      - cohortType
+      - role
+      - definition
+      - isActive
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    TestCohortResponse:
+      description: Response containing a single test cohort
+      type: object
+      properties:
+        cohort:
+          $ref: '#/components/schemas/TestCohortOutput'
+      required:
+      - cohort
+      additionalProperties: false
+    MeasurementConfigOutput:
+      description: Full measurement configuration for an advertiser
+      type: object
+      properties:
+        advertiserId:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+        mmmEnabled:
+          description: Whether Marketing Mix Modeling is enabled
+          type: boolean
+        mmmConfig:
+          description: MMM configuration settings (present when mmmEnabled is true)
+          allOf:
+          - $ref: '#/components/schemas/MmmConfig'
+        brandLiftEnabled:
+          description: Whether brand lift measurement is enabled
+          type: boolean
+        settings:
+          description: Additional measurement settings as key-value pairs
+          type: object
+          additionalProperties: {}
+        createdAt:
+          description: When the measurement config was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the measurement config was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - advertiserId
+      - mmmEnabled
+      - brandLiftEnabled
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    MmmConfig:
+      description: Marketing Mix Modeling configuration with optional additional fields
+      type: object
+      properties:
+        provider:
+          description: MMM provider name
+          example: measured
+          type: string
+        dataSourceIds:
+          description: IDs of data sources connected for MMM analysis
+          example:
+          - ds_123
+          - ds_456
+          type: array
+          items:
+            type: string
+        reportingFrequency:
+          description: How often MMM reports are generated
+          type: string
+          enum:
+          - weekly
+          - monthly
+          - quarterly
+      additionalProperties: {}
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    CreateTestCohortInput:
+      description: Request body for creating a new test cohort
+      type: object
+      properties:
+        name:
+          description: Name of the test cohort
+          example: West Coast Treatment Group
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Optional description of the test cohort
+          example: Users in CA, OR, WA receiving full ad exposure
+          type: string
+          maxLength: 1000
+        cohortType:
+          description: Type classification for the cohort
+          example: geographic
+          type: string
+          minLength: 1
+        role:
+          description: 'Role of the cohort in the test (default: TREATMENT)'
+          default: TREATMENT
+          type: string
+          enum:
+          - TREATMENT
+          - CONTROL
+          - OBSERVATION
+        definition:
+          description: Cohort targeting definition
+          allOf:
+          - $ref: '#/components/schemas/CohortDefinition'
+        estimatedSize:
+          description: Estimated number of users in this cohort
+          example: 50000
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - name
+      - cohortType
+      - definition
+    MeasurementDataSyncResult:
+      description: Per-record result from sync_measurement_data
+      type: object
+      properties:
+        index:
+          description: Index of this measurement in the request array
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        action:
+          description: What happened to this measurement during sync
+          type: string
+          enum:
+          - created
+          - updated
+          - unchanged
+          - failed
+        error:
+          description: Error message when action is "failed"
+          type: string
+      required:
+      - index
+      - action
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    SyncMeasurementObject:
+      description: A single measurement data point to sync
+      type: object
+      properties:
+        start_time:
+          description: Start of the measurement period (ISO 8601 with timezone)
+          example: '2026-03-01T00:00:00-05:00'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+        end_time:
+          description: End of the measurement period (ISO 8601 with timezone)
+          example: '2026-03-07T23:59:59-05:00'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+        metric_id:
+          description: Type of metric being measured
+          example: incremental_revenue
+          type: string
+          enum:
+          - revenue
+          - incremental_revenue
+          - conversions
+          - incremental_conversions
+          - page_view_count
+          - add_to_cart_count
+          - purchase_count
+          - ltv_1d
+          - ltv_7d
+          - ltv_30d
+        metric_value:
+          description: Measured value for this metric
+          example: 8450.75
+          type: number
+        unit:
+          description: Unit of measure for the metric value
+          example: currency
+          type: string
+          enum:
+          - currency
+          - count
+          - ratio
+          - percentage
+        currency:
+          description: ISO 4217 currency code — required when unit is "currency"
+          example: USD
+          type: string
+          pattern: ^[A-Z]{3}$
+        campaign_id:
+          description: Campaign identifier
+          example: camp_456
+          type: string
+          minLength: 1
+          maxLength: 255
+        media_buy_id:
+          description: Media buy identifier
+          example: mb_789
+          type: string
+          minLength: 1
+          maxLength: 255
+        package_id:
+          description: Package identifier
+          example: pkg_001
+          type: string
+          minLength: 1
+          maxLength: 255
+        creative_id:
+          description: Creative identifier
+          example: cr_002
+          type: string
+          minLength: 1
+          maxLength: 255
+        source:
+          description: Who sent the data
+          example: advertiser
+          type: string
+          enum:
+          - advertiser
+          - mmp
+          - measurement_partner
+        source_platform:
+          description: Platform the measurement data originates from
+          example: billy_grace
+          type: string
+          minLength: 1
+          maxLength: 255
+        source_metric_name:
+          description: Raw partner metric name for mapping
+          example: Incremental Revenue
+          type: string
+          minLength: 1
+          maxLength: 255
+        external_row_id:
+          description: External row identifier for idempotency
+          example: bg_row_001
+          type: string
+          minLength: 1
+          maxLength: 255
+      required:
+      - start_time
+      - end_time
+      - metric_id
+      - metric_value
+      - unit
+    CohortDefinition:
+      description: Flexible definition for cohort targeting criteria. Type is required, additional fields vary by type.
+      type: object
+      properties:
+        type:
+          description: Type of cohort definition (e.g., "zip_code", "user_segment", "geo_region", "custom")
+          example: zip_code
+          type: string
+          minLength: 1
+      required:
+      - type
+      additionalProperties: {}
+    TestCohortListResponse:
+      description: Response containing a paginated list of test-cohort summaries
+      type: object
+      properties:
+        cohorts:
+          description: Test cohorts projected to the summary shape. Use `get_test_cohort` for the full resource.
+          type: array
+          items:
+            $ref: '#/components/schemas/TestCohortSummary'
+        total:
+          description: Total count of cohorts matching the query
+          example: 6
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - cohorts
+      - total
+      additionalProperties: false
+    SyncMeasurementDataResponse:
+      description: Response from sync_measurement_data
+      type: object
+      properties:
+        measurements:
+          description: Per-record sync results
+          type: array
+          items:
+            $ref: '#/components/schemas/MeasurementDataSyncResult'
+      required:
+      - measurements
+      additionalProperties: false
+    UpdateMeasurementConfigInput:
+      description: Request body for updating measurement configuration
+      type: object
+      properties:
+        mmmEnabled:
+          description: Whether Marketing Mix Modeling is enabled
+          type: boolean
+        mmmConfig:
+          description: MMM configuration settings
+          allOf:
+          - $ref: '#/components/schemas/MmmConfig'
+        brandLiftEnabled:
+          description: Whether brand lift measurement is enabled
+          type: boolean
+        settings:
+          description: Additional measurement settings as key-value pairs
+          type: object
+          additionalProperties: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

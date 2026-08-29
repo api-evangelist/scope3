@@ -1,0 +1,327 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront AI Usage API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: AI Usage
+  description: Storefront AI token usage visibility by model
+paths:
+  /usage/by-model:
+    get:
+      operationId: getStorefrontAiUsageByModel
+      summary: Get storefront AI usage by model over time
+      description: Get customer-borne storefront AI token usage grouped by day and model. Customer scope is always derived from the authenticated organization.
+      tags:
+      - AI Usage
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: since
+        schema:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      responses:
+        '200':
+          description: Get storefront AI usage by model over time
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model:
+                          type: string
+                        inputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        outputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        cacheCreationInputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        cacheReadInputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        totalTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        costMicroUsd:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        costUsd:
+                          type: number
+                          minimum: 0
+                        callCount:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        day:
+                          type: string
+                      required:
+                      - model
+                      - inputTokens
+                      - outputTokens
+                      - cacheCreationInputTokens
+                      - cacheReadInputTokens
+                      - totalTokens
+                      - costMicroUsd
+                      - costUsd
+                      - callCount
+                      - day
+                      additionalProperties: false
+                required:
+                - rows
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /usage/summary:
+    get:
+      operationId: getStorefrontAiUsageSummary
+      summary: Get storefront AI usage summary
+      description: Get customer-borne storefront AI token usage summarized by model. Estimated costs are pre-billing visibility values, not customer charges.
+      tags:
+      - AI Usage
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: since
+        schema:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      responses:
+        '200':
+          description: Get storefront AI usage summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model:
+                          type: string
+                        inputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        outputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        cacheCreationInputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        cacheReadInputTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        totalTokens:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        costMicroUsd:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        costUsd:
+                          type: number
+                          minimum: 0
+                        callCount:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                      required:
+                      - model
+                      - inputTokens
+                      - outputTokens
+                      - cacheCreationInputTokens
+                      - cacheReadInputTokens
+                      - totalTokens
+                      - costMicroUsd
+                      - costUsd
+                      - callCount
+                      additionalProperties: false
+                  totals:
+                    type: object
+                    properties:
+                      inputTokens:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      outputTokens:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      cacheCreationInputTokens:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      cacheReadInputTokens:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      totalTokens:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      costMicroUsd:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      costUsd:
+                        type: number
+                        minimum: 0
+                      callCount:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                    required:
+                    - inputTokens
+                    - outputTokens
+                    - cacheCreationInputTokens
+                    - cacheReadInputTokens
+                    - totalTokens
+                    - costMicroUsd
+                    - costUsd
+                    - callCount
+                    additionalProperties: false
+                  topModel:
+                    type:
+                    - string
+                    - 'null'
+                required:
+                - rows
+                - totals
+                - topModel
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

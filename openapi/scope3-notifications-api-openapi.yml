@@ -1,0 +1,624 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Notifications API
+  version: 2.0.0
+  description: 'Operations tagged Notifications across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Notifications
+paths:
+  /notifications:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listNotifications
+      summary: List notifications
+      description: List notifications for the authenticated user, newest first, with unread/acknowledged filtering and pagination. The response includes the total and unread counts.
+      tags:
+      - Notifications
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: brandAgentId
+        schema:
+          type: number
+      - in: query
+        name: campaignId
+        schema:
+          type: string
+      - in: query
+        name: creativeId
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - success
+          - error
+          - warning
+          - info
+      - in: query
+        name: types
+        schema:
+          type: string
+      - in: query
+        name: unreadOnly
+        schema:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+      - in: query
+        name: limit
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+      - in: query
+        name: offset
+        schema:
+          type: number
+          minimum: 0
+      responses:
+        '200':
+          description: List notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /notifications/read-all:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: readAllNotifications
+      summary: Mark all notifications as read
+      description: Mark all notifications as read for the authenticated user. Optionally scope to a single `brandAgentId`.
+      tags:
+      - Notifications
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brandAgentId:
+                  type: number
+      responses:
+        '200':
+          description: Mark all notifications as read
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /notifications/{notificationId}/read:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: readNotification
+      summary: Mark notification as read
+      description: Mark a single notification as read.
+      tags:
+      - Notifications
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: notificationId
+        schema:
+          description: Notification id.
+          type: string
+          minLength: 1
+        required: true
+        description: Notification id.
+      responses:
+        '200':
+          description: Mark notification as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationActionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No notification with this id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /notifications/{notificationId}/acknowledge:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: acknowledgeNotification
+      summary: Acknowledge notification
+      description: Acknowledge a single notification, dismissing it from active surfaces.
+      tags:
+      - Notifications
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: notificationId
+        schema:
+          description: Notification id.
+          type: string
+          minLength: 1
+        required: true
+        description: Notification id.
+      responses:
+        '200':
+          description: Acknowledge notification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationActionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No notification with this id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    NotificationActionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum:
+          - true
+        notificationId:
+          type: string
+      required:
+      - success
+      - notificationId
+      additionalProperties: false
+    NotificationSummary:
+      description: Compact notification view returned by list endpoints. Use the notification detail endpoint for the full `data` payload.
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the notification
+          type: string
+        type:
+          description: Notification event type
+          type: string
+          enum:
+          - brand_agent.created
+          - brand_agent.updated
+          - brand_agent.deleted
+          - campaign.healthy
+          - campaign.unhealthy
+          - campaign.created
+          - campaign.updated
+          - campaign.deleted
+          - campaign.completed
+          - creative.approved
+          - creative.rejected
+          - creative.changes_requested
+          - creative.sync_started
+          - creative.sync_completed
+          - creative.sync_failed
+          - creative.created
+          - creative.updated
+          - creative.deleted
+          - strategy.created
+          - strategy.updated
+          - strategy.deleted
+          - media_buy.created
+          - media_buy.updated
+          - media_buy.deleted
+          - media_buy.forward_failed
+          - media_buy.awaiting_source_moderation
+          - media_buy.source_rejected
+          - media_buy.stuck
+          - media_buy_update_proposal.approved
+          - media_buy_update_proposal.rejected
+          - media_buy_update_proposal.expired
+          - salesagent.available
+          - salesagent.unavailable
+          - salesagent.registered
+          - salesagent.unregistered
+          - salesagent.updated
+          - salesagent.sync_action_required
+          - signalsagent.registered
+          - signalsagent.unregistered
+          - signalsagent.updated
+          - signalsagent.signal_activated
+          - signalsagent.signals_fetched
+          - outcomesagent.registered
+          - outcomesagent.unregistered
+          - outcomesagent.updated
+          - syndication.completed
+          - syndication.failed
+          - audience.synced
+          - audience.sync_failed
+          - optimization.suggestion_received
+          - optimization.suggestion_approved
+          - optimization.suggestion_rejected
+          - optimization.suggestion_applied
+          - optimization.suggestion_failed
+          - system.warning
+          - system.error
+          - learning_cycle.completed
+          - learning_cycle.failed
+          - hypothesis.status_changed
+          - hypothesis.review_requested
+          - hypothesis.proven
+          - hypothesis.disproven
+          - measurement.received
+          - measurement.stale
+          - opportunity.evaluated
+          - opportunity.recommended
+          - opportunity.flagged
+          - opportunity.explore
+          - storefront.composition_paused
+          - storefront.products_not_traffickable
+          - storefront_adapter_credential.action_required
+          - storefront_adapter_connection.mapping_required
+          - inventory_source.unhealthy
+          - inventory_source.recovered
+          - source.action_required
+          - source.action_resolved
+          - storefront.supply_nudge
+          - storefront.liveness_degraded
+          - storefront.liveness_recovered
+          - provider_fleet.incident_opened
+          - provider_fleet.incident_recovered
+          - media_buy.approval_requested
+          - creative.review_requested
+          - ad_server.approval_requested
+          - inventory_shortfall.review_requested
+          - storefront.media_buy_forward_failed
+          - storefront.media_buy_moderation_aging
+          - murph_room.mentioned
+          - ask.resolved
+        status:
+          description: Notification status
+          type: string
+          enum:
+          - success
+          - error
+          - warning
+          - info
+        read:
+          description: Whether the buyer has marked this read
+          type: boolean
+        acknowledged:
+          description: Whether the notification has been acknowledged
+          type: boolean
+        messagePreview:
+          description: Truncated notification message (max 200 chars). Null when the notification has no message string. Replaces the full passthrough `data` payload on summary rows.
+          type:
+          - string
+          - 'null'
+        actionUrl:
+          description: App-relative URL to open when the notification is selected. Null when the notification has no safe action URL.
+          type:
+          - string
+          - 'null'
+        createdAt:
+          description: When the notification was created (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - type
+      - status
+      - read
+      - acknowledged
+      - messagePreview
+      - actionUrl
+      - createdAt
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    NotificationListResponse:
+      description: Paginated list of notification summaries
+      type: object
+      properties:
+        notifications:
+          description: Notifications projected to the summary shape. Use the notification detail endpoint for the full `data` payload.
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationSummary'
+        totalCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        unreadCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        hasMore:
+          type: boolean
+      required:
+      - notifications
+      - totalCount
+      - unreadCount
+      - hasMore
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    StorefrontNotificationSummary:
+      description: Compact notification view returned by the storefront list endpoint. Identical to NotificationSummary, minus buyer-only event types that can never appear in a seller notification list.
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the notification
+          type: string
+        type:
+          description: Notification event type
+          type: string
+          enum:
+          - brand_agent.created
+          - brand_agent.updated
+          - brand_agent.deleted
+          - campaign.healthy
+          - campaign.unhealthy
+          - campaign.created
+          - campaign.updated
+          - campaign.deleted
+          - campaign.completed
+          - creative.approved
+          - creative.rejected
+          - creative.changes_requested
+          - creative.sync_started
+          - creative.sync_completed
+          - creative.sync_failed
+          - creative.created
+          - creative.updated
+          - creative.deleted
+          - strategy.created
+          - strategy.updated
+          - strategy.deleted
+          - media_buy.created
+          - media_buy.updated
+          - media_buy.deleted
+          - media_buy_update_proposal.approved
+          - media_buy_update_proposal.rejected
+          - media_buy_update_proposal.expired
+          - salesagent.available
+          - salesagent.unavailable
+          - salesagent.registered
+          - salesagent.unregistered
+          - salesagent.updated
+          - salesagent.sync_action_required
+          - signalsagent.registered
+          - signalsagent.unregistered
+          - signalsagent.updated
+          - signalsagent.signal_activated
+          - signalsagent.signals_fetched
+          - outcomesagent.registered
+          - outcomesagent.unregistered
+          - outcomesagent.updated
+          - syndication.completed
+          - syndication.failed
+          - audience.synced
+          - audience.sync_failed
+          - optimization.suggestion_received
+          - optimization.suggestion_approved
+          - optimization.suggestion_rejected
+          - optimization.suggestion_applied
+          - optimization.suggestion_failed
+          - system.warning
+          - system.error
+          - learning_cycle.completed
+          - learning_cycle.failed
+          - hypothesis.status_changed
+          - hypothesis.review_requested
+          - hypothesis.proven
+          - hypothesis.disproven
+          - measurement.received
+          - measurement.stale
+          - opportunity.evaluated
+          - opportunity.recommended
+          - opportunity.flagged
+          - opportunity.explore
+          - storefront.composition_paused
+          - storefront.products_not_traffickable
+          - storefront_adapter_credential.action_required
+          - storefront_adapter_connection.mapping_required
+          - inventory_source.unhealthy
+          - inventory_source.recovered
+          - source.action_required
+          - source.action_resolved
+          - storefront.supply_nudge
+          - storefront.liveness_degraded
+          - storefront.liveness_recovered
+          - provider_fleet.incident_opened
+          - provider_fleet.incident_recovered
+          - media_buy.approval_requested
+          - creative.review_requested
+          - ad_server.approval_requested
+          - inventory_shortfall.review_requested
+          - storefront.media_buy_forward_failed
+          - storefront.media_buy_moderation_aging
+          - murph_room.mentioned
+          - ask.resolved
+        status:
+          description: Notification status
+          type: string
+          enum:
+          - success
+          - error
+          - warning
+          - info
+        read:
+          description: Whether the buyer has marked this read
+          type: boolean
+        acknowledged:
+          description: Whether the notification has been acknowledged
+          type: boolean
+        messagePreview:
+          description: Truncated notification message (max 200 chars). Null when the notification has no message string. Replaces the full passthrough `data` payload on summary rows.
+          type:
+          - string
+          - 'null'
+        actionUrl:
+          description: App-relative URL to open when the notification is selected. Null when the notification has no safe action URL.
+          type:
+          - string
+          - 'null'
+        createdAt:
+          description: When the notification was created (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - type
+      - status
+      - read
+      - acknowledged
+      - messagePreview
+      - actionUrl
+      - createdAt
+      additionalProperties: false
+    StorefrontNotificationListResponse:
+      description: Paginated list of notification summaries (storefront spec)
+      type: object
+      properties:
+        notifications:
+          description: Notifications projected to the summary shape. Use the notification detail endpoint for the full `data` payload.
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontNotificationSummary'
+        totalCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        unreadCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        hasMore:
+          type: boolean
+      required:
+      - notifications
+      - totalCount
+      - unreadCount
+      - hasMore
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

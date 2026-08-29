@@ -1,0 +1,181 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Brands API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Brands
+paths:
+  /brands/resolve:
+    post:
+      operationId: resolveBuyerBrand
+      summary: Resolve a brand profile
+      description: 'Resolve a buyer domain to a brand-confirmation card ("here is how we see you"). Resolve-only — no persistence; the buyer confirms the card and the advertiser-create flow persists it. Always returns 200: resolved=true with the brand name, logo, and ADCP manifest when found; resolved=false with a builderUrl when no profile exists. A resolved card may carry a warning when the profile was built from the website and is unverified — review before saving.'
+      tags:
+      - Brands
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveBrandBody'
+      responses:
+        '200':
+          description: Resolve a brand profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveBrandResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ResolveBrandResponse:
+      type: object
+      properties:
+        resolved:
+          description: Whether a brand profile was found
+          type: boolean
+        domain:
+          type: string
+        brandName:
+          type: string
+        logoUrl:
+          type:
+          - string
+          - 'null'
+        logoBackground:
+          description: Hint for the logo background (e.g. light/dark), when known
+          type:
+          - string
+          - 'null'
+        manifestUrl:
+          type: string
+        manifest:
+          type: object
+          additionalProperties: {}
+        registryEntry:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        authorizedOperators:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        houseBrand:
+          type: boolean
+        warning:
+          type: string
+        error:
+          type: string
+        builderUrl:
+          description: Set when resolved is false -- URL where the caller can register a manifest
+          type: string
+      required:
+      - resolved
+      - domain
+      additionalProperties: false
+    ResolveBrandBody:
+      type: object
+      properties:
+        domain:
+          description: Brand domain to resolve (e.g., "nike.com")
+          type: string
+          minLength: 1
+      required:
+      - domain
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

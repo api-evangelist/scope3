@@ -1,14 +1,14 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  version: 1.0.0
-  title: AI Impact Measurement Data API
+  title: calculator Scope3 Carbon Calculator Data API
+  description: API to calculate the carbon footprint of a campaign
+  version: 2.0.0
+servers:
+- url: https://api.scope3.com/v2
 security:
 - bearerAuth: []
 tags:
 - name: Data
-servers:
-- url: https://api.scope3.com/v2
-  description: Carbon Calculator (Measurement) API server
 paths:
   /data/upload:
     post:
@@ -51,12 +51,14 @@ paths:
                   - CUSTOM
                   description: The field mapping type
                 version:
-                  type: string
-                  nullable: true
+                  type:
+                  - string
+                  - 'null'
                   description: The custom mapping version
                 dataSource:
-                  type: string
-                  nullable: true
+                  type:
+                  - string
+                  - 'null'
                   description: The custom mapping data source
       responses:
         '200':
@@ -145,4 +147,3 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT

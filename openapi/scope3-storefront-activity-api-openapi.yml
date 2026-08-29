@@ -1,0 +1,346 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront Storefront Activity API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Storefront Activity
+  description: Audit log of configuration and inventory changes on the storefront
+paths:
+  /audit-logs:
+    get:
+      operationId: listStorefrontAuditLogs
+      summary: List storefront activity
+      description: List recent configuration and inventory-source changes on the storefront. Supports filters by resource type (`INVENTORY_SOURCE`, `AGENT`), inventory source ID, action, and date range.
+      tags:
+      - Storefront Activity
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: startDate
+        schema:
+          description: ISO timestamp; only include audit logs at or after this time
+          example: '2026-03-01T00:00:00Z'
+          type: string
+        description: ISO timestamp; only include audit logs at or after this time
+      - in: query
+        name: endDate
+        schema:
+          description: ISO timestamp; only include audit logs at or before this time
+          example: '2026-04-01T00:00:00Z'
+          type: string
+        description: ISO timestamp; only include audit logs at or before this time
+      - in: query
+        name: inventorySourceId
+        schema:
+          description: Filter to a single storefront inventory source by source ID
+          example: source_abc123
+          type: string
+        description: Filter to a single storefront inventory source by source ID
+      - in: query
+        name: resourceTypes
+        schema:
+          description: Filter to a subset of storefront resource types. Defaults to all storefront resource types.
+          anyOf:
+          - type: array
+            items:
+              type: string
+              enum:
+              - STOREFRONT
+              - STOREFRONT_INVENTORY_SOURCE
+          - type: string
+        description: Filter to a subset of storefront resource types. Defaults to all storefront resource types.
+      - in: query
+        name: actorOrigin
+        schema:
+          description: 'Filter to actions initiated a particular way: "agent" surfaces only changes Murph made on a user''s behalf, "human" only direct user changes.'
+          example: agent
+          type: string
+          enum:
+          - human
+          - agent
+          - autonomous
+          - system
+        description: 'Filter to actions initiated a particular way: "agent" surfaces only changes Murph made on a user''s behalf, "human" only direct user changes.'
+      - in: query
+        name: actorUserId
+        schema:
+          description: Filter to actions taken by a specific user (by user id)
+          example: 10
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        description: Filter to actions taken by a specific user (by user id)
+      - in: query
+        name: actorUserEmail
+        schema:
+          description: Filter to actions taken by a specific user (by email)
+          example: jane@acme.com
+          type: string
+        description: Filter to actions taken by a specific user (by email)
+      - in: query
+        name: resourceId
+        schema:
+          description: Filter to a single resource by its external id (e.g. an advertiser, creative, or media buy id)
+          example: creative_abc123
+          type: string
+        description: Filter to a single resource by its external id (e.g. an advertiser, creative, or media buy id)
+      - in: query
+        name: actions
+        schema:
+          description: Narrow to a subset of meaningful actions (e.g. only DELETE/ARCHIVE). Defaults to all meaningful actions.
+          anyOf:
+          - type: array
+            items:
+              type: string
+              enum:
+              - CREATE
+              - UPDATE
+              - DELETE
+              - ARCHIVE
+              - EXECUTE
+              - ACTIVATE
+              - DEACTIVATE
+          - type: string
+        description: Narrow to a subset of meaningful actions (e.g. only DELETE/ARCHIVE). Defaults to all meaningful actions.
+      - in: query
+        name: outcome
+        schema:
+          description: Filter by whether the action took effect. Omit to see only changes that succeeded (the default feed). Pass "denied" to see blocked attempts or "failed" for errored ones — these attempt views are not limited to the default resource types.
+          example: denied
+          type: string
+          enum:
+          - succeeded
+          - denied
+          - failed
+        description: Filter by whether the action took effect. Omit to see only changes that succeeded (the default feed). Pass "denied" to see blocked attempts or "failed" for errored ones — these attempt views are not limited to the default resource types.
+      - in: query
+        name: take
+        schema:
+          description: Number of results to return (max 500)
+          example: 50
+          default: 50
+          type: integer
+          maximum: 500
+          minimum: 1
+        description: Number of results to return (max 500)
+      - in: query
+        name: skip
+        schema:
+          description: Number of results to skip for pagination
+          example: 0
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Number of results to skip for pagination
+      responses:
+        '200':
+          description: List storefront activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListStorefrontActivityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListStorefrontActivityResponse:
+      description: Paginated list of storefront activity audit logs
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontAuditLog'
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - logs
+      - total
+      additionalProperties: false
+    StorefrontAuditLog:
+      description: Audit log row surfaced to the storefront activity feed
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        timestamp:
+          type: string
+        createdAt:
+          type: string
+        action:
+          type: string
+        resourceType:
+          type: string
+        resourceId:
+          type:
+          - string
+          - 'null'
+        resourceName:
+          type:
+          - string
+          - 'null'
+        userId:
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        userEmail:
+          type:
+          - string
+          - 'null'
+        userName:
+          type:
+          - string
+          - 'null'
+        serviceTokenId:
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        serviceTokenName:
+          type:
+          - string
+          - 'null'
+        actorOrigin:
+          description: 'How the action was initiated: "human" (direct), "agent" (the Murph agent on a human''s behalf), "autonomous" (no human in the loop), or "system" (platform/service-token). Null for legacy rows recorded before origin tracking.'
+          example: human
+          type:
+          - string
+          - 'null'
+        outcome:
+          description: 'Whether the action took effect: "succeeded", "denied" (blocked by a permission/ToS gate), or "failed" (errored mid-execution). Null for legacy rows recorded before outcome tracking.'
+          example: succeeded
+          type:
+          - string
+          - 'null'
+        parameters:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        changes:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        description:
+          type: string
+      required:
+      - id
+      - timestamp
+      - createdAt
+      - action
+      - resourceType
+      - resourceId
+      - resourceName
+      - userId
+      - userEmail
+      - userName
+      - serviceTokenId
+      - serviceTokenName
+      - actorOrigin
+      - outcome
+      - parameters
+      - changes
+      - description
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

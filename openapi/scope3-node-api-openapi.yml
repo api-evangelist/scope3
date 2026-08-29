@@ -1,14 +1,11 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
   version: 1.0.0
-  title: AI Impact Measurement Node API
+  title: AI impact measurement Node API
 security:
 - bearerAuth: []
 tags:
 - name: Node
-servers:
-- url: https://aiapi.scope3.com
-  description: AI Impact Measurement API server
 paths:
   /node:
     get:
@@ -248,6 +245,83 @@ paths:
       - Node
 components:
   schemas:
+    NodeUpdateRequest:
+      type: object
+      description: 'Update an existing node.
+
+        - Id can not be updated
+
+        Note on permissions:
+
+        - cloud_instance_id and managed_service_id can only be set by admins or users who own those resources
+
+        - Custom nodes are visible only to their owners
+
+        - Global nodes are visible to all users
+
+        - Admins can see and manage all nodes
+
+        '
+      properties:
+        cloud_id:
+          type: string
+          example: aws
+        cloud_instance_id:
+          type: string
+          example: a2-highgpu-1g
+        managed_service_id:
+          type: string
+          example: aws-bedrock
+        gpu_id:
+          type: string
+          example: a100_40gb
+        gpu_count:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          example: 8
+          x-go-type: int64
+        cpu_count:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          example: 2
+          x-go-type: int64
+        idle_power_w_ex_gpu:
+          type: number
+          example: 100
+          minimum: 0
+          maximum: 10000
+          format: float
+          x-go-type: float64
+        average_utilization_rate:
+          type: number
+          example: 0.8
+          format: float
+          x-go-type: float64
+          minimum: 0
+          maximum: 1
+        embodied_emissions_kgco2e_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        embodied_water_l_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        use_life_years:
+          type: number
+          example: 5
+          minimum: 1
+          maximum: 30
+          format: float
+          x-go-type: float64
     NodeCreateRequest:
       type: object
       required:
@@ -334,95 +408,6 @@ components:
           maximum: 30
           format: float
           x-go-type: float64
-    NodeResponse:
-      title: Node Response
-      type: object
-      additionalProperties: false
-      required:
-      - nodes
-      properties:
-        nodes:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/Node'
-    NodeUpdateRequest:
-      type: object
-      description: 'Update an existing node.
-
-        - Id can not be updated
-
-        Note on permissions:
-
-        - cloud_instance_id and managed_service_id can only be set by admins or users who own those resources
-
-        - Custom nodes are visible only to their owners
-
-        - Global nodes are visible to all users
-
-        - Admins can see and manage all nodes
-
-        '
-      properties:
-        cloud_id:
-          type: string
-          example: aws
-        cloud_instance_id:
-          type: string
-          example: a2-highgpu-1g
-        managed_service_id:
-          type: string
-          example: aws-bedrock
-        gpu_id:
-          type: string
-          example: a100_40gb
-        gpu_count:
-          type: integer
-          minimum: 0
-          maximum: 10000
-          example: 8
-          x-go-type: int64
-        cpu_count:
-          type: integer
-          minimum: 1
-          maximum: 10000
-          example: 2
-          x-go-type: int64
-        idle_power_w_ex_gpu:
-          type: number
-          example: 100
-          minimum: 0
-          maximum: 10000
-          format: float
-          x-go-type: float64
-        average_utilization_rate:
-          type: number
-          example: 0.8
-          format: float
-          x-go-type: float64
-          minimum: 0
-          maximum: 1
-        embodied_emissions_kgco2e_ex_gpu:
-          type: number
-          example: 2500
-          minimum: 0
-          maximum: 100000
-          format: float
-          x-go-type: float64
-        embodied_water_l_ex_gpu:
-          type: number
-          example: 2500
-          minimum: 0
-          maximum: 100000
-          format: float
-          x-go-type: float64
-        use_life_years:
-          type: number
-          example: 5
-          minimum: 1
-          maximum: 30
-          format: float
-          x-go-type: float64
     Node:
       allOf:
       - $ref: '#/components/schemas/NodeCreateRequest'
@@ -444,6 +429,18 @@ components:
           created_by:
             type: string
             description: ID of the user who created the node (admin or owner only)
+    NodeResponse:
+      title: Node Response
+      type: object
+      additionalProperties: false
+      required:
+      - nodes
+      properties:
+        nodes:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Node'
     Error:
       type: object
       additionalProperties: false

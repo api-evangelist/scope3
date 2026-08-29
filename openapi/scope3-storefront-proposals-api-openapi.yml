@@ -1,0 +1,2015 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront Storefront Proposals API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Storefront Proposals
+paths:
+  /proposals:
+    post:
+      operationId: createStorefrontProposal
+      summary: Create storefront proposal
+      description: Save a discover-products response for a buyer (operator) and mint a shareable proposal_code. Buyers redeem the code on discover_products in a follow-up release.
+      tags:
+      - Storefront Proposals
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStorefrontProposalBody'
+      responses:
+        '201':
+          description: Create storefront proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontProposal'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      operationId: listStorefrontProposals
+      summary: List storefront proposals
+      description: List storefront proposals for the seller, filterable by status and operator.
+      tags:
+      - Storefront Proposals
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: status
+        schema:
+          description: Filter by status
+          type: string
+          enum:
+          - active
+          - redeemed
+          - expired
+          - revoked
+        description: Filter by status
+      - in: query
+        name: operatorId
+        schema:
+          description: Filter by buyer operator
+          type: string
+          minLength: 1
+          maxLength: 255
+        description: Filter by buyer operator
+      - in: query
+        name: limit
+        schema:
+          description: Page size (default 20, max 100)
+          default: 20
+          type: integer
+          maximum: 100
+          minimum: 1
+        description: Page size (default 20, max 100)
+      - in: query
+        name: offset
+        schema:
+          description: Number of rows to skip
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Number of rows to skip
+      responses:
+        '200':
+          description: List storefront proposals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorefrontProposalSummary'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /proposals/{id}:
+    get:
+      operationId: getStorefrontProposal
+      summary: Get storefront proposal
+      description: Get a single storefront proposal, including the saved discovery response.
+      tags:
+      - Storefront Proposals
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          description: Proposal row id
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Proposal row id
+      responses:
+        '200':
+          description: Get storefront proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontProposal'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: updateStorefrontProposal
+      summary: Update storefront proposal
+      description: Update label, notes, or expiry of a storefront proposal.
+      tags:
+      - Storefront Proposals
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          description: Proposal row id
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Proposal row id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStorefrontProposalBody'
+      responses:
+        '200':
+          description: Update storefront proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontProposal'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /proposals/{id}/revoke:
+    post:
+      operationId: revokeStorefrontProposal
+      summary: Revoke storefront proposal
+      description: Revoke a storefront proposal so the buyer can no longer redeem the code. Allowed only when status is 'active' or 'expired'.
+      tags:
+      - Storefront Proposals
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          description: Proposal row id
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Proposal row id
+      responses:
+        '200':
+          description: Revoke storefront proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontProposal'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    StorefrontProposal:
+      description: A persisted storefront proposal
+      type: object
+      properties:
+        id:
+          description: Proposal row id
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        proposalCode:
+          description: Short shareable handle. Sellers give this to buyers; buyers pass it to discover_products.
+          example: PRP-XK4A29
+          type: string
+        operatorId:
+          description: Encoded buyer identity retained for backwards compatibility. Use operatorRef for the structured form.
+          type: string
+        operatorRef:
+          description: Structured buyer identity for redemption auth.
+          allOf:
+          - $ref: '#/components/schemas/StorefrontProposalOperatorReferenceOutput'
+        label:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        status:
+          description: 'Proposal lifecycle status. ''active'': available to redeem. ''redeemed'': buyer has applied it to a media buy. ''expired'': past TTL. ''revoked'': seller withdrew.'
+          type: string
+          enum:
+          - active
+          - redeemed
+          - expired
+          - revoked
+        expiresAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        proposalId:
+          description: The protocol-level proposalId from the saved discovery snapshot
+          type: string
+        discoverySessionId:
+          description: Discovery session id this proposal was captured from (for traceability)
+          type: string
+        snapshot:
+          description: The frozen products + proposals returned to the buyer on redemption
+          allOf:
+          - $ref: '#/components/schemas/ProposalSnapshot'
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          type: string
+        firstViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedInMediaBuyId:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - proposalCode
+      - operatorId
+      - operatorRef
+      - label
+      - notes
+      - status
+      - expiresAt
+      - proposalId
+      - discoverySessionId
+      - snapshot
+      - createdAt
+      - createdBy
+      - firstViewedAt
+      - lastViewedAt
+      - redeemedAt
+      - redeemedInMediaBuyId
+      additionalProperties: false
+    UpdateStorefrontProposalBody:
+      description: Request body for editing a storefront proposal
+      type: object
+      properties:
+        label:
+          description: Updated label
+          type: string
+          minLength: 1
+          maxLength: 255
+        notes:
+          description: Updated notes
+          type: string
+          maxLength: 4000
+        expiresAt:
+          description: Updated expiry (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+    ProductFormatOptionParams:
+      description: Canonical format params. For hosted video, carries accepted containers/codecs.
+      type: object
+      properties:
+        containers:
+          description: Accepted delivery containers for hosted video. A buyer should only send a creative whose container is listed here.
+          example:
+          - mp4
+          type: array
+          items:
+            type: string
+            enum:
+            - mp4
+            - webm
+            - mov
+        video_codecs:
+          description: Accepted video codecs for hosted video.
+          example:
+          - h264
+          type: array
+          items:
+            type: string
+            enum:
+            - h264
+            - h265
+            - vp8
+            - vp9
+            - av1
+            - prores
+        audio_codecs:
+          description: Accepted audio codecs for hosted video.
+          example:
+          - aac
+          type: array
+          items:
+            type: string
+            enum:
+            - aac
+            - mp3
+            - opus
+            - pcm
+      additionalProperties: {}
+    Proposal:
+      description: A recommended media plan with budget allocations across products (ADCP v3)
+      type: object
+      properties:
+        proposalId:
+          description: Unique identifier — used to refine or execute the proposal
+          type: string
+        name:
+          description: Human-readable name for this media plan proposal
+          type: string
+        description:
+          description: Strategic explanation of what the proposal achieves
+          type: string
+        briefAlignment:
+          description: Explanation of how this proposal aligns with the brief
+          type: string
+        salesAgentId:
+          description: Sales agent that generated this proposal
+          type: string
+        salesAgentName:
+          description: Human-readable sales agent name
+          type: string
+        storefrontId:
+          description: Storefront the proposal was surfaced through. The storefront is the buyer-facing seller identity; the underlying sales agent is internal routing detail.
+          type: string
+        storefrontName:
+          description: Human-readable storefront name. Use this as the seller label on proposal cards.
+          type: string
+        supportedRoutingTypes:
+          deprecated: true
+          description: Deprecated v2 compatibility field. It is not a storefront type or proposal capability and must not affect eligibility or execution.
+          type: array
+          items:
+            type: string
+            enum:
+            - DECISIONED
+            - ROUTED
+        allocations:
+          description: Budget distribution across products — percentages sum to 100
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductAllocation'
+        expiresAt:
+          description: When the proposal expires (ISO 8601)
+          type: string
+        totalBudgetGuidance:
+          description: Budget guidance for this proposal
+          type: object
+          properties:
+            min:
+              type: number
+            recommended:
+              type: number
+            max:
+              type: number
+            currency:
+              type: string
+          additionalProperties: false
+      required:
+      - proposalId
+      - name
+      - allocations
+      additionalProperties: false
+    StorefrontProposalSummary:
+      description: Compact proposal summary for list views
+      type: object
+      properties:
+        id:
+          description: Proposal row id
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        proposalCode:
+          description: Short shareable handle. Sellers give this to buyers; buyers pass it to discover_products.
+          example: PRP-XK4A29
+          type: string
+        operatorId:
+          description: Encoded buyer identity retained for backwards compatibility. Use operatorRef for the structured form.
+          type: string
+        operatorRef:
+          description: Structured buyer identity for redemption auth.
+          allOf:
+          - $ref: '#/components/schemas/StorefrontProposalOperatorReferenceOutput'
+        label:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        status:
+          description: 'Proposal lifecycle status. ''active'': available to redeem. ''redeemed'': buyer has applied it to a media buy. ''expired'': past TTL. ''revoked'': seller withdrew.'
+          type: string
+          enum:
+          - active
+          - redeemed
+          - expired
+          - revoked
+        expiresAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        proposalId:
+          description: The protocol-level proposalId from the saved discovery snapshot
+          type: string
+        discoverySessionId:
+          description: Discovery session id this proposal was captured from (for traceability)
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          type: string
+        firstViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedInMediaBuyId:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - proposalCode
+      - operatorId
+      - operatorRef
+      - label
+      - notes
+      - status
+      - expiresAt
+      - proposalId
+      - discoverySessionId
+      - createdAt
+      - createdBy
+      - firstViewedAt
+      - lastViewedAt
+      - redeemedAt
+      - redeemedInMediaBuyId
+      additionalProperties: false
+    ProductCardDetailedData:
+      description: Detailed inline product card data for buyer UIs
+      type: object
+      properties:
+        hero_image:
+          type: object
+          properties:
+            asset_type:
+              type: string
+              enum:
+              - image
+            url:
+              type: string
+            width:
+              type: number
+              minimum: 1
+            height:
+              type: number
+              minimum: 1
+            format:
+              type: string
+            alt_text:
+              type: string
+            provenance:
+              type: object
+              properties:
+                digital_source_type:
+                  anyOf:
+                  - type: string
+                    enum:
+                    - digital_capture
+                  - type: string
+                    enum:
+                    - digital_creation
+                  - type: string
+                    enum:
+                    - trained_algorithmic_media
+                  - type: string
+                    enum:
+                    - composite_with_trained_algorithmic_media
+                  - type: string
+                    enum:
+                    - algorithmic_media
+                  - type: string
+                    enum:
+                    - composite_capture
+                  - type: string
+                    enum:
+                    - composite_synthetic
+                  - type: string
+                    enum:
+                    - human_edits
+                  - type: string
+                    enum:
+                    - data_driven_media
+                ai_tool:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    version:
+                      type: string
+                    provider:
+                      type: string
+                  required:
+                  - name
+                  additionalProperties: {}
+                human_oversight:
+                  anyOf:
+                  - type: string
+                    enum:
+                    - none
+                  - type: string
+                    enum:
+                    - prompt_only
+                  - type: string
+                    enum:
+                    - selected
+                  - type: string
+                    enum:
+                    - edited
+                  - type: string
+                    enum:
+                    - directed
+                declared_by:
+                  type: object
+                  properties:
+                    agent_url:
+                      type: string
+                    role:
+                      anyOf:
+                      - type: string
+                        enum:
+                        - creator
+                      - type: string
+                        enum:
+                        - advertiser
+                      - type: string
+                        enum:
+                        - agency
+                      - type: string
+                        enum:
+                        - platform
+                      - type: string
+                        enum:
+                        - tool
+                  required:
+                  - role
+                  additionalProperties: {}
+                declared_at:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                created_time:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                c2pa:
+                  type: object
+                  properties:
+                    manifest_url:
+                      type: string
+                  required:
+                  - manifest_url
+                  additionalProperties: {}
+                embedded_provenance:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      method:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - manifest_wrapper
+                        - type: string
+                          enum:
+                          - provenance_markers
+                      standard:
+                        type: string
+                      provider:
+                        type: string
+                      verify_agent:
+                        type: object
+                        properties:
+                          agent_url:
+                            type: string
+                            pattern: ^https:\/\/
+                          feature_id:
+                            type: string
+                        required:
+                        - agent_url
+                        additionalProperties: {}
+                      embedded_at:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    required:
+                    - method
+                    - provider
+                    additionalProperties: {}
+                watermarks:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      media_type:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - audio
+                        - type: string
+                          enum:
+                          - image
+                        - type: string
+                          enum:
+                          - video
+                        - type: string
+                          enum:
+                          - text
+                      provider:
+                        type: string
+                      verify_agent:
+                        type: object
+                        properties:
+                          agent_url:
+                            type: string
+                            pattern: ^https:\/\/
+                          feature_id:
+                            type: string
+                        required:
+                        - agent_url
+                        additionalProperties: {}
+                      c2pa_action:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - c2pa.watermarked.bound
+                        - type: string
+                          enum:
+                          - c2pa.watermarked.unbound
+                      embedded_at:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    required:
+                    - media_type
+                    - provider
+                    additionalProperties: {}
+                disclosure:
+                  type: object
+                  properties:
+                    required:
+                      type: boolean
+                    jurisdictions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          country:
+                            type: string
+                          region:
+                            type: string
+                          regulation:
+                            type: string
+                          label_text:
+                            type: string
+                          render_guidance:
+                            type: object
+                            properties:
+                              persistence:
+                                anyOf:
+                                - type: string
+                                  enum:
+                                  - continuous
+                                - type: string
+                                  enum:
+                                  - initial
+                                - type: string
+                                  enum:
+                                  - flexible
+                              min_duration_ms:
+                                type: number
+                                minimum: 1
+                              positions:
+                                type: array
+                                items:
+                                  anyOf:
+                                  - type: string
+                                    enum:
+                                    - prominent
+                                  - type: string
+                                    enum:
+                                    - footer
+                                  - type: string
+                                    enum:
+                                    - audio
+                                  - type: string
+                                    enum:
+                                    - subtitle
+                                  - type: string
+                                    enum:
+                                    - overlay
+                                  - type: string
+                                    enum:
+                                    - end_card
+                                  - type: string
+                                    enum:
+                                    - pre_roll
+                                  - type: string
+                                    enum:
+                                    - companion
+                              ext:
+                                type: object
+                                properties: {}
+                                additionalProperties: {}
+                            additionalProperties: {}
+                        required:
+                        - country
+                        - regulation
+                        additionalProperties: {}
+                  required:
+                  - required
+                  additionalProperties: {}
+                verification:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      verified_by:
+                        type: string
+                      verified_time:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      result:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - authentic
+                        - type: string
+                          enum:
+                          - ai_generated
+                        - type: string
+                          enum:
+                          - ai_modified
+                        - type: string
+                          enum:
+                          - inconclusive
+                      confidence:
+                        type: number
+                        minimum: 0
+                        maximum: 1
+                      details_url:
+                        type: string
+                    required:
+                    - verified_by
+                    - result
+                    additionalProperties: {}
+                ext:
+                  type: object
+                  properties: {}
+                  additionalProperties: {}
+              additionalProperties: {}
+          required:
+          - asset_type
+          - url
+          - width
+          - height
+          additionalProperties: {}
+        carousel_images:
+          type: array
+          items:
+            type: object
+            properties:
+              asset_type:
+                type: string
+                enum:
+                - image
+              url:
+                type: string
+              width:
+                type: number
+                minimum: 1
+              height:
+                type: number
+                minimum: 1
+              format:
+                type: string
+              alt_text:
+                type: string
+              provenance:
+                type: object
+                properties:
+                  digital_source_type:
+                    anyOf:
+                    - type: string
+                      enum:
+                      - digital_capture
+                    - type: string
+                      enum:
+                      - digital_creation
+                    - type: string
+                      enum:
+                      - trained_algorithmic_media
+                    - type: string
+                      enum:
+                      - composite_with_trained_algorithmic_media
+                    - type: string
+                      enum:
+                      - algorithmic_media
+                    - type: string
+                      enum:
+                      - composite_capture
+                    - type: string
+                      enum:
+                      - composite_synthetic
+                    - type: string
+                      enum:
+                      - human_edits
+                    - type: string
+                      enum:
+                      - data_driven_media
+                  ai_tool:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      version:
+                        type: string
+                      provider:
+                        type: string
+                    required:
+                    - name
+                    additionalProperties: {}
+                  human_oversight:
+                    anyOf:
+                    - type: string
+                      enum:
+                      - none
+                    - type: string
+                      enum:
+                      - prompt_only
+                    - type: string
+                      enum:
+                      - selected
+                    - type: string
+                      enum:
+                      - edited
+                    - type: string
+                      enum:
+                      - directed
+                  declared_by:
+                    type: object
+                    properties:
+                      agent_url:
+                        type: string
+                      role:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - creator
+                        - type: string
+                          enum:
+                          - advertiser
+                        - type: string
+                          enum:
+                          - agency
+                        - type: string
+                          enum:
+                          - platform
+                        - type: string
+                          enum:
+                          - tool
+                    required:
+                    - role
+                    additionalProperties: {}
+                  declared_at:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                  created_time:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                  c2pa:
+                    type: object
+                    properties:
+                      manifest_url:
+                        type: string
+                    required:
+                    - manifest_url
+                    additionalProperties: {}
+                  embedded_provenance:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        method:
+                          anyOf:
+                          - type: string
+                            enum:
+                            - manifest_wrapper
+                          - type: string
+                            enum:
+                            - provenance_markers
+                        standard:
+                          type: string
+                        provider:
+                          type: string
+                        verify_agent:
+                          type: object
+                          properties:
+                            agent_url:
+                              type: string
+                              pattern: ^https:\/\/
+                            feature_id:
+                              type: string
+                          required:
+                          - agent_url
+                          additionalProperties: {}
+                        embedded_at:
+                          type: string
+                          format: date-time
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      required:
+                      - method
+                      - provider
+                      additionalProperties: {}
+                  watermarks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        media_type:
+                          anyOf:
+                          - type: string
+                            enum:
+                            - audio
+                          - type: string
+                            enum:
+                            - image
+                          - type: string
+                            enum:
+                            - video
+                          - type: string
+                            enum:
+                            - text
+                        provider:
+                          type: string
+                        verify_agent:
+                          type: object
+                          properties:
+                            agent_url:
+                              type: string
+                              pattern: ^https:\/\/
+                            feature_id:
+                              type: string
+                          required:
+                          - agent_url
+                          additionalProperties: {}
+                        c2pa_action:
+                          anyOf:
+                          - type: string
+                            enum:
+                            - c2pa.watermarked.bound
+                          - type: string
+                            enum:
+                            - c2pa.watermarked.unbound
+                        embedded_at:
+                          type: string
+                          format: date-time
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      required:
+                      - media_type
+                      - provider
+                      additionalProperties: {}
+                  disclosure:
+                    type: object
+                    properties:
+                      required:
+                        type: boolean
+                      jurisdictions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            country:
+                              type: string
+                            region:
+                              type: string
+                            regulation:
+                              type: string
+                            label_text:
+                              type: string
+                            render_guidance:
+                              type: object
+                              properties:
+                                persistence:
+                                  anyOf:
+                                  - type: string
+                                    enum:
+                                    - continuous
+                                  - type: string
+                                    enum:
+                                    - initial
+                                  - type: string
+                                    enum:
+                                    - flexible
+                                min_duration_ms:
+                                  type: number
+                                  minimum: 1
+                                positions:
+                                  type: array
+                                  items:
+                                    anyOf:
+                                    - type: string
+                                      enum:
+                                      - prominent
+                                    - type: string
+                                      enum:
+                                      - footer
+                                    - type: string
+                                      enum:
+                                      - audio
+                                    - type: string
+                                      enum:
+                                      - subtitle
+                                    - type: string
+                                      enum:
+                                      - overlay
+                                    - type: string
+                                      enum:
+                                      - end_card
+                                    - type: string
+                                      enum:
+                                      - pre_roll
+                                    - type: string
+                                      enum:
+                                      - companion
+                                ext:
+                                  type: object
+                                  properties: {}
+                                  additionalProperties: {}
+                              additionalProperties: {}
+                          required:
+                          - country
+                          - regulation
+                          additionalProperties: {}
+                    required:
+                    - required
+                    additionalProperties: {}
+                  verification:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        verified_by:
+                          type: string
+                        verified_time:
+                          type: string
+                          format: date-time
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                        result:
+                          anyOf:
+                          - type: string
+                            enum:
+                            - authentic
+                          - type: string
+                            enum:
+                            - ai_generated
+                          - type: string
+                            enum:
+                            - ai_modified
+                          - type: string
+                            enum:
+                            - inconclusive
+                        confidence:
+                          type: number
+                          minimum: 0
+                          maximum: 1
+                        details_url:
+                          type: string
+                      required:
+                      - verified_by
+                      - result
+                      additionalProperties: {}
+                  ext:
+                    type: object
+                    properties: {}
+                    additionalProperties: {}
+                additionalProperties: {}
+            required:
+            - asset_type
+            - url
+            - width
+            - height
+            additionalProperties: {}
+        title:
+          type: string
+        description:
+          type: string
+        specifications:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              value:
+                type: string
+            required:
+            - label
+            - value
+            additionalProperties: false
+        price_label:
+          type: string
+        cta_label:
+          type: string
+      additionalProperties: false
+    PricingOptionData:
+      description: Pricing option from a sales agent
+      type: object
+      properties:
+        pricingOptionId:
+          type: string
+        pricingModel:
+          type: string
+        isFixed:
+          type: boolean
+        rate:
+          type: number
+        floorPrice:
+          type: number
+        fixedPrice:
+          type: number
+        currency:
+          type: string
+        priceGuidance:
+          description: Cached auction guidance percentiles from the Sales Agent. These are estimates, not floors.
+          type: object
+          properties:
+            floor:
+              type:
+              - number
+              - 'null'
+            p25:
+              type:
+              - number
+              - 'null'
+            p50:
+              type:
+              - number
+              - 'null'
+            p75:
+              type:
+              - number
+              - 'null'
+            p90:
+              type:
+              - number
+              - 'null'
+          additionalProperties: false
+      additionalProperties: false
+    ProductAllocation:
+      description: Budget allocation for a product within a proposal
+      type: object
+      properties:
+        productId:
+          description: Product ID — references a product in the sibling products array
+          type: string
+        allocationPercentage:
+          description: Percentage of total budget allocated to this product
+          type: number
+          minimum: 0
+          maximum: 100
+        pricingOptionId:
+          description: Recommended pricing option ID from the product pricing_options
+          type: string
+        rationale:
+          description: Why this product and allocation are recommended
+          type: string
+        sequence:
+          description: Ordering hint for multi-line-item plans (1-based)
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        tags:
+          description: Categorical tags (e.g., "desktop", "mobile")
+          type: array
+          items:
+            type: string
+      required:
+      - productId
+      - allocationPercentage
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    Product:
+      description: Product resource for campaign inventory
+      type: object
+      properties:
+        productId:
+          description: Unique identifier for the product
+          example: prod_123
+          type: string
+        name:
+          description: Product name
+          example: Premium CTV Inventory - Sports
+          type: string
+        channel:
+          description: First canonical AdCP media channel. Use channels for the complete set.
+          example: ctv
+          type: string
+        channels:
+          description: Canonical AdCP media channels declared by the product
+          example:
+          - streaming_audio
+          - podcast
+          type: array
+          items:
+            type: string
+        inventoryType:
+          description: Inventory classification such as premium or run_of_site; not a media channel
+          example: run_of_site
+          type: string
+        formatTypes:
+          description: Canonical AdCP format kinds derived from formatOptions (never legacy named-format IDs)
+          example:
+          - video_hosted
+          type: array
+          items:
+            type: string
+        cpm:
+          description: Cost per mille (CPM)
+          example: 12.5
+          type: number
+        currency:
+          description: ISO currency code for `cpm` (e.g. "USD", "ZAR")
+          example: USD
+          type: string
+        expiresAt:
+          description: When this product's pricing stops being valid (ISO 8601). Present only when the seller quoted an FX-converted price (a rate-of-the-day conversion into a currency the product is not natively priced in); absent for natively-priced products, which carry no expiry and cache freely. A cached product past this timestamp MUST be treated as stale — re-discover or re-quote rather than transacting on the expired price. Selecting or booking against an expired quote gets a fresh price, not the stale one.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        pricingScope:
+          description: Whether this product's pricing is the seller's public rate card ('public') or reflects a buyer-specific discount/rate ('account'). Absent is equivalent to 'public' (a pre-3.1 seller, or a source that has never applied account-specific pricing). A buyer's agent should treat 'public' items as portable across a shared/anonymous cache and 'account' items as private to this account — never re-serve an account-scoped price to another account or a public cache partition.
+          type: string
+          enum:
+          - public
+          - account
+        salesAgentId:
+          description: Sales agent ID
+          type: string
+        salesAgentName:
+          description: Sales agent name
+          type: string
+        storefrontId:
+          description: Storefront ID — the storefront this product was discovered through. A single sales agent may back sources across multiple storefronts; products are stamped per (storefront, agent) pairing so the same product can appear in multiple storefronts independently.
+          type: string
+        storefrontName:
+          description: Storefront display name
+          type: string
+        supportedRoutingTypes:
+          deprecated: true
+          description: Deprecated v2 compatibility field. It is not a storefront type or product capability and must not affect eligibility or execution.
+          type: array
+          items:
+            type: string
+            enum:
+            - DECISIONED
+            - ROUTED
+        description:
+          description: Product description
+          type: string
+        deliveryType:
+          description: Delivery type — guaranteed means fixed delivery commitment
+          example: guaranteed
+          type: string
+          enum:
+          - guaranteed
+          - non_guaranteed
+        briefRelevance:
+          description: AI-generated explanation of why this product matches the campaign brief
+          type: string
+        productCard:
+          description: Standard visual card (300x400px) for UI rendering
+          allOf:
+          - $ref: '#/components/schemas/ProductCardData'
+        productCardDetailed:
+          description: Detailed card with carousel and full specifications
+          allOf:
+          - $ref: '#/components/schemas/ProductCardDetailedData'
+        pricingOptions:
+          description: Full pricing options from the sales agent
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingOptionData'
+        estimatedExposures:
+          description: Estimated impressions for guaranteed products
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        forecast:
+          description: Structured delivery forecast with budget points and metric ranges (ADCP 3.15+)
+          type: object
+          additionalProperties: {}
+        bookability:
+          description: Sanitized Sales Agent cached pricing/availability guidance for whether the product is bookable.
+          type: string
+        publisherProperties:
+          description: Publisher properties from ADCP (domains, property types, etc.)
+          type: array
+          items:
+            type: object
+            properties:
+              publisherDomain:
+                type: string
+              propertyType:
+                type: string
+              name:
+                type: string
+              selectionType:
+                type: string
+              identifiers:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: {}
+            additionalProperties: false
+        isSandbox:
+          description: Whether this product was discovered in sandbox mode
+          type: boolean
+        formatOptions:
+          description: AdCP 3.1 format declarations for this product. Each entry carries a format_kind discriminator, optional format_option_id (stable identifier buyers use to select a specific format via format_option_refs in create_media_buy), and canonical params. For hosted-video formats (format_kind "video_hosted"), params.containers / params.video_codecs / params.audio_codecs advertise the accepted delivery containers and codecs, so a buyer can avoid sending a creative that would be rejected downstream. Present only when the sales agent publishes v2 format declarations alongside legacy format_ids.
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductFormatOption'
+      required:
+      - productId
+      - name
+      additionalProperties: false
+    ProductFormatOption:
+      description: AdCP 3.1 format declaration for a product
+      type: object
+      properties:
+        format_kind:
+          description: AdCP format kind discriminator (e.g. video_hosted, image)
+          example: video_hosted
+          type: string
+        format_option_id:
+          description: Stable identifier buyers use to select this format via format_option_refs in create_media_buy
+          type: string
+        display_name:
+          description: Human-readable name for this format option
+          type: string
+        params:
+          description: Canonical params for this format option
+          allOf:
+          - $ref: '#/components/schemas/ProductFormatOptionParams'
+      additionalProperties: {}
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    CreateStorefrontProposalBody:
+      description: Request body for creating a storefront proposal
+      type: object
+      properties:
+        operatorId:
+          description: 'Buyer identity for the proposal. Prefer { "domain": "brand.example" }. Legacy string values are accepted as domain strings, except customer:<id> which is decoded as { customerId }.'
+          example:
+            domain: acme.com
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 255
+          - $ref: '#/components/schemas/StorefrontProposalOperatorReference'
+        label:
+          description: Seller's internal label for the proposal
+          example: Acme Q3 RFP — CTV
+          type: string
+          minLength: 1
+          maxLength: 255
+        notes:
+          description: Free-form notes about the offline RFP
+          type: string
+          maxLength: 4000
+        expiresAt:
+          description: When the proposal code expires (ISO 8601). Server enforces this is no later than the underlying proposal.expiresAt.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        discoveryId:
+          description: Discovery session id from a recent discover-products call. The server reads the cached snapshot for this session and persists it as the frozen offer. The session must have been scoped to this seller and restricted to its storefront sales agents.
+          example: disc_a1b2c3
+          type: string
+          minLength: 1
+          maxLength: 255
+        proposalId:
+          description: Which proposal from the discovery snapshot to save with the proposal code.
+          example: proposal_abc123
+          type: string
+          minLength: 1
+          maxLength: 255
+      required:
+      - operatorId
+      - label
+      - expiresAt
+      - discoveryId
+      - proposalId
+    StorefrontProposalOperatorReferenceOutput:
+      description: Resolvable buyer identity for a storefront proposal. Prefer { domain } for brand-backed buyers; use { customerId } only as an unbranded fallback.
+      anyOf:
+      - type: object
+        properties:
+          domain:
+            description: Buyer brand domain. The buyer must resolve to this brand domain when redeeming the proposal code.
+            example: acme.com
+            type: string
+            minLength: 1
+            maxLength: 255
+        required:
+        - domain
+        additionalProperties: false
+      - type: object
+        properties:
+          customerId:
+            description: Buyer customer id fallback used only when the buyer does not have an advertiser brand domain.
+            example: 123
+            type: integer
+            maximum: 9007199254740991
+            minimum: 1
+        required:
+        - customerId
+        additionalProperties: false
+    ProductCardData:
+      description: Visual card data for rendering a product in UI
+      type: object
+      properties:
+        image:
+          type: object
+          properties:
+            asset_type:
+              type: string
+              enum:
+              - image
+            url:
+              type: string
+            width:
+              type: number
+              minimum: 1
+            height:
+              type: number
+              minimum: 1
+            format:
+              type: string
+            alt_text:
+              type: string
+            provenance:
+              type: object
+              properties:
+                digital_source_type:
+                  anyOf:
+                  - type: string
+                    enum:
+                    - digital_capture
+                  - type: string
+                    enum:
+                    - digital_creation
+                  - type: string
+                    enum:
+                    - trained_algorithmic_media
+                  - type: string
+                    enum:
+                    - composite_with_trained_algorithmic_media
+                  - type: string
+                    enum:
+                    - algorithmic_media
+                  - type: string
+                    enum:
+                    - composite_capture
+                  - type: string
+                    enum:
+                    - composite_synthetic
+                  - type: string
+                    enum:
+                    - human_edits
+                  - type: string
+                    enum:
+                    - data_driven_media
+                ai_tool:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    version:
+                      type: string
+                    provider:
+                      type: string
+                  required:
+                  - name
+                  additionalProperties: {}
+                human_oversight:
+                  anyOf:
+                  - type: string
+                    enum:
+                    - none
+                  - type: string
+                    enum:
+                    - prompt_only
+                  - type: string
+                    enum:
+                    - selected
+                  - type: string
+                    enum:
+                    - edited
+                  - type: string
+                    enum:
+                    - directed
+                declared_by:
+                  type: object
+                  properties:
+                    agent_url:
+                      type: string
+                    role:
+                      anyOf:
+                      - type: string
+                        enum:
+                        - creator
+                      - type: string
+                        enum:
+                        - advertiser
+                      - type: string
+                        enum:
+                        - agency
+                      - type: string
+                        enum:
+                        - platform
+                      - type: string
+                        enum:
+                        - tool
+                  required:
+                  - role
+                  additionalProperties: {}
+                declared_at:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                created_time:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                c2pa:
+                  type: object
+                  properties:
+                    manifest_url:
+                      type: string
+                  required:
+                  - manifest_url
+                  additionalProperties: {}
+                embedded_provenance:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      method:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - manifest_wrapper
+                        - type: string
+                          enum:
+                          - provenance_markers
+                      standard:
+                        type: string
+                      provider:
+                        type: string
+                      verify_agent:
+                        type: object
+                        properties:
+                          agent_url:
+                            type: string
+                            pattern: ^https:\/\/
+                          feature_id:
+                            type: string
+                        required:
+                        - agent_url
+                        additionalProperties: {}
+                      embedded_at:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    required:
+                    - method
+                    - provider
+                    additionalProperties: {}
+                watermarks:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      media_type:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - audio
+                        - type: string
+                          enum:
+                          - image
+                        - type: string
+                          enum:
+                          - video
+                        - type: string
+                          enum:
+                          - text
+                      provider:
+                        type: string
+                      verify_agent:
+                        type: object
+                        properties:
+                          agent_url:
+                            type: string
+                            pattern: ^https:\/\/
+                          feature_id:
+                            type: string
+                        required:
+                        - agent_url
+                        additionalProperties: {}
+                      c2pa_action:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - c2pa.watermarked.bound
+                        - type: string
+                          enum:
+                          - c2pa.watermarked.unbound
+                      embedded_at:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    required:
+                    - media_type
+                    - provider
+                    additionalProperties: {}
+                disclosure:
+                  type: object
+                  properties:
+                    required:
+                      type: boolean
+                    jurisdictions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          country:
+                            type: string
+                          region:
+                            type: string
+                          regulation:
+                            type: string
+                          label_text:
+                            type: string
+                          render_guidance:
+                            type: object
+                            properties:
+                              persistence:
+                                anyOf:
+                                - type: string
+                                  enum:
+                                  - continuous
+                                - type: string
+                                  enum:
+                                  - initial
+                                - type: string
+                                  enum:
+                                  - flexible
+                              min_duration_ms:
+                                type: number
+                                minimum: 1
+                              positions:
+                                type: array
+                                items:
+                                  anyOf:
+                                  - type: string
+                                    enum:
+                                    - prominent
+                                  - type: string
+                                    enum:
+                                    - footer
+                                  - type: string
+                                    enum:
+                                    - audio
+                                  - type: string
+                                    enum:
+                                    - subtitle
+                                  - type: string
+                                    enum:
+                                    - overlay
+                                  - type: string
+                                    enum:
+                                    - end_card
+                                  - type: string
+                                    enum:
+                                    - pre_roll
+                                  - type: string
+                                    enum:
+                                    - companion
+                              ext:
+                                type: object
+                                properties: {}
+                                additionalProperties: {}
+                            additionalProperties: {}
+                        required:
+                        - country
+                        - regulation
+                        additionalProperties: {}
+                  required:
+                  - required
+                  additionalProperties: {}
+                verification:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      verified_by:
+                        type: string
+                      verified_time:
+                        type: string
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                      result:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - authentic
+                        - type: string
+                          enum:
+                          - ai_generated
+                        - type: string
+                          enum:
+                          - ai_modified
+                        - type: string
+                          enum:
+                          - inconclusive
+                      confidence:
+                        type: number
+                        minimum: 0
+                        maximum: 1
+                      details_url:
+                        type: string
+                    required:
+                    - verified_by
+                    - result
+                    additionalProperties: {}
+                ext:
+                  type: object
+                  properties: {}
+                  additionalProperties: {}
+              additionalProperties: {}
+          required:
+          - asset_type
+          - url
+          - width
+          - height
+          additionalProperties: {}
+        title:
+          type: string
+        description:
+          type: string
+        price_label:
+          type: string
+        cta_label:
+          type: string
+      additionalProperties: false
+    StorefrontProposalOperatorReference:
+      description: Resolvable buyer identity for a storefront proposal. Prefer { domain } for brand-backed buyers; use { customerId } only as an unbranded fallback.
+      anyOf:
+      - type: object
+        properties:
+          domain:
+            description: Buyer brand domain. The buyer must resolve to this brand domain when redeeming the proposal code.
+            example: acme.com
+            type: string
+            minLength: 1
+            maxLength: 255
+        required:
+        - domain
+      - type: object
+        properties:
+          customerId:
+            description: Buyer customer id fallback used only when the buyer does not have an advertiser brand domain.
+            example: 123
+            type: integer
+            maximum: 9007199254740991
+            minimum: 1
+        required:
+        - customerId
+    ProposalSnapshot:
+      description: Frozen products + proposals captured from the discovery session at compose time
+      type: object
+      properties:
+        products:
+          description: All products that were available in the discovery session
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        proposals:
+          description: All proposals from the discovery session (including the chosen one)
+          type: array
+          items:
+            $ref: '#/components/schemas/Proposal'
+      required:
+      - products
+      - proposals
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

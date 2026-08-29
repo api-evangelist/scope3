@@ -1,0 +1,2618 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Account API
+  version: 2.0.0
+  description: 'Operations tagged Account across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Account
+  description: Account management, service tokens, and preferences
+paths:
+  /accounts/current:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: getCurrentAccount
+      summary: Get current account
+      description: Get the authenticated user's current customer account context.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Get current account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentAccountResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /accounts:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listCustomerAccounts
+      summary: List customer accounts
+      description: List all customer accounts the authenticated user has active membership on.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List customer accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomerAccountsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /accounts/create-child:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: createChildAccount
+      summary: Create child account
+      description: Create a new child customer account. For standalone customers, creates a parent/child hierarchy first. Requires ADMIN role.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChildAccountBody'
+      responses:
+        '201':
+          description: Create child account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildAccountResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /accounts/{customerId}/domain:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    patch:
+      operationId: updateCustomerDomain
+      summary: Update customer domain
+      description: Update a customer's registered organization domain. Requires ADMIN role on the target customer (direct membership, parent admin via the customer hierarchy, or SuperAdmin).
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: customerId
+        schema:
+          description: Customer ID
+          example: '200'
+          type: string
+          minLength: 1
+        required: true
+        description: Customer ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerDomainBody'
+      responses:
+        '200':
+          description: Update customer domain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCustomerDomainResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /accounts/{customerId}:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    delete:
+      operationId: deleteChildAccount
+      summary: Delete child account
+      description: Hard-delete a child customer account. Only CHILD customers can be deleted, and the caller must be an ADMIN on the parent (or a Scope3 SuperAdmin). Refuses with 409 if the child still has linked resources.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: customerId
+        schema:
+          description: Customer ID
+          example: '200'
+          type: string
+          minLength: 1
+        required: true
+        description: Customer ID
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /accounts/{customerId}/membership:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: getMembershipSettings
+      summary: Get membership settings
+      description: Get membership settings for a customer org, including whether domain auto-join is enabled. Requires ADMIN role.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: customerId
+        schema:
+          description: Customer ID
+          example: '200'
+          type: string
+          minLength: 1
+        required: true
+        description: Customer ID
+      responses:
+        '200':
+          description: Get membership settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipSettingsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: updateMembershipSettings
+      summary: Update membership settings
+      description: Update membership settings for a customer org. Requires ADMIN role and a registered customer domain to enable domain auto-join.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: customerId
+        schema:
+          description: Customer ID
+          example: '200'
+          type: string
+          minLength: 1
+        required: true
+        description: Customer ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMembershipSettingsBody'
+      responses:
+        '200':
+          description: Update membership settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipSettingsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /browser-origins:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listBrowserOrigins
+      summary: List browser origins
+      description: List exact browser origins allowed to call Interchange MCP and OAuth endpoints from the selected account. Admin-only. Customer-managed origins are CORS-enabled without credentialed cookie access; browser clients must use OAuth or explicit bearer tokens.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List browser origins
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrowserOriginsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Admin role required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createBrowserOrigin
+      summary: Register browser origin
+      description: Register an exact HTTPS browser origin for browser-based MCP and OAuth calls. Provide only the origin, such as `https://mcp.example.com`; do not include paths, redirects, wildcards, query strings, fragments, or non-HTTPS schemes. Admin-only.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrowserOriginBody'
+      responses:
+        '201':
+          description: Register browser origin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrowserOrigin'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Admin role required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /browser-origins/{id}:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    delete:
+      operationId: deleteBrowserOrigin
+      summary: Delete browser origin
+      description: Archive a browser origin so it no longer receives CORS access for browser-based MCP and OAuth calls. Admin-only.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          description: Browser origin registration ID
+          type: string
+          pattern: ^[1-9]\d*$
+        required: true
+        description: Browser origin registration ID
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Admin role required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No active browser origin with this id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /notification-preferences:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: getNotificationPreferences
+      summary: Get notification preferences
+      description: Get notification opt-in preferences for the authenticated user.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Get notification preferences
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateNotificationPreferences
+      summary: Update notification preferences
+      description: Set notification opt-in preferences for the authenticated user. Replaces all existing opt-ins.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                optIns:
+                  maxItems: 200
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      notificationType:
+                        description: Notification event type to opt into. The enum is shared across personas, but each event type delivers only to the customer role it is scoped to — e.g. campaign.*, creative approval outcomes, media_buy_update_proposal.*, and the media_buy.* why-visibility transition events (forward_failed, awaiting_source_moderation, source_rejected, stuck) deliver to BUYER customers; storefront.* and inventory_source.* deliver to SELLER customers. Opting into an event type outside your role delivers nothing.
+                        type: string
+                        enum:
+                        - brand_agent.created
+                        - brand_agent.updated
+                        - brand_agent.deleted
+                        - campaign.healthy
+                        - campaign.unhealthy
+                        - campaign.created
+                        - campaign.updated
+                        - campaign.deleted
+                        - campaign.completed
+                        - creative.approved
+                        - creative.rejected
+                        - creative.changes_requested
+                        - creative.sync_started
+                        - creative.sync_completed
+                        - creative.sync_failed
+                        - creative.created
+                        - creative.updated
+                        - creative.deleted
+                        - strategy.created
+                        - strategy.updated
+                        - strategy.deleted
+                        - media_buy.created
+                        - media_buy.updated
+                        - media_buy.deleted
+                        - media_buy.forward_failed
+                        - media_buy.awaiting_source_moderation
+                        - media_buy.source_rejected
+                        - media_buy.stuck
+                        - media_buy_update_proposal.approved
+                        - media_buy_update_proposal.rejected
+                        - media_buy_update_proposal.expired
+                        - salesagent.available
+                        - salesagent.unavailable
+                        - salesagent.registered
+                        - salesagent.unregistered
+                        - salesagent.updated
+                        - salesagent.sync_action_required
+                        - signalsagent.registered
+                        - signalsagent.unregistered
+                        - signalsagent.updated
+                        - signalsagent.signal_activated
+                        - signalsagent.signals_fetched
+                        - outcomesagent.registered
+                        - outcomesagent.unregistered
+                        - outcomesagent.updated
+                        - syndication.completed
+                        - syndication.failed
+                        - audience.synced
+                        - audience.sync_failed
+                        - optimization.suggestion_received
+                        - optimization.suggestion_approved
+                        - optimization.suggestion_rejected
+                        - optimization.suggestion_applied
+                        - optimization.suggestion_failed
+                        - system.warning
+                        - system.error
+                        - learning_cycle.completed
+                        - learning_cycle.failed
+                        - hypothesis.status_changed
+                        - hypothesis.review_requested
+                        - hypothesis.proven
+                        - hypothesis.disproven
+                        - measurement.received
+                        - measurement.stale
+                        - opportunity.evaluated
+                        - opportunity.recommended
+                        - opportunity.flagged
+                        - opportunity.explore
+                        - storefront.composition_paused
+                        - storefront.products_not_traffickable
+                        - storefront_adapter_credential.action_required
+                        - storefront_adapter_connection.mapping_required
+                        - inventory_source.unhealthy
+                        - inventory_source.recovered
+                        - source.action_required
+                        - source.action_resolved
+                        - storefront.supply_nudge
+                        - storefront.liveness_degraded
+                        - storefront.liveness_recovered
+                        - provider_fleet.incident_opened
+                        - provider_fleet.incident_recovered
+                        - media_buy.approval_requested
+                        - creative.review_requested
+                        - ad_server.approval_requested
+                        - inventory_shortfall.review_requested
+                        - storefront.media_buy_forward_failed
+                        - storefront.media_buy_moderation_aging
+                        - murph_room.mentioned
+                        - ask.resolved
+                      channel:
+                        type: string
+                        enum:
+                        - email
+                        - in_app
+                    required:
+                    - notificationType
+                    - channel
+              required:
+              - optIns
+      responses:
+        '200':
+          description: Update notification preferences
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /notification-delivery-preferences:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: getNotificationDeliveryPreferences
+      summary: Get Slack notification settings
+      description: Get Product Updates and source outage alert settings for the account’s primary Murph Slack channel. If the account has no connected channel, `destination` is `null` and `configurable` is `false`.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Get Slack notification settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  adapter:
+                    type: string
+                    enum:
+                    - slack
+                  destination:
+                    type:
+                    - object
+                    - 'null'
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type:
+                        - string
+                        - 'null'
+                      isPrimary:
+                        type: boolean
+                    required:
+                    - id
+                    - name
+                    - isPrimary
+                    additionalProperties: false
+                  configurable:
+                    type: boolean
+                  preferences:
+                    type: array
+                    items:
+                      oneOf:
+                      - type: object
+                        properties:
+                          stream:
+                            type: string
+                            enum:
+                            - product_updates
+                          enabled:
+                            type: boolean
+                        required:
+                        - stream
+                        - enabled
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          stream:
+                            type: string
+                            enum:
+                            - source_health_alerts
+                          enabled:
+                            type: boolean
+                          thresholdMinutes:
+                            type: integer
+                            maximum: 9007199254740991
+                            minimum: 1
+                        required:
+                        - stream
+                        - enabled
+                        - thresholdMinutes
+                        additionalProperties: false
+                      type: object
+                required:
+                - adapter
+                - destination
+                - configurable
+                - preferences
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateNotificationDeliveryPreference
+      summary: Update a Slack notification setting
+      description: Turn Product Updates on or off, or configure source outage alerts for the account’s primary Murph Slack channel. Source outage alerts can be turned on or off and sent after 10, 30, or 60 minutes.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+                properties:
+                  stream:
+                    type: string
+                    enum:
+                    - product_updates
+                  enabled:
+                    type: boolean
+                required:
+                - stream
+                - enabled
+                additionalProperties: false
+              - type: object
+                properties:
+                  stream:
+                    type: string
+                    enum:
+                    - source_health_alerts
+                  enabled:
+                    type: boolean
+                  thresholdMinutes:
+                    anyOf:
+                    - type: number
+                      enum:
+                      - 10
+                    - type: number
+                      enum:
+                      - 30
+                    - type: number
+                      enum:
+                      - 60
+                required:
+                - stream
+                additionalProperties: false
+              type: object
+      responses:
+        '200':
+          description: Update a Slack notification setting
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  adapter:
+                    type: string
+                    enum:
+                    - slack
+                  destination:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type:
+                        - string
+                        - 'null'
+                      isPrimary:
+                        type: boolean
+                    required:
+                    - id
+                    - name
+                    - isPrimary
+                    additionalProperties: false
+                  configurable:
+                    type: boolean
+                    enum:
+                    - true
+                  preference:
+                    oneOf:
+                    - type: object
+                      properties:
+                        stream:
+                          type: string
+                          enum:
+                          - product_updates
+                        enabled:
+                          type: boolean
+                      required:
+                      - stream
+                      - enabled
+                      additionalProperties: false
+                    - type: object
+                      properties:
+                        stream:
+                          type: string
+                          enum:
+                          - source_health_alerts
+                        enabled:
+                          type: boolean
+                        thresholdMinutes:
+                          type: integer
+                          maximum: 9007199254740991
+                          minimum: 1
+                      required:
+                      - stream
+                      - enabled
+                      - thresholdMinutes
+                      additionalProperties: false
+                    type: object
+                required:
+                - adapter
+                - destination
+                - configurable
+                - preference
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No Slack channel is connected to this account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /market-readiness:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: previewMarketReadiness
+      summary: Preview market readiness
+      description: Return public-safe pilot state and supply evidence for requested ISO country × canonical channel cells. Pilot state is an explicit human decision; storefront discovery never opens a market. Global platform coverage is returned as an overlay, not as a country. Supply-query failures are reported as unknown. This endpoint does not enroll a buyer or bypass the alpha opt-in gate.
+      tags:
+      - Account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketReadinessRequest'
+      responses:
+        '200':
+          description: Preview market readiness
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketReadinessResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: RATE_LIMITED (per-IP public endpoint cap).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /readiness:
+    get:
+      operationId: getBuyerReadiness
+      summary: Get buyer readiness
+      description: Get platform-level activation criteria and per-destination buying readiness for the authenticated buyer account.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          description: Maximum number of destination rows to return.
+          example: 50
+          default: 50
+          type: integer
+          minimum: 1
+          maximum: 100
+        description: Maximum number of destination rows to return.
+      - in: query
+        name: offset
+        schema:
+          description: Zero-based destination offset.
+          example: 0
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Zero-based destination offset.
+      responses:
+        '200':
+          description: Get buyer readiness
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerReadiness'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    servers:
+    - url: https://api.interchange.io/api/v2/buyer
+      description: Production server
+  /readiness/operator:
+    patch:
+      operationId: updateBuyerOperator
+      summary: Update buyer operator domain
+      description: Confirm or change the authenticated buyer account's commercial operator domain without changing its WorkOS organization. Requires ADMIN role on the current account.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBuyerOperatorBody'
+      responses:
+        '200':
+          description: Update buyer operator domain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerOperatorUpdate'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    servers:
+    - url: https://api.interchange.io/api/v2/buyer
+      description: Production server
+  /accounts/liveness:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: getAccountsLiveness
+      summary: Get storefront liveness for accounts
+      description: Batched storefront liveness for the requested seller customer ids — one derived verdict per storefront (setup, live, live_attention, or live_critical) computed from persisted signals, powering the per-storefront status dot in the account switcher. Ids the caller cannot access are silently omitted.
+      tags:
+      - Account
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: customerIds
+        schema:
+          description: Comma-separated seller customer ids to resolve liveness for (e.g. "123,456"). Ids the caller cannot access are silently omitted from the response; when absent or empty the response map is empty.
+          type: string
+        description: Comma-separated seller customer ids to resolve liveness for (e.g. "123,456"). Ids the caller cannot access are silently omitted from the response; when absent or empty the response map is empty.
+      responses:
+        '200':
+          description: Get storefront liveness for accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontLivenessBatchResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    OrgAccountSummary:
+      description: Summary of a customer organization account
+      type: object
+      properties:
+        id:
+          description: Customer ID
+          example: 100
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        company:
+          description: Company name
+          example: Acme Inc
+          type: string
+        name:
+          description: Display name
+          example: Acme
+          type: string
+        role:
+          description: User role on this customer (MEMBER, ADMIN, SUPER_ADMIN)
+          example: ADMIN
+          type: string
+      required:
+      - id
+      - company
+      - name
+      additionalProperties: false
+    MarketReadinessRequest:
+      description: A bounded set of ISO country × canonical channel cells to preview.
+      type: object
+      properties:
+        cells:
+          minItems: 1
+          maxItems: 50
+          type: array
+          items:
+            type: object
+            properties:
+              countryCode:
+                description: An assigned ISO 3166-1 alpha-2 country code.
+                type: string
+                enum:
+                - AD
+                - AE
+                - AF
+                - AG
+                - AI
+                - AL
+                - AM
+                - AO
+                - AQ
+                - AR
+                - AS
+                - AT
+                - AU
+                - AW
+                - AX
+                - AZ
+                - BA
+                - BB
+                - BD
+                - BE
+                - BF
+                - BG
+                - BH
+                - BI
+                - BJ
+                - BL
+                - BM
+                - BN
+                - BO
+                - BQ
+                - BR
+                - BS
+                - BT
+                - BV
+                - BW
+                - BY
+                - BZ
+                - CA
+                - CC
+                - CD
+                - CF
+                - CG
+                - CH
+                - CI
+                - CK
+                - CL
+                - CM
+                - CN
+                - CO
+                - CR
+                - CU
+                - CV
+                - CW
+                - CX
+                - CY
+                - CZ
+                - DE
+                - DJ
+                - DK
+                - DM
+                - DO
+                - DZ
+                - EC
+                - EE
+                - EG
+                - EH
+                - ER
+                - ES
+                - ET
+                - FI
+                - FJ
+                - FK
+                - FM
+                - FO
+                - FR
+                - GA
+                - GB
+                - GD
+                - GE
+                - GF
+                - GG
+                - GH
+                - GI
+                - GL
+                - GM
+                - GN
+                - GP
+                - GQ
+                - GR
+                - GS
+                - GT
+                - GU
+                - GW
+                - GY
+                - HK
+                - HM
+                - HN
+                - HR
+                - HT
+                - HU
+                - ID
+                - IE
+                - IL
+                - IM
+                - IN
+                - IO
+                - IQ
+                - IR
+                - IS
+                - IT
+                - JE
+                - JM
+                - JO
+                - JP
+                - KE
+                - KG
+                - KH
+                - KI
+                - KM
+                - KN
+                - KP
+                - KR
+                - KW
+                - KY
+                - KZ
+                - LA
+                - LB
+                - LC
+                - LI
+                - LK
+                - LR
+                - LS
+                - LT
+                - LU
+                - LV
+                - LY
+                - MA
+                - MC
+                - MD
+                - ME
+                - MF
+                - MG
+                - MH
+                - MK
+                - ML
+                - MM
+                - MN
+                - MO
+                - MP
+                - MQ
+                - MR
+                - MS
+                - MT
+                - MU
+                - MV
+                - MW
+                - MX
+                - MY
+                - MZ
+                - NA
+                - NC
+                - NE
+                - NF
+                - NG
+                - NI
+                - NL
+                - false
+                - NP
+                - NR
+                - NU
+                - NZ
+                - OM
+                - PA
+                - PE
+                - PF
+                - PG
+                - PH
+                - PK
+                - PL
+                - PM
+                - PN
+                - PR
+                - PS
+                - PT
+                - PW
+                - PY
+                - QA
+                - RE
+                - RO
+                - RS
+                - RU
+                - RW
+                - SA
+                - SB
+                - SC
+                - SD
+                - SE
+                - SG
+                - SH
+                - SI
+                - SJ
+                - SK
+                - SL
+                - SM
+                - SN
+                - SO
+                - SR
+                - SS
+                - ST
+                - SV
+                - SX
+                - SY
+                - SZ
+                - TC
+                - TD
+                - TF
+                - TG
+                - TH
+                - TJ
+                - TK
+                - TL
+                - TM
+                - TN
+                - TO
+                - TR
+                - TT
+                - TV
+                - TW
+                - TZ
+                - UA
+                - UG
+                - UM
+                - US
+                - UY
+                - UZ
+                - VA
+                - VC
+                - VE
+                - VG
+                - VI
+                - VN
+                - VU
+                - WF
+                - WS
+                - YE
+                - YT
+                - ZA
+                - ZM
+                - ZW
+              channel:
+                type: string
+                enum:
+                - audio
+                - ctv
+                - display
+                - dooh
+                - google
+                - meta
+                - social
+            required:
+            - countryCode
+            - channel
+      required:
+      - cells
+    BuyerDestinationReadiness:
+      description: Buyer-specific readiness for one seller or buying platform. Seller availability, connection wiring, and commercial routing remain separate inputs.
+      type: object
+      properties:
+        storefrontId:
+          type: string
+        platformId:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - adcp
+          - adapter
+        provider:
+          type:
+          - string
+          - 'null'
+        billingRoute:
+          type: string
+          enum:
+          - direct
+          - interchange
+        status:
+          type: string
+          enum:
+          - ready
+          - seller_unavailable
+          - needs_connection
+          - needs_account_selection
+          - needs_advertiser_mapping
+          - needs_commercial_setup
+          - platform_blocked
+        canBuy:
+          type: boolean
+        reason:
+          type: string
+        action:
+          allOf:
+          - $ref: '#/components/schemas/BuyerReadinessAction'
+      required:
+      - storefrontId
+      - platformId
+      - name
+      - kind
+      - provider
+      - billingRoute
+      - status
+      - canBuy
+      - reason
+      - action
+      additionalProperties: false
+    MarketReadinessSupplyItem:
+      description: Public-safe supply evidence for one scope. Unknown is distinct from a successful empty read.
+      type: object
+      properties:
+        scope:
+          type: string
+          enum:
+          - domestic
+          - global
+        status:
+          type: string
+          enum:
+          - available
+          - none
+          - unknown
+        storefrontCount:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 9007199254740991
+        namedStorefronts:
+          description: Up to 10 public-safe listed storefronts. storefrontCount is the full usable count.
+          maxItems: 10
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              domain:
+                type:
+                - string
+                - 'null'
+            required:
+            - name
+            - domain
+            additionalProperties: false
+        sourceHealth:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - unknown
+      required:
+      - scope
+      - status
+      - storefrontCount
+      - namedStorefronts
+      - sourceHealth
+      additionalProperties: false
+    UpdateBuyerOperatorBody:
+      description: Confirm or change the authenticated buyer account's commercial operator domain.
+      type: object
+      properties:
+        operatorDomain:
+          description: Corporate domain of the organization operating this buyer account.
+          example: northstar.media
+          type: string
+          maxLength: 255
+          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$
+      required:
+      - operatorDomain
+    UpdateCustomerDomainBody:
+      description: Request body for updating a customer's organization domain
+      type: object
+      properties:
+        customerDomain:
+          description: Registered organization domain to set on the customer.
+          example: nike.com
+          type: string
+          maxLength: 255
+          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$
+      required:
+      - customerDomain
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    BrowserOriginsResponse:
+      type: object
+      properties:
+        origins:
+          description: Active browser origins for the selected account
+          type: array
+          items:
+            $ref: '#/components/schemas/BrowserOrigin'
+      required:
+      - origins
+      additionalProperties: false
+    MembershipSettingsResponse:
+      description: Customer membership access settings
+      type: object
+      properties:
+        customerId:
+          description: Customer ID
+          example: 200
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        allowDomainAutoJoin:
+          description: When true, users with a verified matching domain email join immediately as members without admin approval. Defaults to true for top-level organizations and false for child accounts; an explicit setting overrides the default. Requires customerDomain to be set.
+          example: false
+          type: boolean
+      required:
+      - customerId
+      - allowDomainAutoJoin
+      additionalProperties: false
+    UpdateCustomerDomainResponse:
+      description: Updated customer domain
+      type: object
+      properties:
+        id:
+          description: Customer ID
+          example: 200
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        customerDomain:
+          description: Registered organization domain on the customer
+          example: nike.com
+          type:
+          - string
+          - 'null'
+        customerDomainApproved:
+          description: Whether the current domain is verified by an active member email or Scope3 administrator attestation.
+          type: boolean
+      required:
+      - id
+      - customerDomain
+      - customerDomainApproved
+      additionalProperties: false
+    MarketReadinessResponse:
+      description: Human-decided pilot state with separate domestic and global-overlay supply evidence.
+      type: object
+      properties:
+        cells:
+          type: array
+          items:
+            type: object
+            properties:
+              countryCode:
+                description: An assigned ISO 3166-1 alpha-2 country code.
+                type: string
+                enum:
+                - AD
+                - AE
+                - AF
+                - AG
+                - AI
+                - AL
+                - AM
+                - AO
+                - AQ
+                - AR
+                - AS
+                - AT
+                - AU
+                - AW
+                - AX
+                - AZ
+                - BA
+                - BB
+                - BD
+                - BE
+                - BF
+                - BG
+                - BH
+                - BI
+                - BJ
+                - BL
+                - BM
+                - BN
+                - BO
+                - BQ
+                - BR
+                - BS
+                - BT
+                - BV
+                - BW
+                - BY
+                - BZ
+                - CA
+                - CC
+                - CD
+                - CF
+                - CG
+                - CH
+                - CI
+                - CK
+                - CL
+                - CM
+                - CN
+                - CO
+                - CR
+                - CU
+                - CV
+                - CW
+                - CX
+                - CY
+                - CZ
+                - DE
+                - DJ
+                - DK
+                - DM
+                - DO
+                - DZ
+                - EC
+                - EE
+                - EG
+                - EH
+                - ER
+                - ES
+                - ET
+                - FI
+                - FJ
+                - FK
+                - FM
+                - FO
+                - FR
+                - GA
+                - GB
+                - GD
+                - GE
+                - GF
+                - GG
+                - GH
+                - GI
+                - GL
+                - GM
+                - GN
+                - GP
+                - GQ
+                - GR
+                - GS
+                - GT
+                - GU
+                - GW
+                - GY
+                - HK
+                - HM
+                - HN
+                - HR
+                - HT
+                - HU
+                - ID
+                - IE
+                - IL
+                - IM
+                - IN
+                - IO
+                - IQ
+                - IR
+                - IS
+                - IT
+                - JE
+                - JM
+                - JO
+                - JP
+                - KE
+                - KG
+                - KH
+                - KI
+                - KM
+                - KN
+                - KP
+                - KR
+                - KW
+                - KY
+                - KZ
+                - LA
+                - LB
+                - LC
+                - LI
+                - LK
+                - LR
+                - LS
+                - LT
+                - LU
+                - LV
+                - LY
+                - MA
+                - MC
+                - MD
+                - ME
+                - MF
+                - MG
+                - MH
+                - MK
+                - ML
+                - MM
+                - MN
+                - MO
+                - MP
+                - MQ
+                - MR
+                - MS
+                - MT
+                - MU
+                - MV
+                - MW
+                - MX
+                - MY
+                - MZ
+                - NA
+                - NC
+                - NE
+                - NF
+                - NG
+                - NI
+                - NL
+                - false
+                - NP
+                - NR
+                - NU
+                - NZ
+                - OM
+                - PA
+                - PE
+                - PF
+                - PG
+                - PH
+                - PK
+                - PL
+                - PM
+                - PN
+                - PR
+                - PS
+                - PT
+                - PW
+                - PY
+                - QA
+                - RE
+                - RO
+                - RS
+                - RU
+                - RW
+                - SA
+                - SB
+                - SC
+                - SD
+                - SE
+                - SG
+                - SH
+                - SI
+                - SJ
+                - SK
+                - SL
+                - SM
+                - SN
+                - SO
+                - SR
+                - SS
+                - ST
+                - SV
+                - SX
+                - SY
+                - SZ
+                - TC
+                - TD
+                - TF
+                - TG
+                - TH
+                - TJ
+                - TK
+                - TL
+                - TM
+                - TN
+                - TO
+                - TR
+                - TT
+                - TV
+                - TW
+                - TZ
+                - UA
+                - UG
+                - UM
+                - US
+                - UY
+                - UZ
+                - VA
+                - VC
+                - VE
+                - VG
+                - VI
+                - VN
+                - VU
+                - WF
+                - WS
+                - YE
+                - YT
+                - ZA
+                - ZM
+                - ZW
+              channel:
+                type: string
+                enum:
+                - audio
+                - ctv
+                - display
+                - dooh
+                - google
+                - meta
+                - social
+              pilotState:
+                type: string
+                enum:
+                - open
+                - closed
+              pilotScope:
+                type: string
+                enum:
+                - domestic
+                - global_overlay
+                - none
+              domesticSupply:
+                $ref: '#/components/schemas/MarketReadinessSupplyItem'
+              globalSupply:
+                $ref: '#/components/schemas/MarketReadinessSupplyItem'
+            required:
+            - countryCode
+            - channel
+            - pilotState
+            - pilotScope
+            - domesticSupply
+            - globalSupply
+            additionalProperties: false
+      required:
+      - cells
+      additionalProperties: false
+    CreateChildAccountResponse:
+      description: Full user context scoped to the new child customer
+      type: object
+      properties:
+        user:
+          description: User profile data
+          type: object
+          properties: {}
+          additionalProperties: {}
+        customer:
+          description: Customer context for the newly created child
+          type: object
+          properties: {}
+          additionalProperties: {}
+        customers:
+          description: All accessible customer accounts
+          type: array
+          items:
+            type: object
+            properties: {}
+            additionalProperties: {}
+        showTosBox:
+          description: Whether to show the ToS acceptance dialog
+          type: boolean
+        canAcceptTos:
+          description: Whether the current user may accept Terms of Service for the organization governing this child.
+          type: boolean
+        tosUpdate:
+          description: Successor Terms of Service context inherited from the organization.
+          type: object
+          properties:
+            action:
+              type: string
+              enum:
+              - notice
+              - acceptance_due
+              - acceptance_required
+            changeLevel:
+              type: string
+              enum:
+              - PATCH
+              - MINOR
+              - MAJOR
+            acceptedVersion:
+              type:
+              - string
+              - 'null'
+            targetVersion:
+              type: string
+            deadline:
+              type:
+              - string
+              - 'null'
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            termsUrl:
+              type: string
+            changesUrl:
+              type:
+              - string
+              - 'null'
+          required:
+          - action
+          - changeLevel
+          - acceptedVersion
+          - targetVersion
+          - deadline
+          - termsUrl
+          - changesUrl
+          additionalProperties: false
+        organizationContractMissing:
+          description: True when the newly created account cannot operate because the organization it inherits from has no active contract. UI should render a block page until an organization admin accepts ToS.
+          type: boolean
+        hasContract:
+          description: Whether the customer has an active contract
+          type: boolean
+        latestTosVersion:
+          description: Latest embedded sales agent version identifier
+          type: string
+        convertedFromStandalone:
+          description: True if the request triggered a standalone-to-parent conversion
+          type: boolean
+      required:
+      - user
+      - customer
+      - customers
+      - showTosBox
+      - canAcceptTos
+      - hasContract
+      - latestTosVersion
+      - convertedFromStandalone
+      additionalProperties: false
+    CreateBrowserOriginBody:
+      type: object
+      properties:
+        origin:
+          description: Exact HTTPS browser origin to allow for browser MCP/OAuth calls. Do not include a path, query, fragment, wildcard, or userinfo.
+          example: https://mcp.example.com
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: ^https:\/\/[^/?#@]+$
+        label:
+          description: Optional human-readable label
+          type: string
+          minLength: 1
+          maxLength: 120
+      required:
+      - origin
+    CreateChildAccountBody:
+      description: Request body for creating a child customer account
+      type: object
+      properties:
+        name:
+          description: Name for the new child account
+          example: Nike
+          type: string
+          minLength: 1
+          maxLength: 255
+        customerRole:
+          description: Whether the account is a buyer or seller
+          example: BUYER
+          type: string
+          enum:
+          - BUYER
+          - SELLER
+        parentName:
+          description: Name for the parent account created during standalone conversion. Defaults to "{company} (Admin)" if omitted.
+          example: Acme HQ
+          type: string
+          minLength: 1
+          maxLength: 255
+        customerDomain:
+          description: Registered organization domain. For SELLER accounts, also seeds the auto-created storefront's publisher and operator domain.
+          example: nike.com
+          type: string
+          maxLength: 255
+          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$
+        defaultCurrency:
+          description: For SELLER accounts, seller-confirmed primary settlement currency (ISO-4217) for the auto-created storefront.
+          example: USD
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentCurrencies:
+          description: For SELLER accounts, ISO-4217 currencies the auto-created storefront will be paid in. The primary defaultCurrency must be included when both are provided.
+          example:
+          - USD
+          - EUR
+          maxItems: 25
+          type: array
+          items:
+            type: string
+            pattern: ^[A-Z]{3}$
+        accountMode:
+          description: Internal account provisioning mode. DEMO is restricted to Scope3 platform administrators and provisions a leased synthetic Storefront.
+          example: STANDARD
+          default: STANDARD
+          type: string
+          enum:
+          - STANDARD
+          - DEMO
+        demoRecipeIds:
+          description: Versioned synthetic source recipes to attach when accountMode is DEMO.
+          example:
+          - sample-publisher-display
+          - sample-publisher-ctv
+          - sample-retail-media
+          minItems: 1
+          maxItems: 3
+          type: array
+          items:
+            type: string
+            enum:
+            - sample-publisher-display
+            - sample-publisher-ctv
+            - sample-retail-media
+      required:
+      - name
+      - customerRole
+    BuyerReadinessCheck:
+      type: object
+      properties:
+        id:
+          type: string
+          enum:
+          - operator_identity
+          - terms
+          - account_standing
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+          - complete
+          - missing
+          - blocked
+        isBlocker:
+          type: boolean
+        action:
+          allOf:
+          - $ref: '#/components/schemas/BuyerReadinessAction'
+      required:
+      - id
+      - name
+      - description
+      - status
+      - isBlocker
+      - action
+      additionalProperties: false
+    BuyerReadinessAction:
+      description: Server-owned continuation for one buyer setup step. Operations are executed through buyer api_call; pages are opened through their typed owner.
+      type: object
+      properties:
+        label:
+          type: string
+        operation:
+          type:
+          - string
+          - 'null'
+        pathParams:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: string
+        page:
+          type:
+          - string
+          - 'null'
+      required:
+      - label
+      - operation
+      - pathParams
+      - page
+      additionalProperties: false
+    BrowserOrigin:
+      type: object
+      properties:
+        id:
+          description: Browser origin registration ID
+          type: string
+        customerId:
+          description: Customer account that owns this origin
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        origin:
+          description: Exact browser origin, e.g. https://mcp.example.com
+          type: string
+          format: uri
+        label:
+          description: Optional human-readable label for this origin
+          type:
+          - string
+          - 'null'
+        createdByUserId:
+          description: User who registered the origin, when known
+          type:
+          - integer
+          - 'null'
+          maximum: 9007199254740991
+          minimum: 1
+        createdAt:
+          description: When this origin was registered
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When this origin was last updated
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - customerId
+      - origin
+      - label
+      - createdByUserId
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    CurrentAccountResponse:
+      description: Current customer account context
+      type: object
+      properties:
+        id:
+          description: Customer ID
+          example: 100
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        company:
+          description: Company name
+          example: Acme Inc
+          type: string
+        name:
+          description: Display name
+          example: Acme
+          type: string
+        role:
+          description: User role on this customer
+          example: ADMIN
+          type: string
+        customerDomain:
+          description: Registered organization domain on the customer
+          example: acme.com
+          type:
+          - string
+          - 'null'
+        standing:
+          description: 'Customer standing (credit limit). ADMIN-only: present only when the caller is ADMIN or above; omitted otherwise.'
+          type: object
+          properties:
+            creditLimit:
+              description: Credit limit beyond the funded balance, in minor currency units (USD cents). `null` or `0` means the organization has no credit line — it must apply for credit or contact Scope3; `>0` is the granted credit ceiling (absolute, not monthly).
+              example: 500000
+              type:
+              - integer
+              - 'null'
+              minimum: -9007199254740991
+              maximum: 9007199254740991
+            currency:
+              description: ISO 4217 currency code the credit limit is denominated in.
+              example: USD
+              type: string
+          required:
+          - creditLimit
+          - currency
+          additionalProperties: false
+      required:
+      - id
+      - company
+      - name
+      - customerDomain
+      additionalProperties: false
+    BuyerReadiness:
+      description: Canonical buyer setup projection. mediaRateCard is the configured legacy media-pricing contract and is distinct from the feature-gated IU plan; interchangeClearingReady says whether the current Interchange clearing engine can execute the configured pricing with the other commercial prerequisites. Platform readiness requires a configured operator domain, but domain verification is informational and non-blocking. Destination rows add only seller availability, connection or mapping, and route-specific commercial requirements.
+      type: object
+      properties:
+        version:
+          type: number
+          enum:
+          - 1
+        customer:
+          type: object
+          properties:
+            id:
+              type: integer
+              maximum: 9007199254740991
+              minimum: 1
+            company:
+              type: string
+          required:
+          - id
+          - company
+          additionalProperties: false
+        status:
+          type: string
+          enum:
+          - setup
+          - ready
+          - blocked
+        platformReady:
+          type: boolean
+        canBuyAnywhere:
+          type: boolean
+        identity:
+          type: object
+          properties:
+            operatorDomain:
+              type:
+              - string
+              - 'null'
+            operatorDomainSource:
+              type: string
+              enum:
+              - user_confirmed
+              - legacy_customer_domain
+              - none
+            status:
+              type: string
+              enum:
+              - missing
+              - unverified
+              - verified
+            organization:
+              type: object
+              properties:
+                domain:
+                  type:
+                  - string
+                  - 'null'
+                relationship:
+                  type: string
+                  enum:
+                  - same_organization
+                  - portfolio_brand
+                  - external_operator
+                  - unresolved
+                verificationSource:
+                  type: string
+                  enum:
+                  - member_or_admin
+                  - organization_domain
+                  - aao_house
+                  - none
+              required:
+              - domain
+              - relationship
+              - verificationSource
+              additionalProperties: false
+            aao:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - matched
+                  - not_found
+                  - unavailable
+                  - not_checked
+                canonicalDomain:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+                source:
+                  type:
+                  - string
+                  - 'null'
+              required:
+              - status
+              - canonicalDomain
+              - name
+              - source
+              additionalProperties: false
+          required:
+          - operatorDomain
+          - operatorDomainSource
+          - status
+          - organization
+          - aao
+          additionalProperties: false
+        commercial:
+          type: object
+          properties:
+            tosAccepted:
+              type: boolean
+            suspended:
+              type: boolean
+            interchangeClearingReady:
+              type: boolean
+            mediaRateCard:
+              description: Resolved media-pricing contract at the billing organization. ACTIVE means pricing is configured, including a UNIT contract. clearingSupported and clearingUnsupportedReason state whether the current Interchange clearing engine can execute it; interchangeClearingReady also includes terms, payment authority, and account standing.
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - ACTIVE
+                  - MISSING
+                billingCustomerId:
+                  type: integer
+                  maximum: 9007199254740991
+                  minimum: 1
+                inheritedFromOrganization:
+                  type: boolean
+                pricingSource:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - standard
+                  - custom
+                billingType:
+                  type: string
+                  enum:
+                  - DECISIONED
+                pricingType:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - MARGIN
+                  - UNIT
+                feeRatePercent:
+                  type:
+                  - number
+                  - 'null'
+                clearingSupported:
+                  type: boolean
+                clearingUnsupportedReason:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - RATE_CARD_MISSING
+                  - PRICING_TYPE_UNSUPPORTED
+                  - PRICING_CONFIGURATION_INVALID
+              required:
+              - status
+              - billingCustomerId
+              - inheritedFromOrganization
+              - pricingSource
+              - billingType
+              - pricingType
+              - feeRatePercent
+              - clearingSupported
+              - clearingUnsupportedReason
+              additionalProperties: false
+            missing:
+              type: array
+              items:
+                type: string
+                enum:
+                - TOS
+                - STANDARD_RATE_CARD
+                - PAYMENT_AUTHORITY
+          required:
+          - tosAccepted
+          - suspended
+          - interchangeClearingReady
+          - mediaRateCard
+          - missing
+          additionalProperties: false
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerReadinessCheck'
+        destinations:
+          type: object
+          properties:
+            total:
+              description: Total destinations across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            ready:
+              description: Ready destinations across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            needsConnection:
+              description: Destinations needing connection work across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            blocked:
+              description: Blocked destinations across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            limit:
+              type: integer
+              maximum: 9007199254740991
+              minimum: 1
+            offset:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            hasMore:
+              type: boolean
+            nextOffset:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+            truncated:
+              description: True when this response contains fewer destination rows than the global total. Follow nextOffset while hasMore is true.
+              type: boolean
+            items:
+              description: Destination readiness rows for the requested page.
+              type: array
+              items:
+                $ref: '#/components/schemas/BuyerDestinationReadiness'
+          required:
+          - total
+          - ready
+          - needsConnection
+          - blocked
+          - limit
+          - offset
+          - hasMore
+          - nextOffset
+          - truncated
+          - items
+          additionalProperties: false
+      required:
+      - version
+      - customer
+      - status
+      - platformReady
+      - canBuyAnywhere
+      - identity
+      - commercial
+      - checks
+      - destinations
+      additionalProperties: false
+    BuyerOperatorUpdate:
+      description: Confirmed buyer-account operator identity. Authentication organization membership is unchanged.
+      type: object
+      properties:
+        id:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        operatorDomain:
+          type: string
+        verified:
+          type: boolean
+        source:
+          type: string
+          enum:
+          - user_confirmed
+        confirmedAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - operatorDomain
+      - verified
+      - source
+      - confirmedAt
+      additionalProperties: false
+    UpdateMembershipSettingsBody:
+      description: Request body for updating customer membership settings
+      type: object
+      properties:
+        allowDomainAutoJoin:
+          description: When true, users with a verified matching domain email join immediately as members without admin approval. Set false to override the top-level organization default.
+          example: true
+          type: boolean
+      required:
+      - allowDomainAutoJoin
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ListCustomerAccountsResponse:
+      description: List of customer accounts for the authenticated user
+      type: object
+      properties:
+        accounts:
+          description: Customer accounts the user has access to
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgAccountSummary'
+      required:
+      - accounts
+      additionalProperties: false
+    StorefrontLiveness:
+      description: The projected storefront liveness verdict (AI-4698) — one derived status computed centrally and consumed by readiness, the seller-setup widget, and the storefront switcher.
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - setup
+          - live
+          - live_attention
+          - live_critical
+        reasonCode:
+          type: string
+          enum:
+          - archived
+          - paused_before_live
+          - paused_after_live
+          - setup_incomplete
+          - settlement_ineligible
+          - catalog_empty_live
+          - go_live_requirement_regressed
+          - degraded_source
+          - trafficking_error
+          - healthy
+        reason:
+          description: 'Human-readable line pairing with the dot, e.g. "Live — attention: pricing feed expires in 5 days" or "Not live — 2 steps remaining". Never shown without the dot naming the state (status-color-language rule 6).'
+          type: string
+        remainingSteps:
+          description: Open go-live blocker count, present only for state "setup". Null for every other state.
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 9007199254740991
+        actionPath:
+          description: Application path (relative to the customer root, e.g. "/inventory-sources") of the surface that owns the fix, sourced from the readiness CHECK_ROUTING table. Null when the fix lives on the customer home surface (chat / seller-setup widget). Clients navigate to it; they never invent their own routing.
+          type:
+          - string
+          - 'null'
+      required:
+      - state
+      - reasonCode
+      - reason
+      - remainingSteps
+      - actionPath
+      additionalProperties: false
+    StorefrontLivenessBatchResponse:
+      description: Cheap, batched liveness verdicts for every storefront in the caller’s account list — powers the storefront switcher dot without one full readiness computation per storefront.
+      type: object
+      properties:
+        liveness:
+          description: Storefront liveness keyed by seller customer id (as a string). Entries are omitted for customer ids the caller cannot access or that have no storefront.
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/StorefrontLiveness'
+      required:
+      - liveness
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

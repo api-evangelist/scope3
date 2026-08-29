@@ -1,0 +1,1005 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Event Sources API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Event Sources
+  description: Manage event source configurations and log conversion/marketing events for attribution
+paths:
+  /advertisers/{advertiserId}/event-sources:
+    get:
+      operationId: listEventSources
+      summary: List event sources
+      description: List event sources for an advertiser. Event sources represent conversion data pipelines referenced by optimization goals.
+      tags:
+      - Event Sources
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: take
+        schema:
+          description: Number of results to return (max 250)
+          example: 50
+          default: 50
+          type: integer
+          maximum: 250
+          minimum: 1
+        description: Number of results to return (max 250)
+      - in: query
+        name: skip
+        schema:
+          description: Number of results to skip for pagination
+          example: 0
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Number of results to skip for pagination
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: List event sources
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventSourceListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/event-sources/sync:
+    post:
+      operationId: syncEventSources
+      summary: Sync event sources
+      description: Inbound ADCP sync_event_sources endpoint. Buyers call this to sync their event source configurations to the advertiser.
+      tags:
+      - Event Sources
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncEventSourcesRequest'
+      responses:
+        '200':
+          description: Sync event sources
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncEventSourcesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/log-event:
+    post:
+      operationId: logEvent
+      summary: Log conversion events
+      description: Log one or more conversion or marketing events for an advertiser. Accepts up to 10,000 events per call, scoped to an event source previously synced via sync_event_sources. Implements the ADCP log_event spec.
+      tags:
+      - Event Sources
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogEventRequest'
+      responses:
+        '200':
+          description: Log conversion events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogEventResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    EventSourceMappingInput:
+      description: 'Scope3 extension: field mapping contract for a buyer event source'
+      type: object
+      properties:
+        eventIdField:
+          description: Source field mapped to log_event.events[].event_id
+          example: order_id
+          type: string
+          maxLength: 256
+        eventTypeField:
+          description: Source field or expression mapped to event_type
+          example: event_name
+          type: string
+          maxLength: 256
+        eventTimeField:
+          description: Source timestamp field mapped to event_time
+          example: occurred_at
+          type: string
+          maxLength: 256
+        userMatchFields:
+          description: Source fields available for user_match, such as click IDs or hashed identifiers
+          example:
+          - hashed_email
+          - sc3clid
+          type: array
+          items:
+            type: string
+            maxLength: 256
+        valueField:
+          description: Source field mapped to custom_data.value
+          example: revenue
+          type: string
+          maxLength: 256
+        currencyField:
+          description: Source field mapped to custom_data.currency
+          example: currency
+          type: string
+          maxLength: 256
+        orderIdField:
+          description: Source field mapped to custom_data.order_id
+          example: order_id
+          type: string
+          maxLength: 256
+        contentIdsField:
+          description: Source field mapped to custom_data.content_ids
+          example: sku_ids
+          type: string
+          maxLength: 256
+        consentField:
+          description: Source field carrying consent or privacy state
+          example: marketing_consent
+          type: string
+          maxLength: 256
+        dedupeStrategy:
+          description: How stable event IDs are generated and deduplicated
+          type: string
+          maxLength: 1024
+        notes:
+          description: Additional integration notes
+          type: string
+          maxLength: 2048
+      additionalProperties: false
+    LogEventObject:
+      description: A single conversion or marketing event
+      type: object
+      properties:
+        event_id:
+          description: Unique identifier for deduplication (scoped to event_type + event_source_id)
+          example: txn_abc123
+          type: string
+          minLength: 1
+          maxLength: 256
+        event_type:
+          description: Standard event type
+          example: purchase
+          type: string
+          enum:
+          - page_view
+          - view_content
+          - select_content
+          - select_item
+          - search
+          - share
+          - add_to_cart
+          - remove_from_cart
+          - viewed_cart
+          - add_to_wishlist
+          - initiate_checkout
+          - add_payment_info
+          - purchase
+          - refund
+          - lead
+          - qualify_lead
+          - close_convert_lead
+          - disqualify_lead
+          - complete_registration
+          - subscribe
+          - follow
+          - content_view
+          - watch_milestone
+          - start_trial
+          - app_install
+          - app_launch
+          - contact
+          - schedule
+          - donate
+          - submit_application
+          - custom
+        event_time:
+          description: When the event occurred (ISO 8601)
+          example: '2026-03-15T14:30:00-05:00'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+        user_match:
+          description: User identifiers for attribution matching
+          allOf:
+          - $ref: '#/components/schemas/UserMatch'
+        custom_data:
+          description: Event-specific data (value, currency, items)
+          allOf:
+          - $ref: '#/components/schemas/CustomData'
+        action_source:
+          description: Where the event occurred
+          example: website
+          type: string
+          enum:
+          - website
+          - app
+          - in_store
+          - phone_call
+          - system_generated
+          - other
+        event_source_url:
+          description: URL where the event occurred (required when action_source is "website")
+          type: string
+          format: uri
+        custom_event_name:
+          description: Name for custom events (used when event_type is "custom")
+          type: string
+          maxLength: 256
+      required:
+      - event_id
+      - event_type
+      - event_time
+    SyncEventSourcesResponse:
+      description: Response from sync_event_sources
+      type: object
+      properties:
+        event_sources:
+          description: Per-source sync results
+          type: array
+          items:
+            $ref: '#/components/schemas/EventSourceSyncResult'
+      required:
+      - event_sources
+      additionalProperties: false
+    LogEventPartialFailure:
+      description: Detail about an individual event that failed validation
+      type: object
+      properties:
+        event_id:
+          description: Identifier of the failed event
+          type: string
+        code:
+          description: Error code
+          type: string
+        message:
+          description: Error message
+          type: string
+      required:
+      - event_id
+      - code
+      - message
+      additionalProperties: false
+    CustomData:
+      description: Event-specific data (value, currency, items)
+      type: object
+      properties:
+        value:
+          description: Monetary value of the event
+          type: number
+        currency:
+          description: ISO 4217 currency code (e.g. USD, EUR, GBP)
+          type: string
+          pattern: ^[A-Z]{3}$
+        order_id:
+          description: Unique order/transaction identifier
+          type: string
+          maxLength: 256
+        content_ids:
+          description: Product/content identifiers
+          type: array
+          items:
+            type: string
+            maxLength: 256
+        content_type:
+          description: Category (product, service, etc.)
+          type: string
+          maxLength: 128
+        num_items:
+          description: Count of items
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        contents:
+          description: Per-item details (id, quantity, price, brand)
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentItem'
+    EventSourceSetup:
+      description: 'AdCP setup object: install/setup guidance so events flow after a source is registered'
+      type: object
+      properties:
+        snippet_type:
+          description: Install format. "server_only" means events are sent server-to-server with no client-side tag to install.
+          example: server_only
+          type: string
+          enum:
+          - javascript
+          - html
+          - pixel_url
+          - server_only
+        snippet:
+          description: Client-side tag to install. Omitted when snippet_type is "server_only".
+          type: string
+        instructions:
+          description: How to start sending events for this source, including where events are ingested and a link to the setup guide.
+          type: string
+      required:
+      - snippet_type
+      - instructions
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    LogEventResponse:
+      description: Response from log_event
+      type: object
+      properties:
+        events_received:
+          description: Number of events received
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        events_processed:
+          description: Number of events successfully queued
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        partial_failures:
+          description: Events that failed validation
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEventPartialFailure'
+        warnings:
+          description: Non-fatal issues (low match quality, missing fields)
+          type: array
+          items:
+            type: string
+        match_quality:
+          description: Overall match quality score
+          type: number
+          minimum: 0
+          maximum: 1
+      required:
+      - events_received
+      - events_processed
+      additionalProperties: false
+    SyncEventSourceObject:
+      description: A single event source to sync
+      type: object
+      properties:
+        event_source_id:
+          description: Buyer-assigned event source identifier
+          example: website_pixel
+          type: string
+          minLength: 1
+          maxLength: 255
+        name:
+          description: Human-readable label for this event source
+          example: Website Pixel
+          type: string
+          minLength: 1
+          maxLength: 255
+        event_types:
+          description: Event types this source handles. When omitted, accepts all event types.
+          example:
+          - purchase
+          - add_to_cart
+          minItems: 1
+          type: array
+          items:
+            description: IAB ECAPI event type to optimize for
+            type: string
+            enum:
+            - page_view
+            - view_content
+            - select_content
+            - select_item
+            - search
+            - share
+            - add_to_cart
+            - remove_from_cart
+            - viewed_cart
+            - add_to_wishlist
+            - initiate_checkout
+            - add_payment_info
+            - purchase
+            - refund
+            - lead
+            - qualify_lead
+            - close_convert_lead
+            - disqualify_lead
+            - complete_registration
+            - subscribe
+            - follow
+            - content_view
+            - watch_milestone
+            - start_trial
+            - app_install
+            - app_launch
+            - contact
+            - schedule
+            - donate
+            - submit_application
+            - custom
+        allowed_domains:
+          description: Domains authorized to send events for this source
+          example:
+          - shop.example.com
+          - checkout.example.com
+          type: array
+          items:
+            type: string
+            minLength: 1
+        integration_platform:
+          description: 'Scope3 extension: source system or integration platform, such as Hightouch, CRM, or server API'
+          example: Hightouch
+          type: string
+          minLength: 1
+          maxLength: 128
+        mapping:
+          description: 'Scope3 extension: field mapping contract for producing log_event payloads'
+          allOf:
+          - $ref: '#/components/schemas/EventSourceMappingInput'
+        test_event_code:
+          description: 'Scope3 extension: default test event code to use when validating this source'
+          type: string
+          maxLength: 256
+      required:
+      - event_source_id
+    EventSourceListResponse:
+      description: Response containing a paginated list of event sources
+      type: object
+      properties:
+        eventSources:
+          description: List of event sources
+          type: array
+          items:
+            $ref: '#/components/schemas/EventSourceOutput'
+        total:
+          description: Total count of event sources matching the query
+          example: 5
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - eventSources
+      - total
+      additionalProperties: false
+    EventSourceMappingOutput:
+      description: Persisted field mapping contract for this event source
+      type: object
+      properties:
+        eventIdField:
+          type:
+          - string
+          - 'null'
+        eventTypeField:
+          type:
+          - string
+          - 'null'
+        eventTimeField:
+          type:
+          - string
+          - 'null'
+        userMatchFields:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        valueField:
+          type:
+          - string
+          - 'null'
+        currencyField:
+          type:
+          - string
+          - 'null'
+        orderIdField:
+          type:
+          - string
+          - 'null'
+        contentIdsField:
+          type:
+          - string
+          - 'null'
+        consentField:
+          type:
+          - string
+          - 'null'
+        dedupeStrategy:
+          type:
+          - string
+          - 'null'
+        notes:
+          type:
+          - string
+          - 'null'
+      required:
+      - eventIdField
+      - eventTypeField
+      - eventTimeField
+      - userMatchFields
+      - valueField
+      - currencyField
+      - orderIdField
+      - contentIdsField
+      - consentField
+      - dedupeStrategy
+      - notes
+      additionalProperties: false
+    EventSourceHealth:
+      description: Basic ingestion health for an event source
+      type: object
+      properties:
+        status:
+          description: Current observed ingestion status for this source
+          type: string
+          enum:
+          - not_seen
+          - receiving
+          - needs_attention
+        lastEventAt:
+          description: Most recent event_time observed from this source
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastEventReceivedAt:
+          description: When Scope3 last accepted an event from this source
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastEventType:
+          description: Most recent accepted event type from this source
+          type:
+          - string
+          - 'null'
+          enum:
+          - page_view
+          - view_content
+          - select_content
+          - select_item
+          - search
+          - share
+          - add_to_cart
+          - remove_from_cart
+          - viewed_cart
+          - add_to_wishlist
+          - initiate_checkout
+          - add_payment_info
+          - purchase
+          - refund
+          - lead
+          - qualify_lead
+          - close_convert_lead
+          - disqualify_lead
+          - complete_registration
+          - subscribe
+          - follow
+          - content_view
+          - watch_milestone
+          - start_trial
+          - app_install
+          - app_launch
+          - contact
+          - schedule
+          - donate
+          - submit_application
+          - custom
+        lastError:
+          description: Most recent ingestion error observed for this source
+          type:
+          - string
+          - 'null'
+        lastErrorAt:
+          description: When the most recent ingestion error was recorded
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - status
+      - lastEventAt
+      - lastEventReceivedAt
+      - lastEventType
+      - lastError
+      - lastErrorAt
+      additionalProperties: false
+    ContentItem:
+      description: Per-item detail within a conversion event
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 256
+        quantity:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        price:
+          type: number
+        brand:
+          type: string
+          maxLength: 256
+    SyncEventSourcesRequest:
+      description: Request body for syncing event sources (ADCP spec)
+      type: object
+      properties:
+        account:
+          description: Advertiser account to sync event sources onto
+          type: object
+          properties:
+            account_id:
+              description: Advertiser ID to attach catalogs to
+              example: '12345'
+              type: string
+              minLength: 1
+          required:
+          - account_id
+        event_sources:
+          description: Event sources to sync (up to 50 per call)
+          minItems: 1
+          maxItems: 50
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncEventSourceObject'
+        delete_missing:
+          description: Archive buyer-managed event sources not included in this request
+          default: false
+          type: boolean
+      required:
+      - account
+      - event_sources
+    EventSourceOutput:
+      description: Event source resource representation
+      type: object
+      properties:
+        eventSourceId:
+          description: Identifier for this event source
+          example: retailer_sales
+          type: string
+        name:
+          description: Human-readable name
+          example: Retailer Sales Pixel
+          type: string
+        eventTypes:
+          description: Event types this source handles (null = all types accepted)
+          type:
+          - array
+          - 'null'
+          items:
+            description: IAB ECAPI event type to optimize for
+            type: string
+            enum:
+            - page_view
+            - view_content
+            - select_content
+            - select_item
+            - search
+            - share
+            - add_to_cart
+            - remove_from_cart
+            - viewed_cart
+            - add_to_wishlist
+            - initiate_checkout
+            - add_payment_info
+            - purchase
+            - refund
+            - lead
+            - qualify_lead
+            - close_convert_lead
+            - disqualify_lead
+            - complete_registration
+            - subscribe
+            - follow
+            - content_view
+            - watch_milestone
+            - start_trial
+            - app_install
+            - app_launch
+            - contact
+            - schedule
+            - donate
+            - submit_application
+            - custom
+        allowedDomains:
+          description: Domains authorized to send events
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        integrationPlatform:
+          description: 'Scope3 extension: source system or integration platform (for example Hightouch)'
+          type:
+          - string
+          - 'null'
+        mapping:
+          description: 'Scope3 extension: persisted source-to-log_event mapping'
+          allOf:
+          - $ref: '#/components/schemas/EventSourceMappingOutput'
+        testEventCode:
+          description: Optional code used to mark test events for this source
+          type:
+          - string
+          - 'null'
+        health:
+          description: Observed ingestion health for this source
+          allOf:
+          - $ref: '#/components/schemas/EventSourceHealth'
+        createdAt:
+          description: When the event source was created (ISO 8601)
+          example: '2026-01-15T10:30:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the event source was last updated (ISO 8601)
+          example: '2026-01-20T14:45:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - eventSourceId
+      - name
+      - eventTypes
+      - allowedDomains
+      - integrationPlatform
+      - mapping
+      - testEventCode
+      - health
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    LogEventRequest:
+      description: Request body for logging conversion or marketing events (ADCP spec)
+      type: object
+      properties:
+        event_source_id:
+          description: Event source configured on the account via sync_event_sources
+          example: es_abc123
+          type: string
+          minLength: 1
+          maxLength: 256
+        events:
+          description: Events to log (up to 10,000 per call)
+          minItems: 1
+          maxItems: 10000
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEventObject'
+        test_event_code:
+          description: Test event code for validation without affecting production data
+          type: string
+          maxLength: 256
+      required:
+      - event_source_id
+      - events
+    UserMatch:
+      description: User identity fields for attribution matching
+      type: object
+      properties:
+        uids:
+          description: Universal ID values (rampid, id5, uid2, euid, pairid, maid)
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                minLength: 1
+                maxLength: 64
+              value:
+                type: string
+                minLength: 1
+                maxLength: 512
+            required:
+            - type
+            - value
+        hashed_email:
+          description: SHA-256 hash of lowercase, trimmed email address
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        hashed_phone:
+          description: SHA-256 hash of E.164-formatted phone number
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        click_id:
+          description: Platform click identifier (fbclid, gclid, ttclid, etc.)
+          type: string
+          maxLength: 512
+        click_id_type:
+          description: Type of click identifier
+          type: string
+          maxLength: 64
+        client_ip:
+          description: Client IP address for probabilistic matching
+          type: string
+          maxLength: 45
+        client_user_agent:
+          description: Client user agent string for probabilistic matching
+          type: string
+          maxLength: 512
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    EventSourceSyncResult:
+      description: Per-source result from sync_event_sources
+      type: object
+      properties:
+        event_source_id:
+          description: Event source identifier
+          type: string
+        action:
+          description: What happened to this event source during sync
+          type: string
+          enum:
+          - created
+          - updated
+          - unchanged
+          - failed
+          - deleted
+        error:
+          description: Error message when action is "failed"
+          type: string
+        setup:
+          description: AdCP setup object describing how to begin sending events. Present for live sources (created, updated, unchanged); omitted for failed or deleted results.
+          allOf:
+          - $ref: '#/components/schemas/EventSourceSetup'
+      required:
+      - event_source_id
+      - action
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

@@ -1,0 +1,368 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront Storefront Ad Server Diagnostics API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Storefront Ad Server Diagnostics
+paths:
+  /esa/{esaId}/media-buys:
+    get:
+      operationId: listEsaMediaBuys
+      summary: List upstream media buys for an ad server source
+      description: List persisted upstream media buys for the ad server source. Use this read-only endpoint for source diagnostics before making GAM, live, or delivery claims.
+      tags:
+      - Storefront Ad Server Diagnostics
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: status
+        schema:
+          type: string
+      - in: query
+        name: principalId
+        schema:
+          type: string
+      - in: query
+        name: fromDate
+        schema:
+          type: string
+      - in: query
+        name: toDate
+        schema:
+          type: string
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+      - in: query
+        name: cursor
+        schema:
+          type: string
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List upstream media buys for an ad server source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaMediaBuyList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/media-buys/{mediaBuyId}:
+    get:
+      operationId: getEsaMediaBuy
+      summary: Get an upstream media buy for an ad server source
+      description: Fetch one persisted upstream media buy for the ad server source, including status, delivery snapshot fields, products, targeting, creatives, and status history.
+      tags:
+      - Storefront Ad Server Diagnostics
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: mediaBuyId
+        schema:
+          description: Upstream media buy id for the ad server source.
+          example: adcp_mb_123
+          type: string
+          minLength: 1
+        required: true
+        description: Upstream media buy id for the ad server source.
+      responses:
+        '200':
+          description: Get an upstream media buy for an ad server source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaMediaBuyDetail'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    EsaMediaBuySummary:
+      type: object
+      properties:
+        mediaBuyId:
+          type: string
+        buyerRef:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type: string
+        principalName:
+          type: string
+        status:
+          type: string
+        flightStartDate:
+          type: string
+        flightEndDate:
+          type: string
+        totalBudget:
+          anyOf:
+          - type: number
+          - type: string
+        currency:
+          type: string
+        deliveredImpressions:
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        deliveredSpend:
+          anyOf:
+          - type: number
+          - type: string
+        pacing:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+      required:
+      - mediaBuyId
+      - principalId
+      - principalName
+      - status
+      - flightStartDate
+      - flightEndDate
+      - totalBudget
+      - currency
+      - createdAt
+      additionalProperties: false
+    EsaMediaBuyStatusEvent:
+      type: object
+      properties:
+        occurredAt:
+          type: string
+        status:
+          type: string
+        note:
+          type:
+          - string
+          - 'null'
+      required:
+      - occurredAt
+      - status
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    EsaMediaBuyDetail:
+      type: object
+      properties:
+        mediaBuyId:
+          type: string
+        buyerRef:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type: string
+        principalName:
+          type: string
+        status:
+          type: string
+        flightStartDate:
+          type: string
+        flightEndDate:
+          type: string
+        totalBudget:
+          anyOf:
+          - type: number
+          - type: string
+        currency:
+          type: string
+        deliveredImpressions:
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        deliveredSpend:
+          anyOf:
+          - type: number
+          - type: string
+        pacing:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+        products:
+          type: array
+          items:
+            type: string
+        targeting:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+        creatives:
+          type: array
+          items:
+            type: string
+        statusHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaMediaBuyStatusEvent'
+      required:
+      - mediaBuyId
+      - principalId
+      - principalName
+      - status
+      - flightStartDate
+      - flightEndDate
+      - totalBudget
+      - currency
+      - createdAt
+      - products
+      - creatives
+      - statusHistory
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    EsaMediaBuyList:
+      type: object
+      properties:
+        mediaBuys:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaMediaBuySummary'
+        count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - mediaBuys
+      - count
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

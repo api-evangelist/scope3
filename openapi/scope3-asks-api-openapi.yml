@@ -1,0 +1,373 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Asks API
+  version: 2.0.0
+  description: 'Operations tagged Asks across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Asks
+  description: What you are waiting on Scope3 for — support, product, and supply asks in one list
+paths:
+  /asks:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listAsks
+      summary: List my asks
+      description: 'Everything the authenticated customer is waiting on Scope3 for, in one list. Read-only and scoped to the caller''s own account; there is no customer parameter. `statusKey` uses the same customer-safe vocabulary for every kind: `received`, `accepted`, `in_progress`, `done`, or `closed`. Internal workflow states and work-item identifiers never appear. Closing an issue or merging a pull request does not close a support, product, or commercial ask: explicitly linked work must appear in a verified production release. Supply and integration asks may also finish from their own customer-visible live-state evidence. Asks completed through a verified release remain observable for 90 days with their customer-safe resolution. When `hasMore` is true, pass `nextCursor` back as `cursor` to read the next page. When a source cannot be read, its kind appears in `unavailableKinds` so a degraded response is never mistaken for an empty list.'
+      tags:
+      - Asks
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          description: Maximum asks to return, ordered by the most recent customer-visible update.
+          default: 10
+          type: integer
+          minimum: 1
+          maximum: 25
+        description: Maximum asks to return, ordered by the most recent customer-visible update.
+      - in: query
+        name: cursor
+        schema:
+          description: Opaque cursor returned by the previous ask-list response.
+          type: string
+          minLength: 1
+          maxLength: 512
+        description: Opaque cursor returned by the previous ask-list response.
+      responses:
+        '200':
+          description: List my asks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsksResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    AsksResponse:
+      type: object
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        totalCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        requests:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+              isActive:
+                type: boolean
+              isResolved:
+                type: boolean
+              kind:
+                type:
+                - string
+                - 'null'
+                enum:
+                - support
+                - product
+                - supply
+                - integration
+                - commercial
+              title:
+                type: string
+              blockedCustomerAction:
+                type:
+                - string
+                - 'null'
+              statusKey:
+                type: string
+                enum:
+                - received
+                - accepted
+                - in_progress
+                - done
+                - closed
+              statusLabel:
+                type: string
+              statusDescription:
+                type: string
+              nextUpdateAt:
+                type:
+                - string
+                - 'null'
+                format: date-time
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+              isCustomerBlocked:
+                type:
+                - boolean
+                - 'null'
+              createdAt:
+                type:
+                - string
+                - 'null'
+                format: date-time
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+              updatedAt:
+                type:
+                - string
+                - 'null'
+                format: date-time
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+              resolvedAt:
+                type:
+                - string
+                - 'null'
+                format: date-time
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+              disposition:
+                type: string
+                enum:
+                - in_flight
+                - awaiting_requester
+                - confirmed_resolved
+                - accepted
+                - disputed
+                - withdrawn
+              requester:
+                type: object
+                properties:
+                  state:
+                    type: string
+                    enum:
+                    - none
+                    - confirmed_resolved
+                    - accepted
+                    - still_blocked
+                    - withdrawn
+                  priority:
+                    type:
+                    - string
+                    - 'null'
+                    enum:
+                    - low
+                    - medium
+                    - high
+                    - urgent
+                  note:
+                    type:
+                    - string
+                    - 'null'
+                  updatedAt:
+                    type:
+                    - string
+                    - 'null'
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                required:
+                - state
+                - priority
+                - note
+                - updatedAt
+                additionalProperties: false
+              resolution:
+                type:
+                - object
+                - 'null'
+                properties:
+                  releaseVersion:
+                    type: string
+                    minLength: 1
+                  releasedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                  whatChanged:
+                    type: string
+                    minLength: 1
+                  requesterAction:
+                    type:
+                    - string
+                    - 'null'
+                  outcome:
+                    type: string
+                    enum:
+                    - change
+                    - no_change
+                  delivery:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        enum:
+                        - pending
+                        - delivered
+                        - failed
+                      channel:
+                        type:
+                        - string
+                        - 'null'
+                      receipt:
+                        type:
+                        - string
+                        - 'null'
+                      attempts:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      deliveredAt:
+                        type:
+                        - string
+                        - 'null'
+                        format: date-time
+                        pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    required:
+                    - state
+                    - channel
+                    - receipt
+                    - attempts
+                    - deliveredAt
+                    additionalProperties: false
+                  confirmationState:
+                    type: string
+                    enum:
+                    - in_flight
+                    - awaiting_requester
+                    - confirmed_resolved
+                    - accepted
+                    - disputed
+                    - withdrawn
+                required:
+                - releaseVersion
+                - releasedAt
+                - whatChanged
+                - requesterAction
+                - outcome
+                - delivery
+                - confirmationState
+                additionalProperties: false
+            required:
+            - id
+            - kind
+            - title
+            - blockedCustomerAction
+            - createdAt
+            - updatedAt
+            - resolvedAt
+            additionalProperties: false
+        unavailableKinds:
+          type: array
+          items:
+            type: string
+            enum:
+            - support
+            - product
+            - supply
+            - integration
+            - commercial
+        hasMore:
+          type: boolean
+        nextCursor:
+          type: string
+          minLength: 1
+        supplyActions:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              subjectName:
+                type:
+                - string
+                - 'null'
+              classification:
+                type: string
+              status:
+                type: string
+              proposedAt:
+                type:
+                - string
+                - 'null'
+                format: date-time
+                pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            required:
+            - subjectName
+            - classification
+            - status
+            - proposedAt
+            additionalProperties: false
+      required:
+      - generatedAt
+      - totalCount
+      - requests
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

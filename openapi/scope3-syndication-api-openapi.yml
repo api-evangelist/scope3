@@ -1,0 +1,379 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Syndication API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Syndication
+  description: Syndicate resources to ADCP agents
+paths:
+  /advertisers/{advertiserId}/syndicate:
+    post:
+      operationId: syndicate
+      summary: Toggle syndication for a resource
+      description: Toggle syndication ON/OFF for an audience, event source, or catalog to a specific ADCP agent. Returns the syndication status record immediately.
+      tags:
+      - Syndication
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceType:
+                  type: string
+                  enum:
+                  - AUDIENCE
+                  - EVENT_SOURCE
+                  - CATALOG
+                resourceId:
+                  type: string
+                  minLength: 1
+                adcpAgentIds:
+                  minItems: 1
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+                enabled:
+                  type: boolean
+              required:
+              - resourceType
+              - resourceId
+              - adcpAgentIds
+              - enabled
+      responses:
+        '201':
+          description: Toggle syndication for a resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyndicateResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/syndication-status:
+    get:
+      operationId: getSyndicationStatus
+      summary: Query syndication status
+      description: Query syndication status records for an advertiser, with optional filtering by resource type, resource ID, ADCP agent, and enabled state.
+      tags:
+      - Syndication
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: resourceType
+        schema:
+          type: string
+          enum:
+          - AUDIENCE
+          - EVENT_SOURCE
+          - CATALOG
+      - in: query
+        name: resourceId
+        schema:
+          type: string
+      - in: query
+        name: adcpAgentId
+        schema:
+          type: string
+      - in: query
+        name: enabled
+        schema:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - SYNCING
+          - COMPLETED
+          - FAILED
+          - DISABLED
+      - in: query
+        name: limit
+        schema:
+          default: 50
+          type: integer
+          minimum: 1
+          maximum: 100
+      - in: query
+        name: offset
+        schema:
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: Query syndication status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyndicationStatusListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    SyndicationStatusListResponse:
+      description: Paginated list of syndication status records
+      type: object
+      properties:
+        items:
+          description: List of syndication status records
+          type: array
+          items:
+            $ref: '#/components/schemas/SyndicationStatusOutput'
+        total:
+          description: Total count of records matching the query
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - items
+      - total
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    SyndicateResponse:
+      description: Response after toggling syndication for one or more ADCP agents
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyndicationStatusOutput'
+      required:
+      - data
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    SyndicationStatusOutput:
+      description: Syndication status record
+      type: object
+      properties:
+        id:
+          description: Syndication record ID
+          example: '1'
+          type: string
+        customerId:
+          description: Customer ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        advertiserId:
+          description: Advertiser ID
+          example: '12345'
+          type: string
+        resourceType:
+          type: string
+          enum:
+          - AUDIENCE
+          - EVENT_SOURCE
+          - CATALOG
+        resourceId:
+          description: ID of the resource being syndicated
+          type: string
+        audienceId:
+          description: FK to audience table (populated when resourceType is audience)
+          example: '1'
+          type:
+          - string
+          - 'null'
+        eventSourceId:
+          description: FK to event_sources table (populated when resourceType is event_source)
+          type:
+          - string
+          - 'null'
+        catalogId:
+          description: FK to catalogs table (populated when resourceType is catalog)
+          type:
+          - string
+          - 'null'
+        adcpAgentId:
+          description: ADCP agent ID
+          example: '42'
+          type: string
+        adcpAgentAccountId:
+          description: ADCP agent account ID (FK to adcp_agent_accounts)
+          type:
+          - string
+          - 'null'
+        enabled:
+          description: Whether syndication is active
+          type: boolean
+        status:
+          description: Current syndication status
+          type: string
+          enum:
+          - PENDING
+          - SYNCING
+          - COMPLETED
+          - FAILED
+          - DISABLED
+        errorMessage:
+          description: Error message if syndication failed
+          type:
+          - string
+          - 'null'
+        responseData:
+          description: Response data from the syndication operation
+        createdAt:
+          description: ISO 8601 timestamp
+          type: string
+        updatedAt:
+          description: ISO 8601 timestamp
+          type: string
+        completedAt:
+          description: ISO 8601 timestamp when syndication completed
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - customerId
+      - advertiserId
+      - resourceType
+      - resourceId
+      - audienceId
+      - eventSourceId
+      - catalogId
+      - adcpAgentId
+      - adcpAgentAccountId
+      - enabled
+      - status
+      - errorMessage
+      - responseData
+      - createdAt
+      - updatedAt
+      - completedAt
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

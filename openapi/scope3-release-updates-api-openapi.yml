@@ -1,0 +1,315 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Release Updates API
+  version: 2.0.0
+  description: 'Operations tagged Release Updates across 2 of this provider''s published API definitions: scope3-buyer-openapi-original.yml, scope3-storefront-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Release Updates
+paths:
+  /release-updates:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    get:
+      operationId: listReleaseUpdates
+      summary: List personalized release updates
+      description: List deployed release-manifest entries for the authenticated account and role. Use `for_you` for broad and deterministically matched configured or affected features, `explore` for ungated features the role can investigate, or `all` for the complete role-appropriate history.
+      tags:
+      - Release Updates
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: scope
+        schema:
+          default: for_you
+          type: string
+          enum:
+          - for_you
+          - explore
+          - all
+      - in: query
+        name: since
+        schema:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+      - in: query
+        name: skip
+        schema:
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      - in: query
+        name: take
+        schema:
+          default: 20
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: List personalized release updates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scope:
+                    type: string
+                    enum:
+                    - for_you
+                    - explore
+                    - all
+                  updates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        version:
+                          type: string
+                        releasedAt:
+                          type: string
+                          format: date-time
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+                        description:
+                          type: string
+                        tier:
+                          type: string
+                          enum:
+                          - fix
+                          - improvement
+                          - feature
+                          - headline
+                        audience:
+                          type:
+                          - string
+                          - 'null'
+                          enum:
+                          - buyers
+                          - sellers
+                          - all
+                        feature:
+                          type:
+                          - object
+                          - 'null'
+                          properties:
+                            key:
+                              type: string
+                            title:
+                              type: string
+                            description:
+                              type: string
+                            maturity:
+                              type:
+                              - string
+                              - 'null'
+                              enum:
+                              - alpha
+                              - beta
+                              - ga
+                              - retired
+                            docsUrl:
+                              type:
+                              - string
+                              - 'null'
+                              format: uri
+                          required:
+                          - key
+                          - title
+                          - description
+                          - maturity
+                          - docsUrl
+                          additionalProperties: false
+                        relevance:
+                          type: array
+                          items:
+                            type: string
+                            enum:
+                            - affected
+                            - configured
+                            - eligible
+                            - enrolled
+                            - using
+                        reason:
+                          type: string
+                          enum:
+                          - affected
+                          - configured
+                          - broad
+                          - explore
+                          - history
+                        unread:
+                          type: boolean
+                      required:
+                      - id
+                      - version
+                      - releasedAt
+                      - description
+                      - tier
+                      - audience
+                      - feature
+                      - relevance
+                      - reason
+                      - unread
+                      additionalProperties: false
+                  totalCount:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                  unreadCount:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                  lastSeenAt:
+                    type:
+                    - string
+                    - 'null'
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+                  hasMore:
+                    type: boolean
+                  generatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+                required:
+                - scope
+                - updates
+                - totalCount
+                - unreadCount
+                - lastSeenAt
+                - hasMore
+                - generatedAt
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /release-updates/seen:
+    servers:
+    - url: https://api.interchange.io/api/v2
+      description: Production server
+    post:
+      operationId: markReleaseUpdatesSeen
+      summary: Mark release updates as seen
+      description: Advance the authenticated user’s release-update watermark. Watermarks only move forward.
+      tags:
+      - Release Updates
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seenThrough:
+                  type: string
+                  format: date-time
+                  pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+              required:
+              - seenThrough
+      responses:
+        '200':
+          description: Mark release updates as seen
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  seenThrough:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+                required:
+                - seenThrough
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
+x-refined-from:
+- scope3-buyer-openapi-original.yml
+- scope3-storefront-openapi-original.yml

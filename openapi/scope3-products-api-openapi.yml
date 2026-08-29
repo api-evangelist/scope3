@@ -1,0 +1,166 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront Products API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Products
+paths:
+  /products:
+    get:
+      operationId: listStorefrontOwnProducts
+      summary: List eligible products for media buys
+      description: List storefront products aggregated across all active ad server sources. Used by the approvals widget to show which products a pending media buy is eligible for.
+      tags:
+      - Products
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List eligible products for media buys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontProductsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    StorefrontProductSummary:
+      description: A product from an ad server source associated with this storefront
+      type: object
+      properties:
+        productId:
+          description: Upstream product identifier
+          type: string
+        name:
+          description: Product display name
+          type: string
+        description:
+          description: Product description
+          type:
+          - string
+          - 'null'
+        status:
+          description: Product status (e.g. active, inactive)
+          type: string
+        creativeFormatIds:
+          description: Creative format IDs this product accepts
+          type: array
+          items:
+            type: string
+        adUnitNames:
+          description: GAM ad unit names associated with this product
+          type: array
+          items:
+            type: string
+      required:
+      - productId
+      - name
+      - description
+      - status
+      - creativeFormatIds
+      - adUnitNames
+      additionalProperties: false
+    StorefrontProductsResponse:
+      description: List of storefront products aggregated across all ad server sources
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontProductSummary'
+      required:
+      - data
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

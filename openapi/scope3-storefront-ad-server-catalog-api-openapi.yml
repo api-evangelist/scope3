@@ -1,0 +1,1626 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Storefront Storefront Ad Server Catalog API
+  version: 2.0.0
+  description: 'REST API for partners to manage storefronts, inventory sources, and billing.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/storefront`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/storefront` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/storefront
+  description: Production server
+tags:
+- name: Storefront Ad Server Catalog
+paths:
+  /esa/{esaId}/products:
+    post:
+      operationId: createEsaProduct
+      summary: Create a product for an ad server source
+      description: Create a draft or active wholesale product on the ad server source's upstream tenant. Validate the same complete request first with the validation endpoint.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EsaProductUpdateBody'
+      responses:
+        '201':
+          description: Create a product for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      operationId: listEsaProducts
+      summary: List products for an ad server source
+      description: List the wholesale products defined on the ad server source's upstream tenant. Product shapes are the upstream adapter's payload and vary by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List products for an ad server source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaProductListEnvelope'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/products:validate:
+    post:
+      operationId: validateEsaProduct
+      summary: Validate a product draft for an ad server source
+      description: Validate a complete product request against the ad server source without persisting it. Returns field-level blocking errors and advisory warnings.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EsaProductUpdateBody'
+      responses:
+        '200':
+          description: Validate a product draft for an ad server source
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                        message:
+                          type: string
+                        field:
+                          type:
+                          - string
+                          - 'null'
+                        severity:
+                          type: string
+                          enum:
+                          - error
+                          - warning
+                      required:
+                      - code
+                      - message
+                      additionalProperties: {}
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                        message:
+                          type: string
+                        code:
+                          type: string
+                      required:
+                      - message
+                      additionalProperties: {}
+                  warnings:
+                    type: array
+                    items: {}
+                required:
+                - valid
+                additionalProperties: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/products/{productId}:
+    get:
+      operationId: getEsaProduct
+      summary: Get a product for an ad server source
+      description: Get a single wholesale product from the ad server source's upstream tenant. The response body is the upstream adapter's payload and varies by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: productId
+        schema:
+          description: Upstream product id for the ad server source.
+          example: prod_abc
+          type: string
+          minLength: 1
+        required: true
+        description: Upstream product id for the ad server source.
+      responses:
+        '200':
+          description: Get a product for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source or product with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateEsaProduct
+      summary: Update a product for an ad server source
+      description: Replace the editable fields of a wholesale product on the ad server source's upstream tenant. The upstream endpoint requires a complete replacement body; the response body is the upstream adapter's payload and varies by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: productId
+        schema:
+          description: Upstream product id for the ad server source.
+          example: prod_abc
+          type: string
+          minLength: 1
+        required: true
+        description: Upstream product id for the ad server source.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EsaProductUpdateBody'
+      responses:
+        '200':
+          description: Update a product for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source or product with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: patchEsaProduct
+      summary: Change only the named fields of a product for an ad server source
+      description: Apply a partial update to a wholesale product on the ad server source's upstream tenant. Only the fields present in the body are applied; a field you omit — or send as `null` — keeps its stored value, and `inventory` merges one level deep. Prefer this over the full-replace PUT unless you hold a complete product — a replace clears the pricing options, channels and targeting it does not re-send. A partial update may leave a product incomplete, in which case it stays out of the buyer-facing catalog until it is completed. The response body is the upstream adapter's payload and varies by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: productId
+        schema:
+          description: Upstream product id for the ad server source.
+          example: prod_abc
+          type: string
+          minLength: 1
+        required: true
+        description: Upstream product id for the ad server source.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EsaProductPatchBody'
+      responses:
+        '200':
+          description: Change only the named fields of a product for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source or product with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteEsaProduct
+      summary: Delete a product for an ad server source
+      description: Delete a wholesale product from the ad server source's upstream tenant.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: productId
+        schema:
+          description: Upstream product id for the ad server source.
+          example: prod_abc
+          type: string
+          minLength: 1
+        required: true
+        description: Upstream product id for the ad server source.
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source or product with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/signals:
+    get:
+      operationId: listEsaSignals
+      summary: List signals for an ad server source
+      description: List the named targeting definitions authored for the ad server source. The API wire objects are named `signal`; their shapes are the upstream adapter's payload and vary by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List signals for an ad server source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaSignalListEnvelope'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createEsaSignal
+      summary: Create or dry-run a signal for an ad server source
+      description: Create a complete signal mapping on the upstream ad-server tenant. Set dry_run=true to validate and preview without persisting.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: dry_run
+        schema:
+          description: Validate and preview the upstream signal without persisting it.
+          type: string
+          enum:
+          - 'true'
+        description: Validate and preview the upstream signal without persisting it.
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signalId:
+                  type: string
+                  pattern: ^[A-Za-z0-9_-]+$
+                name:
+                  type: string
+                  minLength: 1
+                valueType:
+                  type: string
+                  enum:
+                  - binary
+                  - categorical
+                  - numeric
+                adapterConfig:
+                  type: object
+                  additionalProperties: {}
+                description:
+                  type:
+                  - string
+                  - 'null'
+                categories:
+                  type: array
+                  items:
+                    type: string
+                range:
+                  type:
+                  - object
+                  - 'null'
+                  properties:
+                    min:
+                      anyOf:
+                      - type: number
+                      - type: string
+                    max:
+                      anyOf:
+                      - type: number
+                      - type: string
+                  additionalProperties: {}
+                targetingDimension:
+                  type:
+                  - string
+                  - 'null'
+                signalType:
+                  type: string
+                  enum:
+                  - generic
+                  - property
+                  - age
+                ageDetermination:
+                  type: string
+                  enum:
+                  - survey_based
+                  - assumptive
+                  - user_provided
+                  - user_verified
+                dataProvider:
+                  type:
+                  - string
+                  - 'null'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                pricing_options:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/VendorPricingOption'
+              required:
+              - signalId
+              - name
+              - valueType
+              - adapterConfig
+              additionalProperties: {}
+      responses:
+        '200':
+          description: Dry-run validation result when dry_run=true.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaSignalResponse'
+        '201':
+          description: Create or dry-run a signal for an ad server source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaSignalResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/signals/adapter-capabilities:
+    get:
+      operationId: getEsaSignalAdapterCapabilities
+      summary: Get signal capabilities for an ad server source
+      description: 'Describe what the source''s ad-server adapter supports for signals: available targeting types and the adapter config shape. The response body is the upstream adapter''s payload and varies by ad server.'
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: Get signal capabilities for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/signals/candidates:
+    get:
+      operationId: listEsaSignalCandidates
+      summary: List ad-server targeting for signal authoring
+      description: Browse source-native ad-server targeting (audience segments, targeting keys, and values) that can back a signal. The API wire objects are named `candidate`; the response is the upstream adapter's paginated payload and varies by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: candidateType
+        schema:
+          description: Filter to one adapter-defined candidate type.
+          type: string
+        description: Filter to one adapter-defined candidate type.
+      - in: query
+        name: q
+        schema:
+          description: Candidate name/keyword search.
+          type: string
+        description: Candidate name/keyword search.
+      - in: query
+        name: parentId
+        schema:
+          description: Restrict to children of this candidate.
+          type: string
+        description: Restrict to children of this candidate.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+      - in: query
+        name: cursor
+        schema:
+          type: string
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List ad-server targeting for signal authoring
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/signals/{signalId}:
+    get:
+      operationId: getEsaSignal
+      summary: Get a signal for an ad server source
+      description: Get a single signal from the ad server source's upstream tenant. The API wire object is named `signal`; its shape is the upstream adapter's payload and varies by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: signalId
+        schema:
+          description: Signal id. The wire field remains `signalId` for API compatibility.
+          example: sig_abc
+          type: string
+          minLength: 1
+        required: true
+        description: Signal id. The wire field remains `signalId` for API compatibility.
+      responses:
+        '200':
+          description: Get a signal for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source or signal with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateEsaSignal
+      summary: Replace or dry-run a signal for an ad server source
+      description: Replace a complete signal mapping on the upstream ad-server tenant. The body signalId must match the path. Set dry_run=true to validate and preview without persisting.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: dry_run
+        schema:
+          description: Validate and preview the upstream signal without persisting it.
+          type: string
+          enum:
+          - 'true'
+        description: Validate and preview the upstream signal without persisting it.
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: signalId
+        schema:
+          description: Signal id. The wire field remains `signalId` for API compatibility.
+          example: sig_abc
+          type: string
+          minLength: 1
+        required: true
+        description: Signal id. The wire field remains `signalId` for API compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signalId:
+                  type: string
+                  pattern: ^[A-Za-z0-9_-]+$
+                name:
+                  type: string
+                  minLength: 1
+                valueType:
+                  type: string
+                  enum:
+                  - binary
+                  - categorical
+                  - numeric
+                adapterConfig:
+                  type: object
+                  additionalProperties: {}
+                description:
+                  type:
+                  - string
+                  - 'null'
+                categories:
+                  type: array
+                  items:
+                    type: string
+                range:
+                  type:
+                  - object
+                  - 'null'
+                  properties:
+                    min:
+                      anyOf:
+                      - type: number
+                      - type: string
+                    max:
+                      anyOf:
+                      - type: number
+                      - type: string
+                  additionalProperties: {}
+                targetingDimension:
+                  type:
+                  - string
+                  - 'null'
+                signalType:
+                  type: string
+                  enum:
+                  - generic
+                  - property
+                  - age
+                ageDetermination:
+                  type: string
+                  enum:
+                  - survey_based
+                  - assumptive
+                  - user_provided
+                  - user_verified
+                dataProvider:
+                  type:
+                  - string
+                  - 'null'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                pricing_options:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/VendorPricingOption'
+              required:
+              - signalId
+              - name
+              - valueType
+              - adapterConfig
+              additionalProperties: {}
+      responses:
+        '200':
+          description: Replace or dry-run a signal for an ad server source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaSignalResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteEsaSignal
+      summary: Delete a signal for an ad server source
+      description: Delete a signal mapping from the upstream ad-server tenant.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      - in: path
+        name: signalId
+        schema:
+          description: Signal id. The wire field remains `signalId` for API compatibility.
+          example: sig_abc
+          type: string
+          minLength: 1
+        required: true
+        description: Signal id. The wire field remains `signalId` for API compatibility.
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/inventory/capabilities:
+    get:
+      operationId: getEsaInventoryAdapterCapabilities
+      summary: Get inventory capabilities for an ad server source
+      description: 'Describe what the connection''s ad-server adapter supports for inventory: selector dimensions and publisher-property discovery. The response body is the upstream adapter''s payload and varies by ad server.'
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: Get inventory capabilities for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/inventory/publisher-properties:
+    get:
+      operationId: listEsaPublisherProperties
+      summary: List publisher properties for an ad server source
+      description: List the publisher properties (sites, apps) the ad-server adapter exposes for this connection. Returns the full set; there is no domain filter. Property shapes are the upstream adapter's payload and vary by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List publisher properties for an ad server source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsaPublisherPropertyListEnvelope'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/inventory/selectors:
+    get:
+      operationId: searchEsaAdServerSelectors
+      summary: Search inventory selectors for an ad server source
+      description: Search one ad-server selector dimension (ad units, placements, etc.) for inventory that can back a product. `selectorType` is required; optional `mediaType` and `environmentType` filters are forwarded to ad-server sources that support media/environment-scoped inventory browsing. The response body is the upstream adapter's paginated payload and varies by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: selectorType
+        schema:
+          description: Which ad-server selector dimension to search (adapter-defined, e.g. ad_unit, placement). Required.
+          type: string
+        required: true
+        description: Which ad-server selector dimension to search (adapter-defined, e.g. ad_unit, placement). Required.
+      - in: query
+        name: q
+        schema:
+          description: Selector name search.
+          type: string
+        description: Selector name search.
+      - in: query
+        name: parentId
+        schema:
+          description: Restrict to children of this selector.
+          type: string
+        description: Restrict to children of this selector.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+      - in: query
+        name: cursor
+        schema:
+          type: string
+      - in: query
+        name: mediaType
+        schema:
+          description: Restrict selectors to inventory matching the requested media type.
+          type: string
+          enum:
+          - display
+          - video
+        description: Restrict selectors to inventory matching the requested media type.
+      - in: query
+        name: environmentType
+        schema:
+          description: Restrict selectors to inventory matching the requested ad-server environment.
+          type: string
+          enum:
+          - BROWSER
+          - VIDEO_PLAYER
+        description: Restrict selectors to inventory matching the requested ad-server environment.
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: Search inventory selectors for an ad server source
+        '400':
+          description: '`selectorType` is missing.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /esa/{esaId}/creative-formats:
+    get:
+      operationId: listEsaCreativeFormats
+      summary: List creative formats for an ad server source
+      description: List the creative formats available on the ad server source's upstream tenant, optionally filtered by name or asset type. The response body is the upstream adapter's payload and varies by ad server.
+      tags:
+      - Storefront Ad Server Catalog
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: q
+        schema:
+          description: Format name search.
+          type: string
+        description: Format name search.
+      - in: query
+        name: assetType
+        schema:
+          description: Filter by asset type. Repeat the parameter for multiple types; a single value also parses.
+          type: array
+          items:
+            type: string
+        description: Filter by asset type. Repeat the parameter for multiple types; a single value also parses.
+      - in: path
+        name: esaId
+        schema:
+          description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+          example: 123
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        required: true
+        description: Ad server source connection id. The wire field remains `esaId` for API compatibility.
+      responses:
+        '200':
+          description: List creative formats for an ad server source
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No ad server source with this id, or the source is deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    EsaSignalResponse:
+      type: object
+      additionalProperties: {}
+    EsaProductUpdateBody:
+      description: Full salesagent WholesaleProductRequest update body for an ad-server source product. The upstream endpoint requires a complete replacement body; unknown/extra fields are forwarded as-is.
+      type: object
+      properties:
+        wholesale_product_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        delivery_type:
+          type: string
+        format_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaCanonicalProductFormatOption'
+        inventory:
+          type: object
+          additionalProperties: {}
+      additionalProperties: {}
+    VendorPricingOption:
+      description: AdCP vendor pricing option. A signal carries zero or more; absence means the signal is free. Forwarded verbatim to the managed ad-server source.
+      allOf:
+      - type: object
+        properties:
+          pricing_option_id:
+            type: string
+          applies_to_output_format_ids:
+            type: array
+            items: {}
+        required:
+        - pricing_option_id
+        additionalProperties: {}
+      - oneOf:
+        - type: object
+          properties:
+            model:
+              type: string
+              enum:
+              - cpm
+            cpm:
+              type: number
+            currency:
+              type: string
+          required:
+          - model
+          - cpm
+          - currency
+          additionalProperties: {}
+        - type: object
+          properties:
+            model:
+              type: string
+              enum:
+              - percent_of_media
+            percent:
+              type: number
+            max_cpm:
+              type: number
+            currency:
+              type: string
+          required:
+          - model
+          - percent
+          - currency
+          additionalProperties: {}
+        - type: object
+          properties:
+            model:
+              type: string
+              enum:
+              - flat_fee
+            amount:
+              type: number
+            period:
+              type: string
+              enum:
+              - monthly
+              - quarterly
+              - annual
+              - campaign
+            currency:
+              type: string
+          required:
+          - model
+          - amount
+          - period
+          - currency
+          additionalProperties: {}
+        - type: object
+          properties:
+            model:
+              type: string
+              enum:
+              - per_unit
+            unit:
+              type: string
+            unit_price:
+              type: number
+            currency:
+              type: string
+          required:
+          - model
+          - unit
+          - unit_price
+          - currency
+          additionalProperties: {}
+        - type: object
+          properties:
+            model:
+              type: string
+              enum:
+              - custom
+            description:
+              type: string
+            currency:
+              type: string
+          required:
+          - model
+          - description
+          additionalProperties: {}
+        type: object
+    EsaSignalListEnvelope:
+      type: object
+      properties:
+        signals:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - signals
+      additionalProperties: false
+    EsaCanonicalProductFormatOption:
+      description: URL-free AdCP 3.1 product format declaration. Canonical formats use format_kind plus params and never agent_url; publisher-backed options pair format_option_id with publisher_domain.
+      type: object
+      properties:
+        format_option_id:
+          type: string
+        publisher_domain:
+          description: Publisher catalog namespace for format_option_id. Omit for product-local format options.
+          type: string
+          maxLength: 253
+          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$
+        format_kind:
+          anyOf:
+          - type: string
+            enum:
+            - image
+          - type: string
+            enum:
+            - html5
+          - type: string
+            enum:
+            - display_tag
+          - type: string
+            enum:
+            - image_carousel
+          - type: string
+            enum:
+            - video_hosted
+          - type: string
+            enum:
+            - video_vast
+          - type: string
+            enum:
+            - audio_hosted
+          - type: string
+            enum:
+            - audio_daast
+          - type: string
+            enum:
+            - sponsored_placement
+          - type: string
+            enum:
+            - native_in_feed
+          - type: string
+            enum:
+            - responsive_creative
+          - type: string
+            enum:
+            - agent_placement
+          - type: string
+            enum:
+            - custom
+        params:
+          type: object
+          additionalProperties: {}
+      required:
+      - format_kind
+      - params
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    EsaAllowedPublisherSelector:
+      type: object
+      properties:
+        publisherDomain:
+          description: The parent publisher domain from the source's publisher record. For a network whose properties represent individual sites, this is the network domain, not a represented site.
+          type: string
+        selectionType:
+          description: Whether the option covers every property on the domain, specific property ids, or specific property tags.
+          type: string
+          enum:
+          - all
+          - by_id
+          - by_tag
+        propertyIds:
+          type: array
+          items:
+            type: string
+        propertyTags:
+          type: array
+          items:
+            type: string
+        label:
+          description: Human-readable option label.
+          type: string
+      required:
+      - publisherDomain
+      - selectionType
+      - label
+      additionalProperties: false
+    EsaProductListEnvelope:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - products
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    EsaProductPatchBody:
+      description: Partial change body for an ad-server-source product. Only the fields present are applied; an omitted field — or one sent as null — keeps its stored value, and `inventory` merges one level deep. Unknown/extra fields are forwarded as-is.
+      type: object
+      properties:
+        wholesale_product_id:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 100
+        name:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 200
+        description:
+          type:
+          - string
+          - 'null'
+        status:
+          type:
+          - string
+          - 'null'
+        delivery_type:
+          type:
+          - string
+          - 'null'
+        format_options:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            additionalProperties: {}
+        inventory:
+          type:
+          - object
+          - 'null'
+          additionalProperties: {}
+      additionalProperties: {}
+    EsaPublisherPropertyListEnvelope:
+      type: object
+      properties:
+        properties:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        allowedSelectors:
+          description: 'The coverage selectors this source has recorded and will accept on a product. Declare `inventory.publisher_properties` from these rather than deriving a domain from `properties`: `publisher_domain` must match the parent domain in an advertised selector, while a property''s own identifiers may name a represented site instead. Selector availability depends on the source record, not publisher verification.'
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaAllowedPublisherSelector'
+      required:
+      - properties
+      - allowedSelectors
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

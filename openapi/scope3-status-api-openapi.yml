@@ -1,14 +1,11 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
   version: 1.0.0
-  title: AI Impact Measurement Status API
+  title: AI impact measurement Status API
 security:
 - bearerAuth: []
 tags:
 - name: Status
-servers:
-- url: https://aiapi.scope3.com
-  description: AI Impact Measurement API server
 paths:
   /status:
     get:
@@ -39,6 +36,17 @@ paths:
       - Status
 components:
   schemas:
+    StatusResponse:
+      title: Status Response
+      type: object
+      additionalProperties: false
+      required:
+      - ready
+      properties:
+        ready:
+          type: boolean
+        reason:
+          type: string
     Error:
       type: object
       additionalProperties: false
@@ -56,17 +64,6 @@ components:
               type: string
             field:
               type: string
-    StatusResponse:
-      title: Status Response
-      type: object
-      additionalProperties: false
-      required:
-      - ready
-      properties:
-        ready:
-          type: boolean
-        reason:
-          type: string
   securitySchemes:
     bearerAuth:
       type: http

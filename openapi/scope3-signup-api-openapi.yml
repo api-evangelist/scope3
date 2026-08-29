@@ -1,0 +1,274 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Signup API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Signup
+  description: Request reviewed access to Interchange
+paths:
+  /auth/buyer-signup-intake:
+    servers:
+    - url: https://api.interchange.io
+      description: Production signup service
+    post:
+      operationId: submitBuyerSignupIntake
+      summary: Request buyer access
+      description: Submit buyer qualification for human review. This public form does not create an account, grant access, or establish organization or email ownership.
+      tags:
+      - Signup
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  maxLength: 254
+                  format: email
+                  pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+                first_name:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                last_name:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                company:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                role:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - brand
+                  - agency
+                intent:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - self_service
+                  - assisted_pilot
+                  - evaluate
+                  - integration_partnership
+                  - campaign_management
+                  - agent_connection
+                agent_name:
+                  type:
+                  - string
+                  - 'null'
+                  minLength: 1
+                  maxLength: 200
+                source:
+                  default: agentic-signup
+                  type: string
+                  enum:
+                  - agentic-signup
+                  - agentic-login
+                  - marketing-site
+                use_case:
+                  type:
+                  - string
+                  - 'null'
+                  maxLength: 1000
+                intended_markets:
+                  default: []
+                  maxItems: 249
+                  type: array
+                  items:
+                    type: string
+                    minLength: 2
+                    maxLength: 32
+                intended_channels:
+                  default: []
+                  maxItems: 22
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - display
+                    - olv
+                    - social
+                    - search
+                    - ctv
+                    - linear_tv
+                    - radio
+                    - streaming_audio
+                    - podcast
+                    - dooh
+                    - ooh
+                    - print
+                    - cinema
+                    - email
+                    - gaming
+                    - retail_media
+                    - influencer
+                    - affiliate
+                    - product_placement
+                    - sponsored_intelligence
+                    - audio
+                    - other
+                pilot_budget:
+                  type:
+                  - string
+                  - 'null'
+                  minLength: 1
+                  maxLength: 100
+                pilot_timing:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - ready_now
+                  - one_to_three_months
+                  - later
+                self_service_experience:
+                  type:
+                  - boolean
+                  - 'null'
+                prelaunch_slack_consent:
+                  type:
+                  - boolean
+                  - 'null'
+                website:
+                  type: string
+                  maxLength: 500
+              required:
+              - email
+              - first_name
+              - last_name
+              - company
+      responses:
+        '201':
+          description: Request buyer access
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    enum:
+                    - true
+                  data:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        enum:
+                        - true
+                      org_ref:
+                        type:
+                        - string
+                        - 'null'
+                      qualification_route:
+                        type: string
+                        enum:
+                        - solutions_review
+                        - market_nurture
+                        - manual_review
+                    required:
+                    - ok
+                    - org_ref
+                    - qualification_route
+                    additionalProperties: false
+                required:
+                - success
+                - data
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token

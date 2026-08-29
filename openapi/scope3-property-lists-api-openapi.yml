@@ -1,0 +1,1416 @@
+openapi: 3.2.0
+info:
+  title: Scope3 Buyer Property Lists API
+  version: 2.0.0
+  description: 'REST API for advertisers to manage advertisers, campaigns, and reporting.
+
+
+    ## Authentication
+
+
+    All endpoints require a Bearer token in the Authorization header:
+
+    ```
+
+    Authorization: Bearer your-api-key
+
+    ```
+
+
+    ## Base URL
+
+
+    `https://api.interchange.io/api/v2/buyer`
+
+
+    ## For AI Agents
+
+
+    AI agents can use the MCP endpoint at `/mcp/v2/buyer` with three tools:
+
+    - `initialize`: Start an MCP session
+
+    - `api_call`: Make REST API calls
+
+    - `ask_about_capability`: Learn about API features'
+servers:
+- url: https://api.interchange.io/api/v2/buyer
+  description: Production server
+tags:
+- name: Property Lists
+  description: Validate property lists against AAO registry
+paths:
+  /advertisers/{advertiserId}/property-lists:
+    get:
+      operationId: listPropertyLists
+      summary: List property lists
+      description: List property lists for an advertiser. Optionally filter by purpose (include/exclude).
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: take
+        schema:
+          description: Number of results to return (max 250)
+          example: 50
+          default: 50
+          type: integer
+          maximum: 250
+          minimum: 1
+        description: Number of results to return (max 250)
+      - in: query
+        name: skip
+        schema:
+          description: Number of results to skip for pagination
+          example: 0
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        description: Number of results to skip for pagination
+      - in: query
+        name: purpose
+        schema:
+          description: Whether properties in this list should be included or excluded
+          example: include
+          type: string
+          enum:
+          - include
+          - exclude
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      responses:
+        '200':
+          description: List property lists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyListListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createPropertyList
+      summary: Create property list
+      description: Create a named include or exclude list of publisher domains for an advertiser. Domains are resolved to internal property records. Unresolvable domains are returned in the response.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePropertyListInput'
+      responses:
+        '200':
+          description: Create property list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /advertisers/{advertiserId}/property-lists/{listId}:
+    get:
+      operationId: getPropertyList
+      summary: Get property list
+      description: Get a specific property list by ID with resolved domain identifiers.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      - in: path
+        name: listId
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Get property list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updatePropertyList
+      summary: Update property list
+      description: Update a property list name and/or replace domains entirely.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      - in: path
+        name: listId
+        schema:
+          type: string
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePropertyListInput'
+      responses:
+        '200':
+          description: Update property list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deletePropertyList
+      summary: Delete property list
+      description: Archive a property list and unlink it from the advertiser targeting profile.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: advertiserId
+        schema:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the advertiser
+      - in: path
+        name: listId
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Delete property list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /campaigns/{campaignId}/property-lists:
+    get:
+      operationId: getCampaignPropertyLists
+      summary: Get campaign property lists
+      description: Get the property lists that apply to a campaign — the campaign-level and advertiser-level lists that constrain where it can deliver.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: campaignId
+        schema:
+          description: Unique identifier for the campaign
+          example: cmp_987654321
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the campaign
+      responses:
+        '200':
+          description: Get campaign property lists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignPropertyListsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: attachPropertyListToCampaign
+      summary: Attach property list to campaign
+      description: Retroactively push an advertiser-scoped include list to all active media buys in a campaign. Use when a list was created after media buys were already running. The list must be an include list configured for the campaign's advertiser. Returns a cascade summary with counts of updated, failed, and skipped (no packages) media buys.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: campaignId
+        schema:
+          description: Unique identifier for the campaign
+          example: cmp_987654321
+          type: string
+          minLength: 1
+        required: true
+        description: Unique identifier for the campaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttachPropertyListBody'
+      responses:
+        '200':
+          description: Attach property list to campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachPropertyListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Campaign or property list not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /property-lists/check:
+    post:
+      operationId: checkPropertyList
+      summary: Check property list
+      description: Check a list of domains against the AAO Community Registry. Returns domains categorized into remove, modify, assess, and ok buckets.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckPropertyListBody'
+      responses:
+        '200':
+          description: Check property list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                      remove:
+                        type: number
+                      modify:
+                        type: number
+                      assess:
+                        type: number
+                      ok:
+                        type: number
+                    required:
+                    - total
+                    - remove
+                    - modify
+                    - assess
+                    - ok
+                    additionalProperties: false
+                  remove:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        canonical:
+                          type: string
+                        reason:
+                          type: string
+                          enum:
+                          - duplicate
+                          - blocked
+                        domain_type:
+                          type: string
+                        blocked_reason:
+                          type: string
+                        identifier:
+                          allOf:
+                          - $ref: '#/components/schemas/PropertyListIdentifier'
+                      required:
+                      - input
+                      - canonical
+                      - reason
+                      additionalProperties: false
+                  modify:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        input:
+                          type: string
+                        canonical:
+                          type: string
+                        reason:
+                          type: string
+                        identifier:
+                          allOf:
+                          - $ref: '#/components/schemas/PropertyListIdentifier'
+                      required:
+                      - input
+                      - canonical
+                      - reason
+                      additionalProperties: false
+                  assess:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        domain:
+                          type: string
+                        identifier:
+                          allOf:
+                          - $ref: '#/components/schemas/PropertyListIdentifier'
+                      required:
+                      - domain
+                      additionalProperties: false
+                  ok:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        domain:
+                          type: string
+                        source:
+                          type: string
+                        identifier:
+                          allOf:
+                          - $ref: '#/components/schemas/PropertyListIdentifier'
+                      required:
+                      - domain
+                      - source
+                      additionalProperties: false
+                  reportId:
+                    description: Primary AAO registry report ID (equals `reportIds[0]` when domains were checked). Omitted when the request contained only bundle identifiers (AAO does not currently check bundles).
+                    type: string
+                  reportIds:
+                    description: All registry report IDs for this check. Contains one ID when the input fits in a single registry call, and multiple IDs when the domain input was chunked. Omitted when the request contained only bundle identifiers.
+                    type: array
+                    items:
+                      type: string
+                required:
+                - summary
+                - remove
+                - modify
+                - assess
+                - ok
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /property-lists/reports/{reportId}:
+    get:
+      operationId: getPropertyListCheckReport
+      summary: Get property list check report
+      description: Retrieve a stored property list check report by ID. Reports expire after 7 days.
+      tags:
+      - Property Lists
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: reportId
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Get property list check report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                      remove:
+                        type: number
+                      modify:
+                        type: number
+                      assess:
+                        type: number
+                      ok:
+                        type: number
+                    required:
+                    - total
+                    - remove
+                    - modify
+                    - assess
+                    - ok
+                    additionalProperties: false
+                required:
+                - summary
+                additionalProperties: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    PropertyListOutput:
+      description: Property list resource representation
+      type: object
+      properties:
+        listId:
+          description: Unique identifier for this property list
+          example: '42'
+          type: string
+        name:
+          description: Human-readable name
+          example: Q1 Campaign - UK Premium
+          type: string
+        purpose:
+          description: Whether properties in this list should be included or excluded
+          example: include
+          type: string
+          enum:
+          - include
+          - exclude
+        identifiers:
+          description: Resolved typed identifiers (domains and bundles)
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+        unresolvedIdentifiers:
+          description: Identifiers that could not be resolved to internal property records
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+        registeredIdentifiers:
+          description: Identifiers registered in the AAO property registry but not yet available for local targeting
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+        domains:
+          description: Resolved domain values (convenience view of `identifiers` where type="domain")
+          type: array
+          items:
+            type: string
+        unresolvedDomains:
+          description: Domain values that could not be resolved (convenience view of `unresolvedIdentifiers` where type="domain")
+          type: array
+          items:
+            type: string
+        registeredDomains:
+          description: Domain values registered in AAO but not yet locally targetable (convenience view of `registeredIdentifiers` where type="domain")
+          type: array
+          items:
+            type: string
+        propertyCount:
+          description: Number of resolved properties in the list
+          example: 25
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        resolutionSummary:
+          description: Quick-glance counts for how the submitted identifier set resolved. Populated on create and update only; omitted from get/list responses (the stored list contains only resolved identifiers). Always surface these counts to users so they know how many of their submitted identifiers will actually target.
+          allOf:
+          - $ref: '#/components/schemas/PropertyListResolutionSummary'
+        cascadeSummary:
+          description: Summarizes how the list was retroactively pushed to active media buys whose advertisers reference this list. Present on create and update responses; omitted from get and list responses.
+          allOf:
+          - $ref: '#/components/schemas/PropertyListCascadeSummary'
+        filters:
+          description: Filter configuration stored at creation time
+          allOf:
+          - $ref: '#/components/schemas/PropertyListFiltersOutput'
+        createdAt:
+          description: When the property list was created (ISO 8601)
+          example: '2026-01-15T10:30:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the property list was last updated (ISO 8601)
+          example: '2026-01-20T14:45:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        status:
+          description: Processing status for async uploads. "processing" while identifiers are being resolved, "ready" when complete, "failed" if resolution encountered a permanent error. Omitted for lists created via the synchronous JSON endpoint.
+          example: ready
+          type: string
+          enum:
+          - processing
+          - ready
+          - failed
+        errorMessage:
+          description: Human-readable error message when status is "failed". Omitted otherwise.
+          type: string
+      required:
+      - listId
+      - name
+      - purpose
+      - identifiers
+      - unresolvedIdentifiers
+      - registeredIdentifiers
+      - domains
+      - unresolvedDomains
+      - registeredDomains
+      - propertyCount
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    PropertyListFilters:
+      type: object
+      properties:
+        channels_any:
+          description: Restrict to SmartPropertyLists matching these channels
+          example:
+          - display
+          - olv
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            enum:
+            - display
+            - olv
+            - social
+            - search
+            - ctv
+            - linear_tv
+            - radio
+            - streaming_audio
+            - podcast
+            - dooh
+            - ooh
+            - print
+            - cinema
+            - email
+            - gaming
+            - retail_media
+            - influencer
+            - affiliate
+            - product_placement
+        countries_all:
+          description: ISO 3166-1 alpha-2 country codes
+          example:
+          - US
+          - GB
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            minLength: 2
+            maxLength: 2
+        property_types:
+          description: Property inventory types
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            enum:
+            - website
+            - mobile_app
+            - ctv_app
+            - desktop_app
+            - dooh
+            - podcast
+            - radio
+            - streaming_audio
+        feature_requirements:
+          description: Feature-based requirements (e.g. IVT, MFA, green)
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              feature_id:
+                type: string
+              min_value:
+                type:
+                - number
+                - 'null'
+              max_value:
+                type:
+                - number
+                - 'null'
+              allowed_values:
+                type:
+                - array
+                - 'null'
+                items: {}
+              if_not_covered:
+                type:
+                - string
+                - 'null'
+                enum:
+                - exclude
+                - include
+            required:
+            - feature_id
+    CampaignPropertyListEntry:
+      description: A property list referenced by one or more media-buy packages on a campaign, with the list summary plus the media-buy/package references that pull it in.
+      type: object
+      properties:
+        listId:
+          type: string
+        name:
+          type: string
+        purpose:
+          description: Whether properties in this list should be included or excluded
+          example: include
+          type: string
+          enum:
+          - include
+          - exclude
+        propertyCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        viaMediaBuys:
+          type: array
+          items:
+            type: object
+            properties:
+              mediaBuyId:
+                type: string
+              packageIds:
+                type: array
+                items:
+                  type: string
+            required:
+            - mediaBuyId
+            - packageIds
+            additionalProperties: false
+      required:
+      - listId
+      - name
+      - purpose
+      - propertyCount
+      - createdAt
+      - updatedAt
+      - viaMediaBuys
+      additionalProperties: false
+    CheckPropertyListBody:
+      description: Request body for checking domains and bundles
+      type: object
+      properties:
+        domains:
+          description: 'Domain values to check (convenience shorthand for `identifiers` with `type: "domain"`).'
+          maxItems: 100000
+          type: array
+          items:
+            type: string
+            minLength: 1
+        identifiers:
+          description: Typed identifiers to check (domains and mobile app bundle IDs). Provide `domains`, `identifiers`, or both; combined total must be 1..100000. Bundle identifiers are not currently checked against the AAO registry and are returned in the `assess` bucket pending upstream support.
+          maxItems: 100000
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+    PropertyListFiltersOutput:
+      type: object
+      properties:
+        channels_any:
+          description: Restrict to SmartPropertyLists matching these channels
+          example:
+          - display
+          - olv
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            enum:
+            - display
+            - olv
+            - social
+            - search
+            - ctv
+            - linear_tv
+            - radio
+            - streaming_audio
+            - podcast
+            - dooh
+            - ooh
+            - print
+            - cinema
+            - email
+            - gaming
+            - retail_media
+            - influencer
+            - affiliate
+            - product_placement
+        countries_all:
+          description: ISO 3166-1 alpha-2 country codes
+          example:
+          - US
+          - GB
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            minLength: 2
+            maxLength: 2
+        property_types:
+          description: Property inventory types
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            enum:
+            - website
+            - mobile_app
+            - ctv_app
+            - desktop_app
+            - dooh
+            - podcast
+            - radio
+            - streaming_audio
+        feature_requirements:
+          description: Feature-based requirements (e.g. IVT, MFA, green)
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            properties:
+              feature_id:
+                type: string
+              min_value:
+                type:
+                - number
+                - 'null'
+              max_value:
+                type:
+                - number
+                - 'null'
+              allowed_values:
+                type:
+                - array
+                - 'null'
+                items: {}
+              if_not_covered:
+                type:
+                - string
+                - 'null'
+                enum:
+                - exclude
+                - include
+            required:
+            - feature_id
+            additionalProperties: false
+      additionalProperties: false
+    PropertyListCascadeSummary:
+      description: Summary of the retroactive push of this updated property list to active media buys.
+      type: object
+      properties:
+        totalMediaBuys:
+          description: Active media buys found whose advertisers reference this list. Each received an update_media_buy call with the refreshed list reference.
+          example: 4
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        updatedCount:
+          description: Active media buys that were successfully notified of the updated list
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        failedCount:
+          description: Active media buys where the update_media_buy call failed. See server logs for details.
+          example: 1
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - totalMediaBuys
+      - updatedCount
+      - failedCount
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    AttachPropertyListResponse:
+      type: object
+      properties:
+        campaignId:
+          description: Campaign the list was attached to
+          type: string
+        propertyListId:
+          description: Property list that was attached
+          type: string
+        cascade:
+          description: Counts of active media buys processed during the retroactive attach
+          allOf:
+          - $ref: '#/components/schemas/AttachCascadeSummary'
+      required:
+      - campaignId
+      - propertyListId
+      - cascade
+      additionalProperties: false
+    PropertyListResolutionSummary:
+      description: Counts describing how a submitted identifier set resolved against the AAO registry and local catalog.
+      type: object
+      properties:
+        totalRequested:
+          description: Number of unique identifiers the caller submitted (after per-type normalization and dedup)
+          example: 500
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        resolvedCount:
+          description: Identifiers successfully resolved to local Property records
+          example: 432
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        registeredCount:
+          description: Identifiers present in the AAO registry but with no local Property record yet (not yet targetable)
+          example: 12
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        unresolvedCount:
+          description: Identifiers not found anywhere; they will NOT participate in targeting
+          example: 56
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        resolutionRate:
+          description: resolvedCount / totalRequested as a fraction 0–1 (0 when totalRequested is 0)
+          example: 0.864
+          type: number
+          minimum: 0
+          maximum: 1
+      required:
+      - totalRequested
+      - resolvedCount
+      - registeredCount
+      - unresolvedCount
+      - resolutionRate
+      additionalProperties: false
+    CreatePropertyListInput:
+      description: Request body for creating a property list
+      type: object
+      properties:
+        name:
+          description: Human-readable name for the property list
+          example: Q1 Campaign - UK Premium
+          type: string
+          minLength: 1
+          maxLength: 255
+        purpose:
+          description: Whether properties in this list should be included or excluded
+          example: include
+          type: string
+          enum:
+          - include
+          - exclude
+        domains:
+          description: 'Domain identifiers (convenience shorthand for `identifiers` entries with `type: "domain"`). Provide `domains`, `identifiers`, or both. Large lists are chunked server-side against the AAO registry and local database; the response includes a `resolutionSummary` with the counts.'
+          example:
+          - nytimes.com
+          - cnn.com
+          - bbc.co.uk
+          maxItems: 100000
+          type: array
+          items:
+            type: string
+            minLength: 1
+        identifiers:
+          description: Typed property identifiers (AdCP-aligned) — mix of website domains, mobile app bundles/packages, store IDs, and CTV app IDs. Provide `domains`, `identifiers`, or both; combined total must be between 1 and 100000.
+          example:
+          - type: domain
+            value: nytimes.com
+          - type: ios_bundle
+            value: com.facebook.katana
+          - type: android_package
+            value: com.facebook.katana
+          - type: apple_app_store_id
+            value: '284882215'
+          maxItems: 100000
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+        filters:
+          description: Filter configuration — controls which SmartPropertyLists this list is linked to
+          allOf:
+          - $ref: '#/components/schemas/PropertyListFilters'
+      required:
+      - name
+      - purpose
+    PropertyListSummary:
+      description: Compact property-list view returned by list endpoints. Use `get_property_list` for full content.
+      type: object
+      properties:
+        listId:
+          description: Unique identifier for this property list
+          example: '42'
+          type: string
+        name:
+          description: Human-readable name
+          example: Q1 Campaign - UK Premium
+          type: string
+        purpose:
+          description: Whether properties in this list should be included or excluded
+          example: include
+          type: string
+          enum:
+          - include
+          - exclude
+        propertyCount:
+          description: Number of resolved properties in the list
+          example: 25
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        createdAt:
+          description: When the property list was created (ISO 8601)
+          example: '2026-01-15T10:30:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the property list was last updated (ISO 8601)
+          example: '2026-01-20T14:45:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - listId
+      - name
+      - purpose
+      - propertyCount
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    EmptyResponse:
+      description: No content
+      type: object
+      properties: {}
+      additionalProperties: false
+    PropertyListIdentifier:
+      description: 'A typed property identifier (AdCP-aligned, sourced from `@adcp/sdk`). Read-side note: Apple App Store bundles share a single backing column, so `apple_tv_bundle` write-time entries normalize to `ios_bundle` on subsequent get/list responses. `bundle_id` (generic fallback) likewise normalizes to the resolved app row''s store-typed form (`ios_bundle` or `android_package`).'
+      type: object
+      properties:
+        type:
+          anyOf:
+          - type: string
+            enum:
+            - domain
+          - type: string
+            enum:
+            - subdomain
+          - type: string
+            enum:
+            - network_id
+          - type: string
+            enum:
+            - ios_bundle
+          - type: string
+            enum:
+            - android_package
+          - type: string
+            enum:
+            - apple_app_store_id
+          - type: string
+            enum:
+            - google_play_id
+          - type: string
+            enum:
+            - roku_store_id
+          - type: string
+            enum:
+            - fire_tv_asin
+          - type: string
+            enum:
+            - samsung_app_id
+          - type: string
+            enum:
+            - apple_tv_bundle
+          - type: string
+            enum:
+            - bundle_id
+          - type: string
+            enum:
+            - venue_id
+          - type: string
+            enum:
+            - screen_id
+          - type: string
+            enum:
+            - openooh_venue_type
+          - type: string
+            enum:
+            - rss_url
+          - type: string
+            enum:
+            - apple_podcast_id
+          - type: string
+            enum:
+            - spotify_collection_id
+          - type: string
+            enum:
+            - podcast_guid
+          - type: string
+            enum:
+            - station_id
+          - type: string
+            enum:
+            - facility_id
+        value:
+          type: string
+      required:
+      - type
+      - value
+      additionalProperties: {}
+    UpdatePropertyListInput:
+      description: Request body for updating a property list
+      type: object
+      properties:
+        name:
+          description: Updated name for the property list
+          type: string
+          minLength: 1
+          maxLength: 255
+        domains:
+          description: 'Updated domain list (convenience shorthand for `identifiers` with `type: "domain"`). If provided together with `identifiers`, both are merged. Replaces the existing identifier set entirely. Large lists are chunked server-side; the response includes a `resolutionSummary` with the counts.'
+          maxItems: 100000
+          type: array
+          items:
+            type: string
+            minLength: 1
+        identifiers:
+          description: Updated typed identifiers (domains + bundles). Replaces the existing identifier set entirely when either `domains` or `identifiers` is provided.
+          maxItems: 100000
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+    AttachCascadeSummary:
+      type: object
+      properties:
+        totalMediaBuys:
+          description: Active media buys found whose advertisers reference this list. Each received an update_media_buy call with the refreshed list reference.
+          example: 4
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        updatedCount:
+          description: Active media buys that were successfully notified of the updated list
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        failedCount:
+          description: Active media buys where the update_media_buy call failed. See server logs for details.
+          example: 1
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        skippedCount:
+          description: Media buys skipped during retroactive attach (already had the list or ineligible status)
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - totalMediaBuys
+      - updatedCount
+      - failedCount
+      - skippedCount
+      additionalProperties: false
+    CampaignPropertyListsResponse:
+      description: Property lists referenced by a campaign, derived from targeting_overlay.property_list on the campaign media-buy packages.
+      type: object
+      properties:
+        campaignId:
+          type: string
+        propertyLists:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignPropertyListEntry'
+        summary:
+          type: object
+          properties:
+            totalLists:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            includeCount:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            excludeCount:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+          required:
+          - totalLists
+          - includeCount
+          - excludeCount
+          additionalProperties: false
+      required:
+      - campaignId
+      - propertyLists
+      - summary
+      additionalProperties: false
+    AttachPropertyListBody:
+      type: object
+      properties:
+        propertyListId:
+          description: The ID of the property list to attach to the campaign
+          example: '1756'
+          type: string
+          minLength: 1
+      required:
+      - propertyListId
+    PropertyListResponse:
+      description: Response containing a single property list
+      type: object
+      properties:
+        propertyList:
+          $ref: '#/components/schemas/PropertyListOutput'
+      required:
+      - propertyList
+      additionalProperties: false
+    PropertyListListResponse:
+      description: Response containing a paginated list of property-list summaries
+      type: object
+      properties:
+        propertyLists:
+          description: Property lists projected to the summary shape. Use `get_property_list` for the full resource (domains, filters).
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListSummary'
+        total:
+          description: Total count of property lists matching the query
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - propertyLists
+      - total
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key or access token
