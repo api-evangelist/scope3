@@ -15,6 +15,18 @@ description: >-
   Skills, a documented error envelope, IETF draft-7 rate-limit headers and a published IU
   pricing model. Backed by GV.
 url: https://raw.githubusercontent.com/api-evangelist/scope3/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
