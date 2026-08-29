@@ -605,6 +605,9 @@ apis:
   - type: OpenAPI
     url: openapi/scope3-webhook-subscriptions-api-openapi.yml
 common:
+- type: CapabilityMap
+  url: capabilities/scope3-capability-edges.yml
+  name: Scope3 Business Capability Map
 - type: Overlay
   url: overlays/scope3-buyer-overlay.yaml
 - type: AgentSkill

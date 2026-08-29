@@ -1,0 +1,111 @@
+slug: scope3
+provider: Scope3
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Media, Entertainment & Telecom Content
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 9
+edges:
+- tag: Measure
+  spec_file: scope3-measure-api-openapi.yml
+  capability_id: BC-740.20
+  capability_id_l1: BC-740
+  capability_name: Climate & Carbon Management
+  confidence: 0.88
+  evidence: POST /measure — 'Emissions Measurement'; schemas Scope3MeasureResponseEmissionsBreakdownDetails,
+    Scope3MediaDistributionEmissionsBreakdownDetails, Scope3CompensatedEmissionsBreakdownDetails
+  reason: Core emissions measurement endpoint returning greenhouse-gas emissions breakdowns for media
+    delivery, which is carbon footprint quantification and disclosure — Climate & Carbon Management.
+- tag: Creative
+  spec_file: scope3-creative-api-openapi.yml
+  capability_id: BC-740.20
+  capability_id_l1: BC-740
+  capability_name: Climate & Carbon Management
+  confidence: 0.85
+  evidence: POST /creative — 'Creative emissions'; schemas Scope3CreativeDeliveryEmissionsBreakdownDetails,
+    Emissions, GMSFDisposalEmissionsBreakdown
+  reason: Computes greenhouse-gas emissions attributable to ad creative delivery within the Carbon Calculator.
+    Clearly carbon footprint measurement rather than creative asset management.
+- tag: Webhook Subscriptions
+  spec_file: scope3-webhook-subscriptions-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.85
+  evidence: POST /webhook-subscriptions createWebhookSubscription Register a webhook subscription; schema
+    BuyerWebhookSubscription
+  reason: Lifecycle management of outbound webhook subscriptions exposed to API consumers maps directly
+    to Webhook & Event Subscription Management in the developer platform capability.
+- tag: Storefront
+  spec_file: scope3-storefront-api-openapi.yml
+  capability_id: BC-3760
+  capability_id_l1: BC-3760
+  capability_name: Advertising Sales & Operations Management
+  confidence: 0.8
+  evidence: REST API for partners to manage storefronts, inventory sources, and billing; listSellerAccountRelationships,
+    decideSellerAccountGrantReview, EvaluateCreativeReviewBody, SellerMediaBuyStatus
+  reason: Large sell-side surface covering storefront setup, inventory sources, buyer account grants,
+    creative review and seller analytics/billing — squarely the advertising sales and operations business.
+    Spans several L2s (inventory, programmatic, trafficking, revenue), so L1 only.
+- tag: Benchmarks
+  spec_file: scope3-benchmarks-api-openapi.yml
+  capability_id: BC-740.20
+  capability_id_l1: BC-740
+  capability_name: Climate & Carbon Management
+  confidence: 0.75
+  evidence: POST /benchmarks — 'Country-channel benchmarks'; openapi description 'API to calculate the
+    carbon footprint of a campaign'; schemas BenchmarksResponse, ChannelWithBenchmarks
+  reason: The operation returns country/channel benchmark values within the Carbon Calculator spec whose
+    stated purpose is calculating campaign carbon footprint, i.e. carbon footprint measurement and benchmarking
+    — Climate & Carbon Management. Not an ad-sales capability since no inventory or trading operations
+    exist here.
+- tag: Reporting
+  spec_file: scope3-reporting-api-openapi.yml
+  capability_id: BC-3760.60
+  capability_id_l1: BC-3760
+  capability_name: Advertising Revenue Reporting
+  confidence: 0.75
+  evidence: GET /reporting/margin  getStorefrontMarginReporting  Get storefront margin (P&L) reporting;
+    schemas CampaignReporting, MediaBuyReporting, SettlementStatus
+  reason: Operations return campaign/media-buy delivery and margin-settlement metrics for an advertising
+    marketplace, matching Advertising Revenue Reporting (campaign delivery reporting and billing/settlement).
+    Some ambiguity as the endpoints are generic 'reporting metrics', hence moderate confidence.
+- tag: Impact
+  spec_file: scope3-impact-api-openapi.yml
+  capability_id: BC-740.20
+  capability_id_l1: BC-740
+  capability_name: Climate & Carbon Management
+  confidence: 0.72
+  evidence: POST /v1/impact — 'Get impact metrics for a task'; schemas ImpactMetrics, GridMix, RegionCode,
+    CountryCode, Model
+  reason: Returns environmental impact metrics for AI tasks using grid-mix and region factors within an
+    'AI impact measurement' spec — carbon footprint quantification, i.e. Climate & Carbon Management.
+    Slight ambiguity because the operation summary itself does not name emissions.
+- tag: AI Impact Measurement
+  spec_file: scope3-ai-impact-measurement-api-openapi.yml
+  capability_id: BC-740.20
+  capability_id_l1: BC-740
+  capability_name: Climate & Carbon Management
+  confidence: 0.7
+  evidence: POST /  calculateImpactBigQuery  Calculate AI model impact metrics for BigQuery
+  reason: Scope3 is described as 'the source of truth for greenhouse-gas emissions data', and this endpoint
+    computes environmental impact metrics for AI model usage — i.e. carbon footprint calculation. Single
+    operation and generic schema names keep confidence moderate.
+- tag: Storefront Ad Server Buyer Routing
+  spec_file: scope3-storefront-ad-server-buyer-routing-api-openapi.yml
+  capability_id: BC-3760.40
+  capability_id_l1: BC-3760
+  capability_name: Ad Trafficking & Operations
+  confidence: 0.7
+  evidence: POST /esa/{esaId}/gam-custom-targeting-keys/ensure  ensureEsaGamCustomTargetingKeys  Ensure
+    GAM custom-targeting keys exist; createEsaBuyerAdvertiserMapping  Create buyer advertiser mapping
+  reason: Configures ad-server (GAM) advertisers, custom-targeting keys and buyer-to-advertiser routing
+    so demand can be delivered — ad trafficking and ad-server operations. Confidence moderate as it is
+    integration configuration rather than spot scheduling per se.
