@@ -131,7 +131,7 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
-  - GPU
+  - Gpu
   tags_raw:
   - Gpu
   properties:
@@ -355,6 +355,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - Measurements
+  tags_raw:
   - Measurement
   properties:
   - type: OpenAPI
@@ -385,6 +387,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - Notification
+  tags_raw:
   - Notifications
   properties:
   - type: OpenAPI
@@ -416,6 +420,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - Product
+  tags_raw:
   - Products
   properties:
   - type: OpenAPI
@@ -456,6 +462,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - Sign Up
+  tags_raw:
   - Signup
   properties:
   - type: OpenAPI
@@ -580,6 +588,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - Task
+  tags_raw:
   - Tasks
   properties:
   - type: OpenAPI
