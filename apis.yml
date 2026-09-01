@@ -131,7 +131,7 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
-  - Gpu
+  - GPU
   tags_raw:
   - Gpu
   properties:
