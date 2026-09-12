@@ -1,16 +1,16 @@
 ---
 kin_checks:
   slug: scope3
-  schema_version: 0.18.2
-  scored_at: '2026-09-04'
-  run_ts: 2026-09-04T062714
+  schema_version: 0.21.0
+  scored_at: '2026-09-12'
+  run_ts: 2026-09-12T080032
   note: Actionable checks only (missed + partial). earned/na are every other check
-    in rubric/scoring-0.18.2.yml; counts below let you verify that.
+    in rubric/scoring-0.21.0.yml; counts below let you verify that.
   counts:
-    total: 132
-    earned: 45
+    total: 136
+    earned: 47
     partial: 28
-    missed: 34
+    missed: 36
     na: 25
   checks:
   - id: well_known_published
@@ -74,6 +74,10 @@ kin_checks:
   - id: reg_vulnerability_disclosure
     status: missed
   - id: reg_compliance_published
+    status: missed
+  - id: upsert_alternate_key
+    status: missed
+  - id: upsert_named
     status: missed
   - id: mcp_server
     status: missed
