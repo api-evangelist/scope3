@@ -325,6 +325,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - Creative
+  tags_raw:
   - Creatives
   properties:
   - type: OpenAPI
@@ -558,6 +560,8 @@ apis:
   humanURL: https://docs.scope3.com/reference/measure-1
   baseURL: https://aiapi.scope3.com
   tags:
+  - Storefront
+  tags_raw:
   - Storefronts
   properties:
   - type: OpenAPI
