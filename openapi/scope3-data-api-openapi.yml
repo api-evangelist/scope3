@@ -96,18 +96,6 @@ paths:
       - Data
 components:
   schemas:
-    DataUploadStatus:
-      type: string
-      enum:
-      - PENDING
-      - PROCESSING
-      - FAILED
-      - PENDING_REVIEW
-      - SUCCESS
-      - SKIPPED
-      - MANUALLY_IGNORED
-      - REPLACED_BY_REPROCESS
-      description: The status of upload
     DataUploadInformation:
       type: object
       required:
@@ -143,6 +131,18 @@ components:
         error:
           type: string
           description: Error message if upload failed
+    DataUploadStatus:
+      type: string
+      enum:
+      - PENDING
+      - PROCESSING
+      - FAILED
+      - PENDING_REVIEW
+      - SUCCESS
+      - SKIPPED
+      - MANUALLY_IGNORED
+      - REPLACED_BY_REPROCESS
+      description: The status of upload
   securitySchemes:
     bearerAuth:
       type: http

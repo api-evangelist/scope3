@@ -551,49 +551,53 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    MediaBillingAttachment:
-      description: Routes one advertiser or account (child customer) to a media billing entity.
+    DeleteMediaBillingEntityResponse:
+      type: object
+      properties: {}
+      additionalProperties: false
+    ListMediaBillingAttachmentsResponse:
+      description: Media billing attachments configured for the org.
       type: object
       properties:
-        id:
-          description: Attachment ID
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        entityId:
-          description: Attached entity ID
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        advertiserId:
-          description: Attached advertiser ID (string — advertiser IDs are 64-bit), or null when this attachment targets an account instead.
-          type:
-          - string
-          - 'null'
-        childCustomerId:
-          description: Attached account (child customer) ID, or null when this attachment targets an advertiser instead.
-          type:
-          - integer
-          - 'null'
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        createdAt:
-          description: Creation timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: Last update timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaBillingAttachment'
       required:
-      - id
-      - entityId
-      - advertiserId
-      - childCustomerId
-      - createdAt
-      - updatedAt
+      - attachments
+      additionalProperties: false
+    DeleteMediaBillingAttachmentResponse:
+      type: object
+      properties: {}
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    CreateMediaBillingAttachmentResponse:
+      type: object
+      properties:
+        attachment:
+          $ref: '#/components/schemas/MediaBillingAttachment'
+      required:
+      - attachment
       additionalProperties: false
     ListMediaBillingEntitiesResponse:
       description: Media billing entities configured for the org.
@@ -672,26 +676,6 @@ components:
       - addressLine1
       - city
       - postalCode
-    DeleteMediaBillingAttachmentResponse:
-      type: object
-      properties: {}
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
     MediaBillingEntity:
       description: A media billing entity — a legal entity Scope3 invoices for media spend.
       type: object
@@ -784,24 +768,21 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    ListMediaBillingAttachmentsResponse:
-      description: Media billing attachments configured for the org.
+    UpdateMediaBillingEntityResponse:
       type: object
       properties:
-        attachments:
-          type: array
-          items:
-            $ref: '#/components/schemas/MediaBillingAttachment'
+        entity:
+          $ref: '#/components/schemas/MediaBillingEntity'
       required:
-      - attachments
+      - entity
       additionalProperties: false
-    CreateMediaBillingAttachmentResponse:
+    CreateMediaBillingEntityResponse:
       type: object
       properties:
-        attachment:
-          $ref: '#/components/schemas/MediaBillingAttachment'
+        entity:
+          $ref: '#/components/schemas/MediaBillingEntity'
       required:
-      - attachment
+      - entity
       additionalProperties: false
     ResolveMediaBillingEntityResponse:
       description: 'Answers "who gets this invoice" for an advertiser or account: the resolved media billing entity and which level of the hierarchy it came from.'
@@ -823,46 +804,65 @@ components:
       - entity
       - resolvedVia
       additionalProperties: false
-    ApiError:
-      description: Structured error object
+    ErrorResponse:
+      description: Standard error response
       type: object
       properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
       required:
-      - code
-      - message
+      - data
+      - error
       additionalProperties: false
-    UpdateMediaBillingEntityResponse:
+    MediaBillingAttachment:
+      description: Routes one advertiser or account (child customer) to a media billing entity.
       type: object
       properties:
-        entity:
-          $ref: '#/components/schemas/MediaBillingEntity'
+        id:
+          description: Attachment ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        entityId:
+          description: Attached entity ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        advertiserId:
+          description: Attached advertiser ID (string — advertiser IDs are 64-bit), or null when this attachment targets an account instead.
+          type:
+          - string
+          - 'null'
+        childCustomerId:
+          description: Attached account (child customer) ID, or null when this attachment targets an advertiser instead.
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        createdAt:
+          description: Creation timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: Last update timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - entity
-      additionalProperties: false
-    DeleteMediaBillingEntityResponse:
-      type: object
-      properties: {}
-      additionalProperties: false
-    CreateMediaBillingEntityResponse:
-      type: object
-      properties:
-        entity:
-          $ref: '#/components/schemas/MediaBillingEntity'
-      required:
-      - entity
+      - id
+      - entityId
+      - advertiserId
+      - childCustomerId
+      - createdAt
+      - updatedAt
       additionalProperties: false
   securitySchemes:
     bearerAuth:

@@ -240,19 +240,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    NotificationActionResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          enum:
-          - true
-        notificationId:
-          type: string
-      required:
-      - success
-      - notificationId
-      additionalProperties: false
     NotificationSummary:
       description: Compact notification view returned by list endpoints. Use the notification detail endpoint for the full `data` payload.
       type: object
@@ -392,6 +379,27 @@ components:
       - actionUrl
       - createdAt
       additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
     ErrorResponse:
       description: Standard error response
       type: object
@@ -433,26 +441,18 @@ components:
       - unreadCount
       - hasMore
       additionalProperties: false
-    ApiError:
-      description: Structured error object
+    NotificationActionResponse:
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        success:
+          type: boolean
+          enum:
+          - true
+        notificationId:
           type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
       required:
-      - code
-      - message
+      - success
+      - notificationId
       additionalProperties: false
     StorefrontNotificationSummary:
       description: Compact notification view returned by the storefront list endpoint. Identical to NotificationSummary, minus buyer-only event types that can never appear in a seller notification list.

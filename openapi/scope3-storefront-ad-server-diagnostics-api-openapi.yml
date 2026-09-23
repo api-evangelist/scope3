@@ -166,88 +166,24 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    EsaMediaBuySummary:
+    EsaMediaBuyList:
       type: object
       properties:
-        mediaBuyId:
-          type: string
-        buyerRef:
-          type:
-          - string
-          - 'null'
-        principalId:
-          type: string
-        principalName:
-          type: string
-        status:
-          type: string
-        flightStartDate:
-          type: string
-        flightEndDate:
-          type: string
-        totalBudget:
-          anyOf:
-          - type: number
-          - type: string
-        currency:
-          type: string
-        deliveredImpressions:
-          type:
-          - integer
-          - 'null'
-          minimum: -9007199254740991
+        mediaBuys:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaMediaBuySummary'
+        count:
+          type: integer
+          minimum: 0
           maximum: 9007199254740991
-        deliveredSpend:
-          anyOf:
-          - type: number
-          - type: string
-        pacing:
-          type:
-          - string
-          - 'null'
-        createdAt:
-          type: string
-      required:
-      - mediaBuyId
-      - principalId
-      - principalName
-      - status
-      - flightStartDate
-      - flightEndDate
-      - totalBudget
-      - currency
-      - createdAt
-      additionalProperties: false
-    EsaMediaBuyStatusEvent:
-      type: object
-      properties:
-        occurredAt:
-          type: string
-        status:
-          type: string
-        note:
+        nextCursor:
           type:
           - string
           - 'null'
       required:
-      - occurredAt
-      - status
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
+      - mediaBuys
+      - count
       additionalProperties: false
     EsaMediaBuyDetail:
       type: object
@@ -321,6 +257,58 @@ components:
       - creatives
       - statusHistory
       additionalProperties: false
+    EsaMediaBuySummary:
+      type: object
+      properties:
+        mediaBuyId:
+          type: string
+        buyerRef:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type: string
+        principalName:
+          type: string
+        status:
+          type: string
+        flightStartDate:
+          type: string
+        flightEndDate:
+          type: string
+        totalBudget:
+          anyOf:
+          - type: number
+          - type: string
+        currency:
+          type: string
+        deliveredImpressions:
+          type:
+          - integer
+          - 'null'
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        deliveredSpend:
+          anyOf:
+          - type: number
+          - type: string
+        pacing:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+      required:
+      - mediaBuyId
+      - principalId
+      - principalName
+      - status
+      - flightStartDate
+      - flightEndDate
+      - totalBudget
+      - currency
+      - createdAt
+      additionalProperties: false
     ApiError:
       description: Structured error object
       type: object
@@ -342,24 +330,36 @@ components:
       - code
       - message
       additionalProperties: false
-    EsaMediaBuyList:
+    ErrorResponse:
+      description: Standard error response
       type: object
       properties:
-        mediaBuys:
-          type: array
-          items:
-            $ref: '#/components/schemas/EsaMediaBuySummary'
-        count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        nextCursor:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    EsaMediaBuyStatusEvent:
+      type: object
+      properties:
+        occurredAt:
+          type: string
+        status:
+          type: string
+        note:
           type:
           - string
           - 'null'
       required:
-      - mediaBuys
-      - count
+      - occurredAt
+      - status
       additionalProperties: false
   securitySchemes:
     bearerAuth:

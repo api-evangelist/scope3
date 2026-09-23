@@ -5528,68 +5528,6 @@ components:
         has_more:
           type: boolean
           description: Whether additional pages of results exist
-    DiscoverSignalsInput:
-      type: object
-      properties:
-        agentId:
-          type: string
-          maxLength: 255
-        signalSpec:
-          type: string
-          maxLength: 5000
-        signalIds:
-          maxItems: 100
-          type: array
-          items:
-            type: string
-            maxLength: 255
-        limit:
-          default: 20
-          type: integer
-          maximum: 100
-          minimum: 1
-        offset:
-          default: 0
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
-      additionalProperties: false
     UpdateSignalFromAgentInput:
       type: object
       properties:
@@ -7328,6 +7266,68 @@ components:
             minimum: 1
       required:
       - signalId
+    DiscoverSignalsInput:
+      type: object
+      properties:
+        agentId:
+          type: string
+          maxLength: 255
+        signalSpec:
+          type: string
+          maxLength: 5000
+        signalIds:
+          maxItems: 100
+          type: array
+          items:
+            type: string
+            maxLength: 255
+        limit:
+          default: 20
+          type: integer
+          maximum: 100
+          minimum: 1
+        offset:
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
     RegisterSignalInput:
       type: object
       properties:

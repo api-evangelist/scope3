@@ -34,6 +34,8 @@ paths:
                 $ref: '#/components/schemas/Error'
       tags:
       - Status
+      summary: Status
+      x-summary-source: derived
 components:
   schemas:
     StatusResponse:

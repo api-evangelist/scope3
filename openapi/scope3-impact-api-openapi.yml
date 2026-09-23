@@ -76,6 +76,95 @@ paths:
       - Impact
 components:
   schemas:
+    DebugInfo:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          $ref: '#/components/schemas/Model'
+        hardware_node:
+          $ref: '#/components/schemas/Node'
+        grid_mix:
+          $ref: '#/components/schemas/GridMix'
+        steps:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/PredictionStep'
+    ImpactMetrics:
+      type: object
+      additionalProperties: false
+      required:
+      - usage_energy_wh
+      - usage_emissions_gco2e
+      - usage_water_ml
+      - embodied_emissions_gco2e
+      - embodied_water_ml
+      properties:
+        usage_energy_wh:
+          type: number
+          example: 0.13
+          format: float
+          x-go-type: float64
+        usage_emissions_gco2e:
+          type: number
+          example: 0.81
+          format: float
+          x-go-type: float64
+        usage_water_ml:
+          type: number
+          example: 1.32
+          format: float
+          x-go-type: float64
+        embodied_emissions_gco2e:
+          type: number
+          example: 0.81
+          format: float
+          x-go-type: float64
+        embodied_water_ml:
+          type: number
+          example: 1.32
+          format: float
+          x-go-type: float64
+    Node:
+      allOf:
+      - $ref: '#/components/schemas/NodeCreateRequest'
+      - type: object
+        required:
+        - created_at
+        - updated_at
+        properties:
+          customer_id:
+            type: integer
+            x-go-type: int64
+            description: ID of the customer who owns this node (visible to admins only)
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+          created_by:
+            type: string
+            description: ID of the user who created the node (admin or owner only)
+    GridMix:
+      type: object
+      additionalProperties: false
+      required:
+      - country
+      - gco2e_per_kwh
+      properties:
+        country:
+          $ref: '#/components/schemas/CountryCode'
+        region:
+          $ref: '#/components/schemas/RegionCode'
+        gco2e_per_kwh:
+          type: number
+          example: 475
+          format: float
+          x-go-type: float64
+          minimum: 0
+          maximum: 2000
     Model:
       title: Model
       type: object
@@ -186,74 +275,25 @@ components:
         created_by:
           type: string
           description: ID of the user who created the node (admin or owner only)
-    DebugInfo:
+    RegionCode:
+      type: string
+      pattern: ^[A-Z]{2}$
+      minLength: 2
+      maxLength: 2
+      description: Two-letter region code as defined by ISO 3166-1 alpha-2
+      example: NY
+    ImpactRequest:
+      title: Impact Request
       type: object
       additionalProperties: false
+      required:
+      - rows
       properties:
-        model:
-          $ref: '#/components/schemas/Model'
-        hardware_node:
-          $ref: '#/components/schemas/Node'
-        grid_mix:
-          $ref: '#/components/schemas/GridMix'
-        steps:
+        rows:
           type: array
-          maxItems: 100
+          maxItems: 1000
           items:
-            $ref: '#/components/schemas/PredictionStep'
-    ModeledRow:
-      type: object
-      additionalProperties: false
-      required:
-      - total_impact
-      properties:
-        inference_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        training_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        fine_tuning_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        total_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        debug:
-          $ref: '#/components/schemas/DebugInfo'
-        error:
-          $ref: '#/components/schemas/Error'
-    ImpactMetrics:
-      type: object
-      additionalProperties: false
-      required:
-      - usage_energy_wh
-      - usage_emissions_gco2e
-      - usage_water_ml
-      - embodied_emissions_gco2e
-      - embodied_water_ml
-      properties:
-        usage_energy_wh:
-          type: number
-          example: 0.13
-          format: float
-          x-go-type: float64
-        usage_emissions_gco2e:
-          type: number
-          example: 0.81
-          format: float
-          x-go-type: float64
-        usage_water_ml:
-          type: number
-          example: 1.32
-          format: float
-          x-go-type: float64
-        embodied_emissions_gco2e:
-          type: number
-          example: 0.81
-          format: float
-          x-go-type: float64
-        embodied_water_ml:
-          type: number
-          example: 1.32
-          format: float
-          x-go-type: float64
+            $ref: '#/components/schemas/ImpactRow'
     Task:
       type: string
       enum:
@@ -301,192 +341,24 @@ components:
         - Specialized models for specific use cases
 
         '
-    ImpactRequest:
-      title: Impact Request
+    ModeledRow:
       type: object
       additionalProperties: false
       required:
-      - rows
+      - total_impact
       properties:
-        rows:
-          type: array
-          maxItems: 1000
-          items:
-            $ref: '#/components/schemas/ImpactRow'
-    ImpactResponse:
-      title: Impact Response
-      type: object
-      additionalProperties: false
-      required:
-      - rows
-      - has_errors
-      properties:
-        rows:
-          maxItems: 1000
-          type: array
-          items:
-            $ref: '#/components/schemas/ModeledRow'
-        total_energy_wh:
-          type: number
-          example: 0.13
-          format: float
-          x-go-type: float64
-        total_gco2e:
-          type: number
-          example: 0.81
-          format: float
-          x-go-type: float64
-        total_mlh2o:
-          type: number
-          example: 1.32
-          format: float
-          x-go-type: float64
-        has_errors:
-          type: boolean
-          example: false
-    PredictionStep:
-      type: object
-      additionalProperties: false
-      required:
-      - description
-      - duration_ms
-      - inferences
-      properties:
-        description:
-          type: string
-        duration_ms:
-          type: number
-          format: float
-          x-go-type: float64
-        inferences:
-          type: integer
-          x-go-type: int64
-    NodeCreateRequest:
-      type: object
-      required:
-      - id
-      - gpu_id
-      - gpu_count
-      - cpu_count
-      description: 'Create a new node.
-
-        Note on permissions:
-
-        - cloud_instance_id and managed_service_id can only be set by admins or users who own those resources
-
-        - Custom nodes are visible only to their owners
-
-        - Global nodes are visible to all users
-
-        - Admins can see and manage all nodes
-
-        '
-      properties:
-        id:
-          type: string
-          example: my-custom-node-1
-          pattern: ^[a-z0-9-]+$
-          minLength: 3
-          maxLength: 64
-        cloud_id:
-          type: string
-          example: aws
-        cloud_instance_id:
-          type: string
-          example: a2-highgpu-1g
-        managed_service_id:
-          type: string
-          example: aws-bedrock
-        gpu_id:
-          type: string
-          example: a100_40gb
-        gpu_count:
-          type: integer
-          minimum: 0
-          maximum: 10000
-          example: 8
-          x-go-type: int64
-        cpu_count:
-          type: integer
-          minimum: 1
-          maximum: 10000
-          example: 2
-          x-go-type: int64
-        idle_power_w_ex_gpu:
-          type: number
-          example: 100
-          minimum: 0
-          maximum: 10000
-          format: float
-          x-go-type: float64
-        average_utilization_rate:
-          type: number
-          example: 0.8
-          format: float
-          x-go-type: float64
-          minimum: 0
-          maximum: 1
-        embodied_emissions_kgco2e_ex_gpu:
-          type: number
-          example: 2500
-          minimum: 0
-          maximum: 100000
-          format: float
-          x-go-type: float64
-        embodied_water_l_ex_gpu:
-          type: number
-          example: 2500
-          minimum: 0
-          maximum: 100000
-          format: float
-          x-go-type: float64
-        use_life_years:
-          type: number
-          example: 5
-          minimum: 1
-          maximum: 30
-          format: float
-          x-go-type: float64
-    DataType:
-      type: string
-      enum:
-      - fp8
-      - fp8-e4m3
-      - fp8-e5m2
-      - fp16
-      - tf32
-      - fp32
-      - fp64
-      - bfloat8
-      - bfloat16
-      - bf16
-      - int4
-      - int8
-      - int16
-      - int32
-      - int64
-      - uint4
-      - uint8
-      - uint16
-      - uint32
-      - uint64
-    Error:
-      type: object
-      additionalProperties: false
-      required:
-      - message
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        details:
-          type: object
-          properties:
-            reason:
-              type: string
-            field:
-              type: string
+        inference_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        training_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        fine_tuning_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        total_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        debug:
+          $ref: '#/components/schemas/DebugInfo'
+        error:
+          $ref: '#/components/schemas/Error'
     ImpactRow:
       type: object
       additionalProperties: false
@@ -658,56 +530,6 @@ components:
           x-go-type: int64
           description: the resolution of the video in number of lines (for instance, 1080 for 1080p)
           example: 1080
-    Node:
-      allOf:
-      - $ref: '#/components/schemas/NodeCreateRequest'
-      - type: object
-        required:
-        - created_at
-        - updated_at
-        properties:
-          customer_id:
-            type: integer
-            x-go-type: int64
-            description: ID of the customer who owns this node (visible to admins only)
-          created_at:
-            type: string
-            format: date-time
-          updated_at:
-            type: string
-            format: date-time
-          created_by:
-            type: string
-            description: ID of the user who created the node (admin or owner only)
-    RegionCode:
-      type: string
-      pattern: ^[A-Z]{2}$
-      minLength: 2
-      maxLength: 2
-      description: Two-letter region code as defined by ISO 3166-1 alpha-2
-      example: NY
-    GridMix:
-      type: object
-      additionalProperties: false
-      required:
-      - country
-      - gco2e_per_kwh
-      properties:
-        country:
-          $ref: '#/components/schemas/CountryCode'
-        region:
-          $ref: '#/components/schemas/RegionCode'
-        gco2e_per_kwh:
-          type: number
-          example: 475
-          format: float
-          x-go-type: float64
-          minimum: 0
-          maximum: 2000
-    Image:
-      type: string
-      example: 1024x1024
-      pattern: ^(\d{1,4})x(\d{1,4})$
     CountryCode:
       type: string
       pattern: ^[A-Z]{2}$
@@ -715,6 +537,184 @@ components:
       maxLength: 2
       description: Two-letter country code as defined by ISO 3166-1 alpha-2
       example: US
+    DataType:
+      type: string
+      enum:
+      - fp8
+      - fp8-e4m3
+      - fp8-e5m2
+      - fp16
+      - tf32
+      - fp32
+      - fp64
+      - bfloat8
+      - bfloat16
+      - bf16
+      - int4
+      - int8
+      - int16
+      - int32
+      - int64
+      - uint4
+      - uint8
+      - uint16
+      - uint32
+      - uint64
+    Image:
+      type: string
+      example: 1024x1024
+      pattern: ^(\d{1,4})x(\d{1,4})$
+    PredictionStep:
+      type: object
+      additionalProperties: false
+      required:
+      - description
+      - duration_ms
+      - inferences
+      properties:
+        description:
+          type: string
+        duration_ms:
+          type: number
+          format: float
+          x-go-type: float64
+        inferences:
+          type: integer
+          x-go-type: int64
+    ImpactResponse:
+      title: Impact Response
+      type: object
+      additionalProperties: false
+      required:
+      - rows
+      - has_errors
+      properties:
+        rows:
+          maxItems: 1000
+          type: array
+          items:
+            $ref: '#/components/schemas/ModeledRow'
+        total_energy_wh:
+          type: number
+          example: 0.13
+          format: float
+          x-go-type: float64
+        total_gco2e:
+          type: number
+          example: 0.81
+          format: float
+          x-go-type: float64
+        total_mlh2o:
+          type: number
+          example: 1.32
+          format: float
+          x-go-type: float64
+        has_errors:
+          type: boolean
+          example: false
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+    NodeCreateRequest:
+      type: object
+      required:
+      - id
+      - gpu_id
+      - gpu_count
+      - cpu_count
+      description: 'Create a new node.
+
+        Note on permissions:
+
+        - cloud_instance_id and managed_service_id can only be set by admins or users who own those resources
+
+        - Custom nodes are visible only to their owners
+
+        - Global nodes are visible to all users
+
+        - Admins can see and manage all nodes
+
+        '
+      properties:
+        id:
+          type: string
+          example: my-custom-node-1
+          pattern: ^[a-z0-9-]+$
+          minLength: 3
+          maxLength: 64
+        cloud_id:
+          type: string
+          example: aws
+        cloud_instance_id:
+          type: string
+          example: a2-highgpu-1g
+        managed_service_id:
+          type: string
+          example: aws-bedrock
+        gpu_id:
+          type: string
+          example: a100_40gb
+        gpu_count:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          example: 8
+          x-go-type: int64
+        cpu_count:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          example: 2
+          x-go-type: int64
+        idle_power_w_ex_gpu:
+          type: number
+          example: 100
+          minimum: 0
+          maximum: 10000
+          format: float
+          x-go-type: float64
+        average_utilization_rate:
+          type: number
+          example: 0.8
+          format: float
+          x-go-type: float64
+          minimum: 0
+          maximum: 1
+        embodied_emissions_kgco2e_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        embodied_water_l_ex_gpu:
+          type: number
+          example: 2500
+          minimum: 0
+          maximum: 100000
+          format: float
+          x-go-type: float64
+        use_life_years:
+          type: number
+          example: 5
+          minimum: 1
+          maximum: 30
+          format: float
+          x-go-type: float64
   securitySchemes:
     bearerAuth:
       type: http

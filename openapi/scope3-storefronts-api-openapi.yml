@@ -1305,6 +1305,567 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    StorefrontConnectionAccountCampaignRollup:
+      description: 'Directed-campaign rollup for one connected account: tracked = mirrored read-only from the connected seller account; managed = authored through the platform. Spend is seller-reported net in the account currency; sums cover delivery denominated in (or reported without) that currency.'
+      type: object
+      properties:
+        campaignsTracked:
+          description: Non-retired tracked campaigns on this account. A tracked campaign is a campaign the platform did not set up, mirrored read-only from the connected seller account.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        campaignsActive:
+          description: Subset of campaignsTracked whose campaign status is currently ACTIVE.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        trackedSpend:
+          description: Delivered spend across tracked campaigns over the trailing window, in the account currency. Seller-reported net — directed buys dispatch the full media budget zero-fee, so net equals the buyer's budget.
+          type: number
+          minimum: 0
+        managedSpend:
+          description: Delivered spend across managed campaigns (authored through the platform) over the trailing window, in the account currency. Seller-reported net, same denomination as trackedSpend.
+          type: number
+          minimum: 0
+        managedShare:
+          description: 'The adoption metric for this relationship: managedSpend / (trackedSpend + managedSpend). Null when no spend was accounted in the window.'
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 1
+        currency:
+          description: ISO 4217 currency all spend values in this rollup are denominated in — always the account currency. Rollups are never summed across currencies.
+          type: string
+          pattern: ^[A-Z]{3}$
+        windowDays:
+          description: Trailing window, in days, the spend aggregates cover (currently 365).
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+      required:
+      - campaignsTracked
+      - campaignsActive
+      - trackedSpend
+      - managedSpend
+      - managedShare
+      - currency
+      - windowDays
+      additionalProperties: false
+    AccountOutput:
+      description: Linked account resource on a partner platform
+      type: object
+      properties:
+        linkId:
+          description: Unique identifier for the advertiser-account link
+          example: '42'
+          type: string
+        accountId:
+          description: Partner account identifier
+          example: acc_acme_pinnacle
+          type: string
+        credentialId:
+          description: Credential row that owns this linked account. Include this value when updating linked accounts so duplicate account IDs across mapped connections remain unambiguous.
+          example: '42'
+          type:
+          - string
+          - 'null'
+        name:
+          description: Human-readable account name from the partner
+          example: Acme c/o Pinnacle
+          type:
+          - string
+          - 'null'
+        advertiser:
+          description: Advertiser name as recorded by the partner platform
+          example: Acme Corp
+          type:
+          - string
+          - 'null'
+        billingProxy:
+          description: Billing proxy entity (e.g. agency buying on behalf of advertiser)
+          example: Pinnacle Media
+          type:
+          - string
+          - 'null'
+        house:
+          description: Domain or house identifier for the account
+          example: acme-corp.com
+          type:
+          - string
+          - 'null'
+        billing:
+          description: Billing arrangement type
+          example: advertiser
+          type:
+          - string
+          - 'null'
+        sources:
+          description: Storefront sources that surface this account to the buyer. A single linked account may be reachable through multiple sources when the underlying agent is shared across storefronts. Empty when the underlying agent is no longer linked to any active storefront source.
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerCredentialSourceRef'
+        advertiserId:
+          description: Advertiser that owns this account link
+          example: '12345'
+          type: string
+        status:
+          description: Current account status
+          type: string
+          enum:
+          - active
+          - pending_approval
+          - payment_required
+          - suspended
+          - closed
+          - unreachable
+        unreachableAt:
+          description: When set, the mapping is preserved but its platform account is no longer reachable through any active connection — the connection that surfaced it was unlinked. Relink the provider (or re-map the account) to restore it. Unreachable mappings never resolve at buy time.
+          example: '2025-01-22T09:00:00Z'
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdAt:
+          description: When the account was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the account was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - linkId
+      - accountId
+      - sources
+      - advertiserId
+      - status
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    StorefrontConnectionAccountMappingsResponse:
+      description: Paginated external account mapping table for buyer integrations.
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontConnectionAccountMappingItem'
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        hasMore:
+          type: boolean
+        nextOffset:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - items
+      - total
+      - hasMore
+      - nextOffset
+      additionalProperties: false
+    ConnectAdcpStorefrontBody:
+      description: Project a registered and advertiser-mapped AdCP storefront source into the connected-account campaign connection plane.
+      type: object
+      properties:
+        advertiserId:
+          description: Advertiser already mapped to the selected AdCP source account.
+          type: string
+          pattern: ^[1-9]\d*$
+        accountId:
+          description: AdCP account identifier returned by list_available_accounts.
+          type: string
+          minLength: 1
+        credentialId:
+          description: Credential identifier returned by list_available_accounts. Required when more than one credential exposes the same account identifier.
+          type: string
+          pattern: ^[1-9]\d*$
+      required:
+      - advertiserId
+      - accountId
+      additionalProperties: false
+    StorefrontConnectionsResponse:
+      description: Storefront connection rows and feature policies visible to a buyer.
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontConnectionSummary'
+      required:
+      - items
+      additionalProperties: false
+    StorefrontConnectionAgentSource:
+      description: Agent-backed inventory source eligible for external account mappings.
+      type: object
+      properties:
+        sourceId:
+          description: Canonical provider ID for an official adapter (for example, meta), or the inventory source ID for an external AdCP connection.
+          type: string
+        name:
+          description: Display name for the inventory source.
+          type: string
+      required:
+      - sourceId
+      - name
+      additionalProperties: false
+    BuyerStorefrontAccount:
+      description: A buyer's registered account for a storefront
+      type: object
+      properties:
+        accountIdentifier:
+          description: The buyer's account identifier at the source
+          type: string
+        status:
+          description: Account registration status
+          type: string
+      required:
+      - accountIdentifier
+      - status
+      additionalProperties: false
+    BuyerStorefrontCapabilitySource:
+      description: Source-level storefront capability diagnostic row
+      type: object
+      properties:
+        sourceId:
+          description: Inventory source identifier within the storefront
+          type: string
+        sourceName:
+          description: Inventory source display name
+          type:
+          - string
+          - 'null'
+        executionType:
+          description: Source execution type
+          type: string
+        agentName:
+          description: External sales-agent name when one exists
+          type:
+          - string
+          - 'null'
+        requiresCredentials:
+          description: Whether buyer-provided credentials are required for this external AdCP source. Null when not applicable or unavailable.
+          type:
+          - boolean
+          - 'null'
+        probeable:
+          description: Whether this row is an external AdCP sales agent that the capability diagnostic can check
+          type: boolean
+        probeStatus:
+          description: Capability availability status. `reachable` means capabilities are available (including in-process synthesized capabilities for adapter and ESA storefronts), possibly from cache.
+          type: string
+          enum:
+          - reachable
+          - unreachable
+          - not_applicable
+          - unavailable
+        message:
+          description: Explanation when the row is not probeable
+          type:
+          - string
+          - 'null'
+        capabilities:
+          description: Capability summary for external AdCP sources; null for managed sources or failed capability lookups
+          allOf:
+          - $ref: '#/components/schemas/BuyerStorefrontCapabilityDetails'
+      required:
+      - sourceId
+      - sourceName
+      - executionType
+      - agentName
+      - requiresCredentials
+      - probeable
+      - probeStatus
+      - message
+      - capabilities
+      additionalProperties: false
+    StorefrontConnectionAccountsResponse:
+      description: External accounts discovered for an integration, including advertiser mappings.
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontConnectionAccount'
+      required:
+      - items
+      additionalProperties: false
+    BuyerStorefront:
+      description: A storefront as seen by a buyer
+      type: object
+      properties:
+        id:
+          description: Storefront ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        platformId:
+          description: Public-facing slug
+          type: string
+        name:
+          description: Storefront display name
+          type: string
+        publisherDomain:
+          description: Publisher domain
+          type:
+          - string
+          - 'null'
+        brandName:
+          description: Operator-owned or resolved brand name shown on storefront discovery cards.
+          type:
+          - string
+          - 'null'
+        logoUrl:
+          description: Operator-owned or resolved logo URL shown on storefront discovery cards.
+          type:
+          - string
+          - 'null'
+        logoBackground:
+          description: Backdrop the logo is designed for, from brand.json. Null when unknown.
+          type:
+          - string
+          - 'null'
+        description:
+          description: Operator-curated description shown on storefront discovery cards.
+          type:
+          - string
+          - 'null'
+        website:
+          description: Operator-curated website URL shown on storefront discovery cards.
+          type:
+          - string
+          - 'null'
+        brandColors:
+          $ref: '#/components/schemas/BuyerStorefrontBrandColors'
+        discoveryCard:
+          description: Canonical storefront identity and coverage used by every marketplace card renderer.
+          allOf:
+          - $ref: '#/components/schemas/DiscoveryCard'
+        displayStatus:
+          description: Deprecated stored-control label. Legacy projections retain `configuring` and `transacting`; projections backed by `isPaused` return `neutral` or `paused`. `archived` overrides both. Use readiness.effectiveStatus and readiness.canTransact for actual availability.
+          type: string
+          enum:
+          - configuring
+          - transacting
+          - archived
+          - neutral
+          - paused
+        readiness:
+          $ref: '#/components/schemas/BuyerStorefrontReadiness'
+        channels:
+          description: Ad channels this storefront supports (e.g. "display", "CTV", "audio"). Empty array if not specified.
+          example:
+          - CTV
+          - display
+          type: array
+          items:
+            type: string
+        adapterProviderType:
+          description: Adapter platform type (e.g. "meta", "tiktok"). Null for non-adapter storefronts.
+          type:
+          - string
+          - 'null'
+        publishers:
+          type:
+          - object
+          - 'null'
+          properties:
+            total:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            verified:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            sample:
+              type: array
+              items:
+                type: string
+          required:
+          - total
+          - verified
+          - sample
+          additionalProperties: false
+        adapterSourceKind:
+          description: Adapter family for official adapter storefronts, such as sales or creative. Null for non-adapter storefronts.
+          type:
+          - string
+          - 'null'
+          enum:
+          - sales
+          - creative
+          - signals
+          - measurement
+          - optimization
+          - composite
+        creativeCapabilities:
+          description: Creative-generation capabilities when this is a creative adapter storefront; null otherwise.
+          allOf:
+          - $ref: '#/components/schemas/BuyerCreativeStorefrontCapability'
+        adapterConnection:
+          description: Buyer-specific connection state for official adapter storefronts; null for non-adapter storefronts or when connection state was not requested.
+          allOf:
+          - $ref: '#/components/schemas/BuyerAdapterConnectionStatus'
+        supportedRoutingTypes:
+          deprecated: true
+          description: Deprecated v2 compatibility placeholder. Every storefront returns both legacy values. Do not use this field for storefront type, targeting, eligibility, execution, connectivity, or settlement; use explicit capabilities, authentication state, and BillingParty instead.
+          type: array
+          items:
+            type: string
+            enum:
+            - DECISIONED
+            - ROUTED
+        supportedBilling:
+          description: 'Supported billing parties for media bought from this storefront, using AdCP BillingParty vocabulary (who is invoiced): `agent` means Interchange clears the transaction and bills the buyer; `operator`/`advertiser` mean the seller or connected platform bills the account operator or advertiser directly — Interchange never touches the media money. Adapter storefronts are always `operator`/`advertiser`.'
+          minItems: 1
+          type: array
+          items:
+            type: string
+            enum:
+            - operator
+            - agent
+            - advertiser
+        regions:
+          description: Operator-curated regions this storefront covers (ISO 3166-1 alpha-2 country codes or group codes like WORLDWIDE, EMEA, NORAM). Empty array if not specified.
+          example:
+          - UK
+          - EMEA
+          type: array
+          items:
+            type: string
+        connected:
+          description: Whether every inventory source the buyer needs is connected. This is buyer credential wiring, not storefront transaction readiness; use `readiness.canTransact` for availability.
+          type: boolean
+        requiresCredentials:
+          description: Whether the buyer must register credentials before they can transact with this storefront.
+          type: boolean
+        customerAccounts:
+          description: The buyer's registered accounts for this storefront, aggregated across its inventory sources and deduped by accountIdentifier.
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerStorefrontAccount'
+        adcpCapabilities:
+          description: AdCP capability manifest for the storefront's underlying agent(s). Non-null for agent-based storefronts with cached capability data; null for adapter storefronts or when no capability data has been fetched yet.
+          allOf:
+          - $ref: '#/components/schemas/BuyerStorefrontAdcpCapabilities'
+        discoveryPerformance:
+          description: Observed response-time stats from buyer product discovery. Use this to decide whether to ask the user before running a long discovery wait.
+          allOf:
+          - $ref: '#/components/schemas/BuyerStorefrontDiscoveryPerformance'
+      required:
+      - id
+      - platformId
+      - name
+      - publisherDomain
+      - brandName
+      - logoUrl
+      - logoBackground
+      - description
+      - website
+      - brandColors
+      - discoveryCard
+      - displayStatus
+      - readiness
+      - channels
+      - adapterProviderType
+      - adapterSourceKind
+      - creativeCapabilities
+      - adapterConnection
+      - supportedRoutingTypes
+      - supportedBilling
+      - regions
+      - connected
+      - requiresCredentials
+      - customerAccounts
+      - adcpCapabilities
+      - discoveryPerformance
+      additionalProperties: false
+    BuyerCredentialRegistrationResponse:
+      description: Response for registering credentials against a storefront inventory source
+      type: object
+      properties:
+        id:
+          description: Credential record ID
+          type: string
+        accountIdentifier:
+          description: The buyer's account identifier at the source
+          type: string
+        status:
+          description: Credential status
+          type: string
+        registeredBy:
+          description: Who registered this credential. Null on legacy rows that predate registration tracking.
+          type:
+          - string
+          - 'null'
+        createdAt:
+          description: When the credential was created (ISO 8601)
+          type: string
+        oauth:
+          description: Present when the source uses OAuth — the buyer must visit `authorizationUrl` to complete consent
+          allOf:
+          - $ref: '#/components/schemas/BuyerCredentialOAuthInfo'
+      required:
+      - id
+      - accountIdentifier
+      - status
+      - registeredBy
+      - createdAt
+      additionalProperties: false
+    BuyerCredentialOAuthInfo:
+      description: OAuth authorization info presented in buyer-facing storefront/source terms
+      type: object
+      properties:
+        authorizationUrl:
+          description: URL the buyer must visit to authorize
+          type: string
+          format: uri
+        storefrontId:
+          description: Storefront the OAuth flow was initiated for
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        sourceId:
+          description: Inventory source the OAuth flow was initiated for
+          type: string
+        sourceName:
+          description: Inventory source display name
+          type: string
+      required:
+      - authorizationUrl
+      - storefrontId
+      - sourceId
+      - sourceName
+      additionalProperties: false
+    BuyerStorefrontCapabilitiesResponse:
+      description: Source-level capability diagnostics for a buyer storefront
+      type: object
+      properties:
+        storefrontId:
+          description: Storefront ID that was inspected
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        agents:
+          description: Active source rows behind the storefront. Field name retained for response compatibility.
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerStorefrontCapabilitySource'
+      required:
+      - storefrontId
+      - agents
+      additionalProperties: false
     DirectedCampaignSyncOutcome:
       description: Counts and bounded safe diagnostics from one account-wide mirror reconciliation.
       type: object
@@ -1504,277 +2065,56 @@ components:
       - skipped
       - errors
       additionalProperties: false
-    StorefrontPresence:
-      description: Read-only wire projection of a storefront-connection-account presence edge -- identity, status, and counts only, never member lists or event payloads.
+    SubscribeDirectedCampaignsBody:
+      description: Subscribe a mapped seller account for read-only tracked-campaign mirroring.
       type: object
       properties:
-        id:
-          description: The presence edge id.
-          type: string
-          minLength: 1
-        objectType:
-          type: string
-          enum:
-          - audience
-          - event_source
-        direction:
-          type: string
-          enum:
-          - pushed
-          - tracked
-        upstreamObjectId:
-          description: The seller's own identifier for the object.
-          type: string
-          minLength: 1
-        audienceId:
-          description: The buyer-level audience this edge belongs to. Present only when direction is "pushed" and objectType is "audience".
-          type: string
-          minLength: 1
-        eventSourceId:
-          description: The buyer-level event source this edge belongs to. Present only when direction is "pushed" and objectType is "event_source".
-          type: string
-          minLength: 1
-        syncState:
-          type: string
-          enum:
-          - live
-          - stale
-          - error
-        lastSyncedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        rowCount:
-          description: Row/member or event count reported by the last sync, when the provider returns one. Never the rows or events themselves.
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-          maximum: 9007199254740991
-        retiredAt:
-          description: Null unless the edge has been retired.
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        createdAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - id
-      - objectType
-      - direction
-      - upstreamObjectId
-      - syncState
-      - lastSyncedAt
-      - rowCount
-      - retiredAt
-      - createdAt
-      - updatedAt
-      additionalProperties: false
-    BuyerStorefrontCapabilitySource:
-      description: Source-level storefront capability diagnostic row
-      type: object
-      properties:
-        sourceId:
-          description: Inventory source identifier within the storefront
-          type: string
-        sourceName:
-          description: Inventory source display name
-          type:
-          - string
-          - 'null'
-        executionType:
-          description: Source execution type
-          type: string
-        agentName:
-          description: External sales-agent name when one exists
-          type:
-          - string
-          - 'null'
-        requiresCredentials:
-          description: Whether buyer-provided credentials are required for this external AdCP source. Null when not applicable or unavailable.
-          type:
-          - boolean
-          - 'null'
-        probeable:
-          description: Whether this row is an external AdCP sales agent that the capability diagnostic can check
-          type: boolean
-        probeStatus:
-          description: Capability availability status. `reachable` means capabilities are available (including in-process synthesized capabilities for adapter and ESA storefronts), possibly from cache.
-          type: string
-          enum:
-          - reachable
-          - unreachable
-          - not_applicable
-          - unavailable
-        message:
-          description: Explanation when the row is not probeable
-          type:
-          - string
-          - 'null'
-        capabilities:
-          description: Capability summary for external AdCP sources; null for managed sources or failed capability lookups
-          allOf:
-          - $ref: '#/components/schemas/BuyerStorefrontCapabilityDetails'
-      required:
-      - sourceId
-      - sourceName
-      - executionType
-      - agentName
-      - requiresCredentials
-      - probeable
-      - probeStatus
-      - message
-      - capabilities
-      additionalProperties: false
-    ConnectedAdcpStorefront:
-      description: Connection/account identifiers for a registered AdCP storefront source ready for an explicit tracked-campaign subscription.
-      type: object
-      properties:
-        connectionId:
-          type: string
-        connectionAccountId:
-          type: string
-        storefrontId:
-          type: string
-        sourceId:
-          type: string
-        agentId:
-          type: string
         advertiserId:
+          description: Numeric advertiser ID mapped to this provider account
           type: string
-        externalAccountId:
+          pattern: ^[1-9]\d*$
+        sourceId:
+          description: Optional for official adapters, whose canonical provider ID is derived from connectionId. Required for external AdCP storefront sources.
           type: string
-        providerType:
-          type: string
-          enum:
-          - adcp
-        connectionKind:
-          type: string
-          enum:
-          - THIRD_PARTY_AGENT
+          minLength: 1
       required:
-      - connectionId
-      - connectionAccountId
-      - storefrontId
-      - sourceId
-      - agentId
       - advertiserId
-      - externalAccountId
-      - providerType
-      - connectionKind
       additionalProperties: false
-    StorefrontConnectionAccountCampaignRollup:
-      description: 'Directed-campaign rollup for one connected account: tracked = mirrored read-only from the connected seller account; managed = authored through the platform. Spend is seller-reported net in the account currency; sums cover delivery denominated in (or reported without) that currency.'
+    StorefrontConnectionHandoff:
       type: object
       properties:
-        campaignsTracked:
-          description: Non-retired tracked campaigns on this account. A tracked campaign is a campaign the platform did not set up, mirrored read-only from the connected seller account.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        campaignsActive:
-          description: Subset of campaignsTracked whose campaign status is currently ACTIVE.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        trackedSpend:
-          description: Delivered spend across tracked campaigns over the trailing window, in the account currency. Seller-reported net — directed buys dispatch the full media budget zero-fee, so net equals the buyer's budget.
-          type: number
-          minimum: 0
-        managedSpend:
-          description: Delivered spend across managed campaigns (authored through the platform) over the trailing window, in the account currency. Seller-reported net, same denomination as trackedSpend.
-          type: number
-          minimum: 0
-        managedShare:
-          description: 'The adoption metric for this relationship: managedSpend / (trackedSpend + managedSpend). Null when no spend was accounted in the window.'
-          type:
-          - number
-          - 'null'
-          minimum: 0
-          maximum: 1
-        currency:
-          description: ISO 4217 currency all spend values in this rollup are denominated in — always the account currency. Rollups are never summed across currencies.
+        connectionUrl:
+          description: First-party browser URL to share with the human buyer — for OAuth providers it goes straight to the provider's consent screen; bearer-only providers land on the Connections view for token entry.
           type: string
-          pattern: ^[A-Z]{3}$
-        windowDays:
-          description: Trailing window, in days, the spend aggregates cover (currently 365).
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-      required:
-      - campaignsTracked
-      - campaignsActive
-      - trackedSpend
-      - managedSpend
-      - managedShare
-      - currency
-      - windowDays
-      additionalProperties: false
-    BuyerAdapterConnectionStatus:
-      description: Buyer-specific delegated-auth status for an official adapter storefront.
-      type: object
-      properties:
-        status:
-          description: Whether this buyer already has delegated credentials for the adapter storefront.
-          type: string
-          enum:
-          - not_connected
-          - connected
-          - needs_account_selection
-          - error
         authModes:
-          description: Credential flows supported by this adapter storefront for the buyer.
           type: array
           items:
             type: string
             enum:
             - oauth
             - bearer
-        accountCount:
-          description: Number of active provider accounts discovered for this buyer connection.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        mappedAdvertiserCount:
-          description: 'Distinct advertisers with an active mapping to one of this connection''s currently active accounts. 0 on a connected storefront means connected-but-not-yet-buyable: a media buy for an unmapped advertiser fails with account_mapping_required until it is mapped under Settings → Connections.'
-          default: 0
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        selectedAccountName:
-          description: Selected provider account display name, if one has been selected.
+        preferredAuthMode:
+          type: string
+          enum:
+          - oauth
+          - bearer
+        storefront:
+          description: Adapter storefront metadata (id, platformId, name, providerType, channels, logoUrl, …).
+          type: object
+          additionalProperties: {}
+        connection:
+          description: The existing connection summary, or null when none.
           type:
-          - string
+          - object
           - 'null'
+          additionalProperties: {}
       required:
-      - status
+      - connectionUrl
       - authModes
-      - accountCount
-      - mappedAdvertiserCount
-      - selectedAccountName
-      additionalProperties: false
-    SubscribeDirectedCampaignsResponse:
-      description: The durable subscription plus the initial one-year mirror reconciliation.
-      type: object
-      properties:
-        subscription:
-          $ref: '#/components/schemas/DirectedCampaignSubscription'
-        sync:
-          $ref: '#/components/schemas/DirectedCampaignSyncOutcome'
-      required:
-      - subscription
-      - sync
-      additionalProperties: false
+      - preferredAuthMode
+      - storefront
+      - connection
+      additionalProperties: {}
     BuyerStorefrontDiscoveryPerformance:
       description: Observed buyer product-discovery response timing for this storefront.
       type: object
@@ -1831,477 +2171,6 @@ components:
       - lastResponseTimeMs
       - lastDiscoveryAt
       additionalProperties: false
-    BuyerStorefrontCapabilitiesResponse:
-      description: Source-level capability diagnostics for a buyer storefront
-      type: object
-      properties:
-        storefrontId:
-          description: Storefront ID that was inspected
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        agents:
-          description: Active source rows behind the storefront. Field name retained for response compatibility.
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerStorefrontCapabilitySource'
-      required:
-      - storefrontId
-      - agents
-      additionalProperties: false
-    BuyerStorefrontSummary:
-      description: Compact storefront view returned by list endpoints. Use the storefront detail endpoint for the full resource.
-      type: object
-      properties:
-        id:
-          description: Storefront ID
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        platformId:
-          description: Public-facing slug
-          type: string
-        name:
-          description: Storefront display name
-          type: string
-        publisherDomain:
-          description: Publisher domain
-          type:
-          - string
-          - 'null'
-        brandName:
-          description: Operator-owned or resolved brand name shown on storefront discovery cards.
-          type:
-          - string
-          - 'null'
-        logoUrl:
-          description: Operator-owned or resolved logo URL shown on storefront discovery cards.
-          type:
-          - string
-          - 'null'
-        logoBackground:
-          description: Backdrop the logo is designed for, from brand.json. Null when unknown.
-          type:
-          - string
-          - 'null'
-        description:
-          description: Operator-curated description shown on storefront discovery cards.
-          type:
-          - string
-          - 'null'
-        website:
-          description: Operator-curated website URL shown on storefront discovery cards.
-          type:
-          - string
-          - 'null'
-        brandColors:
-          $ref: '#/components/schemas/BuyerStorefrontBrandColors'
-        displayStatus:
-          description: Deprecated stored-control label. Legacy projections retain `configuring` and `transacting`; projections backed by `isPaused` return `neutral` or `paused`. `archived` overrides both. Use readiness.effectiveStatus and readiness.canTransact for actual availability.
-          type: string
-          enum:
-          - configuring
-          - transacting
-          - archived
-          - neutral
-          - paused
-        readiness:
-          $ref: '#/components/schemas/BuyerStorefrontReadiness'
-        adapterProviderType:
-          description: Adapter platform type (e.g. "meta", "tiktok"). Null for non-adapter storefronts.
-          type:
-          - string
-          - 'null'
-        adapterSourceKind:
-          description: Adapter family for official adapter storefronts, such as sales or creative. Null for non-adapter storefronts.
-          type:
-          - string
-          - 'null'
-          enum:
-          - sales
-          - creative
-          - signals
-          - measurement
-          - optimization
-          - composite
-        creativeCapabilities:
-          description: Creative-generation capabilities when this is a creative adapter storefront; null otherwise.
-          allOf:
-          - $ref: '#/components/schemas/BuyerCreativeStorefrontCapability'
-        adapterConnection:
-          description: Buyer-specific connection state for official adapter storefronts; null for non-adapter storefronts or when connection state was not requested.
-          allOf:
-          - $ref: '#/components/schemas/BuyerAdapterConnectionStatus'
-        supportedRoutingTypes:
-          deprecated: true
-          description: Deprecated v2 compatibility placeholder. Every storefront returns both legacy values. Do not use this field for storefront type, targeting, eligibility, execution, connectivity, or settlement; use explicit capabilities, authentication state, and BillingParty instead.
-          type: array
-          items:
-            type: string
-            enum:
-            - DECISIONED
-            - ROUTED
-        supportedBilling:
-          description: 'Supported billing parties for media bought from this storefront, using AdCP BillingParty vocabulary (who is invoiced): `agent` means Interchange clears the transaction and bills the buyer; `operator`/`advertiser` mean the seller or connected platform bills the account operator or advertiser directly — Interchange never touches the media money. Adapter storefronts are always `operator`/`advertiser`.'
-          minItems: 1
-          type: array
-          items:
-            type: string
-            enum:
-            - operator
-            - agent
-            - advertiser
-        discoveryPerformance:
-          description: Observed response-time stats from buyer product discovery. Use this to decide whether to ask the user before running a long discovery wait.
-          allOf:
-          - $ref: '#/components/schemas/BuyerStorefrontDiscoveryPerformance'
-        discoveryCard:
-          $ref: '#/components/schemas/BuyerDiscoveryCardSummary'
-        channels:
-          description: Ad channels this storefront supports (e.g. "display", "CTV", "audio"). Empty array if not specified.
-          example:
-          - CTV
-          - display
-          type: array
-          items:
-            type: string
-        regions:
-          description: Operator-curated regions this storefront covers (ISO 3166-1 alpha-2 country codes or group codes like WORLDWIDE, EMEA, NORAM). Empty array if not specified.
-          example:
-          - UK
-          - EMEA
-          type: array
-          items:
-            type: string
-        sourceCount:
-          description: Total number of inventory sources in this storefront. Replaces the embedded `sources[]` array on summary rows.
-          example: 5
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        connectedSourceCount:
-          description: Number of inventory sources the buyer is already wired to use, either because no buyer credentials are required or because credentials are active. Combined with `sourceCount`, gives a quick "is this wired up" signal.
-          example: 3
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - id
-      - platformId
-      - name
-      - publisherDomain
-      - brandName
-      - logoUrl
-      - logoBackground
-      - description
-      - website
-      - brandColors
-      - displayStatus
-      - readiness
-      - adapterProviderType
-      - adapterSourceKind
-      - creativeCapabilities
-      - adapterConnection
-      - supportedRoutingTypes
-      - supportedBilling
-      - discoveryPerformance
-      - discoveryCard
-      - channels
-      - regions
-      - sourceCount
-      - connectedSourceCount
-      additionalProperties: false
-    StorefrontConnectionAccountsResponse:
-      description: External accounts discovered for an integration, including advertiser mappings.
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/StorefrontConnectionAccount'
-      required:
-      - items
-      additionalProperties: false
-    StorefrontConnectionAccountMappingsResponse:
-      description: Paginated external account mapping table for buyer integrations.
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/StorefrontConnectionAccountMappingItem'
-        total:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        hasMore:
-          type: boolean
-        nextOffset:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - items
-      - total
-      - hasMore
-      - nextOffset
-      additionalProperties: false
-    DiscoveryCard:
-      description: Canonical buyer-visible storefront identity, coverage declaration, and optional Advertising Policies disclosure. Unknown coverage never means worldwide or all channels.
-      type: object
-      properties:
-        storefrontId:
-          type: string
-        platformId:
-          type: string
-        storefrontKind:
-          type: string
-          enum:
-          - managed
-          - external_pass_through
-        displayName:
-          type: string
-        logoUrl:
-          type:
-          - string
-          - 'null'
-        logoBackground:
-          type:
-          - string
-          - 'null'
-          enum:
-          - dark-bg
-          - light-bg
-          - transparent-bg
-        description:
-          type:
-          - string
-          - 'null'
-        website:
-          type:
-          - string
-          - 'null'
-        brandColors:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type: string
-        channels:
-          description: Aggregate channel facets for search and display. Do not combine these with aggregate countries as a cross-product coverage promise.
-          type: array
-          items:
-            type: string
-        countries:
-          description: Aggregate ISO 3166-1 alpha-2 country facets for search and display. Do not combine these with aggregate channels as a cross-product coverage promise.
-          type: array
-          items:
-            type: string
-            pattern: ^[A-Z]{2}$
-        acceptsAllCountries:
-          description: True only when the storefront explicitly accepts briefs from every country.
-          type: boolean
-        coverageDeclarations:
-          description: Channel and country coverage claims preserved at their source boundaries. A combined filter matches only when one declaration satisfies both dimensions.
-          type: array
-          items:
-            description: One source-level coverage claim. Channels and countries are correlated within this declaration; an empty dimension is unknown, not unrestricted.
-            type: object
-            properties:
-              channels:
-                description: Channels accepted by this correlated source declaration.
-                type: array
-                items:
-                  type: string
-              countries:
-                description: ISO 3166-1 alpha-2 countries accepted by this correlated source declaration.
-                type: array
-                items:
-                  type: string
-                  pattern: ^[A-Z]{2}$
-              acceptsAllCountries:
-                description: True only when this correlated source declaration explicitly accepts every country.
-                type: boolean
-            required:
-            - channels
-            - countries
-            - acceptsAllCountries
-            additionalProperties: false
-        advertisingPolicies:
-          type:
-          - string
-          - 'null'
-          maxLength: 10000
-        coverage:
-          type: object
-          properties:
-            channels:
-              type: string
-              enum:
-              - declared
-              - partial
-              - unknown
-            countries:
-              type: string
-              enum:
-              - declared
-              - partial
-              - unknown
-          required:
-          - channels
-          - countries
-          additionalProperties: false
-        provenance:
-          type: object
-          properties:
-            identity:
-              type: object
-              properties:
-                displayName:
-                  type: string
-                  enum:
-                  - operator
-                  - registry
-                  - upstream_capabilities
-                  - unknown
-                logoUrl:
-                  type: string
-                  enum:
-                  - operator
-                  - registry
-                  - upstream_capabilities
-                  - unknown
-                description:
-                  type: string
-                  enum:
-                  - operator
-                  - registry
-                  - upstream_capabilities
-                  - unknown
-                website:
-                  type: string
-                  enum:
-                  - operator
-                  - registry
-                  - upstream_capabilities
-                  - unknown
-                brandColors:
-                  type: string
-                  enum:
-                  - operator
-                  - registry
-                  - upstream_capabilities
-                  - unknown
-              required:
-              - displayName
-              - logoUrl
-              - description
-              - website
-              - brandColors
-              additionalProperties: false
-            coverage:
-              type: object
-              properties:
-                channels:
-                  type: string
-                  enum:
-                  - operator
-                  - registry
-                  - upstream_capabilities
-                  - unknown
-                countries:
-                  type: string
-                  enum:
-                  - operator
-                  - registry
-                  - upstream_capabilities
-                  - unknown
-              required:
-              - channels
-              - countries
-              additionalProperties: false
-            advertisingPolicies:
-              type: string
-              enum:
-              - operator
-              - registry
-              - upstream_capabilities
-              - unknown
-          required:
-          - identity
-          - coverage
-          - advertisingPolicies
-          additionalProperties: false
-      required:
-      - storefrontId
-      - platformId
-      - storefrontKind
-      - displayName
-      - logoUrl
-      - logoBackground
-      - description
-      - website
-      - brandColors
-      - channels
-      - countries
-      - acceptsAllCountries
-      - coverageDeclarations
-      - advertisingPolicies
-      - coverage
-      - provenance
-      additionalProperties: false
-    SubscribeDirectedCampaignsBody:
-      description: Subscribe a mapped seller account for read-only tracked-campaign mirroring.
-      type: object
-      properties:
-        advertiserId:
-          description: Numeric advertiser ID mapped to this provider account
-          type: string
-          pattern: ^[1-9]\d*$
-        sourceId:
-          description: Optional for official adapters, whose canonical provider ID is derived from connectionId. Required for external AdCP storefront sources.
-          type: string
-          minLength: 1
-      required:
-      - advertiserId
-      additionalProperties: false
-    StorefrontConnectionHandoff:
-      type: object
-      properties:
-        connectionUrl:
-          description: First-party browser URL to share with the human buyer — for OAuth providers it goes straight to the provider's consent screen; bearer-only providers land on the Connections view for token entry.
-          type: string
-        authModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - oauth
-            - bearer
-        preferredAuthMode:
-          type: string
-          enum:
-          - oauth
-          - bearer
-        storefront:
-          description: Adapter storefront metadata (id, platformId, name, providerType, channels, logoUrl, …).
-          type: object
-          additionalProperties: {}
-        connection:
-          description: The existing connection summary, or null when none.
-          type:
-          - object
-          - 'null'
-          additionalProperties: {}
-      required:
-      - connectionUrl
-      - authModes
-      - preferredAuthMode
-      - storefront
-      - connection
-      additionalProperties: {}
     ErrorResponse:
       description: Standard error response
       type: object
@@ -2318,74 +2187,115 @@ components:
       - data
       - error
       additionalProperties: false
-    StorefrontConnectionAccountAdvertiserMapping:
-      description: Advertiser mapping for an external account discovered through an integration.
+    BuyerStorefrontCapabilityDetails:
+      description: Capability summary for an external AdCP storefront source
       type: object
       properties:
-        linkId:
-          description: Identifier of the advertiser-account link row. Pass to DELETE /advertisers/{advertiserId}/accounts/{linkId} to unmap.
+        version:
+          description: AdCP capability version
           type: string
-        sourceId:
-          description: Canonical provider ID for an official adapter, or the inventory source ID for an external AdCP connection.
-          type: string
-        sourceName:
-          description: Display name for the inventory source.
-          type: string
-        agentId:
-          description: Partner agent ID that receives this mapping.
-          type: string
-        advertiserId:
-          description: Advertiser linked to this discovered provider account.
-          type: string
-        advertiserName:
-          description: Display name for the linked advertiser.
-          type: string
-        unreachableAt:
-          description: When set, this mapping is preserved but its platform account is no longer reachable through any active connection — relink the platform (or re-map the account) to restore it. Unreachable mappings never resolve at buy time.
-          default: null
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        linkedAt:
-          description: When the provider account was first linked.
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: When the provider account mapping was last updated.
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - linkId
-      - sourceId
-      - sourceName
-      - agentId
-      - advertiserId
-      - advertiserName
-      - unreachableAt
-      - linkedAt
-      - updatedAt
-      additionalProperties: false
-    StorefrontPresenceListResponse:
-      description: Paginated list of tracked/pushed presences for a storefront connection account. Offset pagination rides the standard response meta, not the body.
-      type: object
-      properties:
-        presences:
+        tools:
+          description: Tool names reported by the external AdCP source
           type: array
           items:
-            $ref: '#/components/schemas/StorefrontPresence'
-        total:
-          type: number
+            type: string
+        protocols:
+          description: Protocols advertised by the external AdCP source
+          type: array
+          items:
+            type: string
+        features:
+          description: Feature flags advertised by the external AdCP source
+          type: object
+          additionalProperties: {}
+        publisherDomains:
+          description: Publisher domains advertised by this source
+          type: array
+          items:
+            type: string
+        channels:
+          description: Advertising channels advertised by this source
+          type: array
+          items:
+            type: string
+        countries:
+          description: ISO 3166-1 alpha-2 primary countries advertised by this source; authoritative at a pure pass-through boundary and omitted when unknown
+          type: array
+          items:
+            type: string
+        accountResolution:
+          description: How the source resolves buyer accounts; null when not advertised.
+          type:
+          - string
+          - 'null'
+          enum:
+          - explicit_account_id
+          - implicit_from_sync
+        requireOperatorAuth:
+          description: Capability-payload copy of whether buyer-provided credentials are required.
+          type: boolean
+        defaultBilling:
+          description: Default billing mode advertised by the source
+          type:
+          - string
+          - 'null'
+        supportedBillings:
+          description: Billing modes supported by the source
+          type: array
+          items:
+            type: string
+        reportingDeliveryMethods:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            enum:
+            - webhook
+            - offline
+        sandboxSupported:
+          description: Whether the source advertises sandbox support
+          type: boolean
+        synthetic:
+          description: Whether capabilities were synthesized rather than returned directly by the source
+          type: boolean
       required:
-      - presences
-      - total
+      - version
+      - tools
+      - protocols
+      - features
+      - accountResolution
+      - requireOperatorAuth
+      - defaultBilling
+      - supportedBillings
+      - reportingDeliveryMethods
+      - sandboxSupported
+      - synthetic
+      additionalProperties: false
+    BuyerStorefrontReadiness:
+      description: Canonical transaction eligibility for this storefront. This is independent of buyer credential connection state.
+      type: object
+      properties:
+        canTransact:
+          description: Whether ordinary buyer traffic may currently transact with this storefront.
+          type: boolean
+        effectiveStatus:
+          description: Canonical buyer-facing availability after combining seller controls with readiness evidence.
+          type: string
+          enum:
+          - archived
+          - paused
+          - blocked
+          - live
+        blockerIds:
+          description: Machine-readable readiness blockers. Empty when effectiveStatus is `live`.
+          type: array
+          items:
+            type: string
+      required:
+      - canTransact
+      - effectiveStatus
+      - blockerIds
       additionalProperties: false
     BuyerDiscoveryCardSummary:
       description: Compact Discovery Card for Marketplace lists. Full Advertising Policies are detail-only.
@@ -2596,30 +2506,24 @@ components:
       - hasAdvertisingPolicies
       - advertisingPoliciesExcerpt
       additionalProperties: false
-    BuyerCredentialOAuthInfo:
-      description: OAuth authorization info presented in buyer-facing storefront/source terms
+    BuyerStorefrontBrandColors:
+      description: Validated brand.json colors object for rendering buyer discovery cards. Null when unresolved.
+      type:
+      - object
+      - 'null'
+      additionalProperties:
+        type: string
+    SubscribeDirectedCampaignsResponse:
+      description: The durable subscription plus the initial one-year mirror reconciliation.
       type: object
       properties:
-        authorizationUrl:
-          description: URL the buyer must visit to authorize
-          type: string
-          format: uri
-        storefrontId:
-          description: Storefront the OAuth flow was initiated for
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        sourceId:
-          description: Inventory source the OAuth flow was initiated for
-          type: string
-        sourceName:
-          description: Inventory source display name
-          type: string
+        subscription:
+          $ref: '#/components/schemas/DirectedCampaignSubscription'
+        sync:
+          $ref: '#/components/schemas/DirectedCampaignSyncOutcome'
       required:
-      - authorizationUrl
-      - storefrontId
-      - sourceId
-      - sourceName
+      - subscription
+      - sync
       additionalProperties: false
     BuyerStorefrontList:
       description: Paginated list of storefront summaries available to a buyer
@@ -2647,127 +2551,6 @@ components:
       - hasMore
       - nextOffset
       additionalProperties: false
-    AccountOutput:
-      description: Linked account resource on a partner platform
-      type: object
-      properties:
-        linkId:
-          description: Unique identifier for the advertiser-account link
-          example: '42'
-          type: string
-        accountId:
-          description: Partner account identifier
-          example: acc_acme_pinnacle
-          type: string
-        credentialId:
-          description: Credential row that owns this linked account. Include this value when updating linked accounts so duplicate account IDs across mapped connections remain unambiguous.
-          example: '42'
-          type:
-          - string
-          - 'null'
-        name:
-          description: Human-readable account name from the partner
-          example: Acme c/o Pinnacle
-          type:
-          - string
-          - 'null'
-        advertiser:
-          description: Advertiser name as recorded by the partner platform
-          example: Acme Corp
-          type:
-          - string
-          - 'null'
-        billingProxy:
-          description: Billing proxy entity (e.g. agency buying on behalf of advertiser)
-          example: Pinnacle Media
-          type:
-          - string
-          - 'null'
-        house:
-          description: Domain or house identifier for the account
-          example: acme-corp.com
-          type:
-          - string
-          - 'null'
-        billing:
-          description: Billing arrangement type
-          example: advertiser
-          type:
-          - string
-          - 'null'
-        sources:
-          description: Storefront sources that surface this account to the buyer. A single linked account may be reachable through multiple sources when the underlying agent is shared across storefronts. Empty when the underlying agent is no longer linked to any active storefront source.
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerCredentialSourceRef'
-        advertiserId:
-          description: Advertiser that owns this account link
-          example: '12345'
-          type: string
-        status:
-          description: Current account status
-          type: string
-          enum:
-          - active
-          - pending_approval
-          - payment_required
-          - suspended
-          - closed
-          - unreachable
-        unreachableAt:
-          description: When set, the mapping is preserved but its platform account is no longer reachable through any active connection — the connection that surfaced it was unlinked. Relink the provider (or re-map the account) to restore it. Unreachable mappings never resolve at buy time.
-          example: '2025-01-22T09:00:00Z'
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        createdAt:
-          description: When the account was created (ISO 8601)
-          example: '2025-01-15T10:30:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: When the account was last updated (ISO 8601)
-          example: '2025-01-20T14:45:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - linkId
-      - accountId
-      - sources
-      - advertiserId
-      - status
-      - createdAt
-      - updatedAt
-      additionalProperties: false
-    BuyerStorefrontReadiness:
-      description: Canonical transaction eligibility for this storefront. This is independent of buyer credential connection state.
-      type: object
-      properties:
-        canTransact:
-          description: Whether ordinary buyer traffic may currently transact with this storefront.
-          type: boolean
-        effectiveStatus:
-          description: Canonical buyer-facing availability after combining seller controls with readiness evidence.
-          type: string
-          enum:
-          - archived
-          - paused
-          - blocked
-          - live
-        blockerIds:
-          description: Machine-readable readiness blockers. Empty when effectiveStatus is `live`.
-          type: array
-          items:
-            type: string
-      required:
-      - canTransact
-      - effectiveStatus
-      - blockerIds
-      additionalProperties: false
     BuyerCredentialSourceRef:
       description: A storefront/source pair that a single credential row gives the buyer access to
       type: object
@@ -2792,50 +2575,18 @@ components:
       - sourceId
       - sourceName
       additionalProperties: false
-    BuyerCredential:
-      description: A buyer's registered credential, scoped to the storefront sources it gives access to
+    StorefrontConnectionArchived:
       type: object
       properties:
-        id:
-          description: Credential record ID
-          type: string
-        accountIdentifier:
-          description: The buyer's account identifier at the source
-          type: string
-        accountType:
-          description: Account type (e.g. CLIENT, MARKETPLACE)
-          type: string
-        status:
-          description: Credential status
-          type: string
-        registeredBy:
-          description: Who registered this credential. Null on legacy rows that predate registration tracking.
-          type:
-          - string
-          - 'null'
-        createdAt:
-          description: When the credential was created (ISO 8601)
-          type: string
-        updatedAt:
-          description: When the credential was last updated (ISO 8601)
-          type: string
-        sources:
-          description: Storefront sources this credential gives the buyer access to. A single credential may cover multiple sources when the same agent backs the same source across storefronts. Can be empty when the credential's underlying agent is no longer linked to any active storefront source — the credential row is preserved so buyers can see (and clean up) orphaned registrations.
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerCredentialSourceRef'
+        archived:
+          type: boolean
+          enum:
+          - true
       required:
-      - id
-      - accountIdentifier
-      - accountType
-      - status
-      - registeredBy
-      - createdAt
-      - updatedAt
-      - sources
+      - archived
       additionalProperties: false
-    BuyerStorefront:
-      description: A storefront as seen by a buyer
+    BuyerStorefrontSummary:
+      description: Compact storefront view returned by list endpoints. Use the storefront detail endpoint for the full resource.
       type: object
       properties:
         id:
@@ -2881,10 +2632,6 @@ components:
           - 'null'
         brandColors:
           $ref: '#/components/schemas/BuyerStorefrontBrandColors'
-        discoveryCard:
-          description: Canonical storefront identity and coverage used by every marketplace card renderer.
-          allOf:
-          - $ref: '#/components/schemas/DiscoveryCard'
         displayStatus:
           description: Deprecated stored-control label. Legacy projections retain `configuring` and `transacting`; projections backed by `isPaused` return `neutral` or `paused`. `archived` overrides both. Use readiness.effectiveStatus and readiness.canTransact for actual availability.
           type: string
@@ -2896,41 +2643,11 @@ components:
           - paused
         readiness:
           $ref: '#/components/schemas/BuyerStorefrontReadiness'
-        channels:
-          description: Ad channels this storefront supports (e.g. "display", "CTV", "audio"). Empty array if not specified.
-          example:
-          - CTV
-          - display
-          type: array
-          items:
-            type: string
         adapterProviderType:
           description: Adapter platform type (e.g. "meta", "tiktok"). Null for non-adapter storefronts.
           type:
           - string
           - 'null'
-        publishers:
-          type:
-          - object
-          - 'null'
-          properties:
-            total:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            verified:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            sample:
-              type: array
-              items:
-                type: string
-          required:
-          - total
-          - verified
-          - sample
-          additionalProperties: false
         adapterSourceKind:
           description: Adapter family for official adapter storefronts, such as sales or creative. Null for non-adapter storefronts.
           type:
@@ -2970,6 +2687,20 @@ components:
             - operator
             - agent
             - advertiser
+        discoveryPerformance:
+          description: Observed response-time stats from buyer product discovery. Use this to decide whether to ask the user before running a long discovery wait.
+          allOf:
+          - $ref: '#/components/schemas/BuyerStorefrontDiscoveryPerformance'
+        discoveryCard:
+          $ref: '#/components/schemas/BuyerDiscoveryCardSummary'
+        channels:
+          description: Ad channels this storefront supports (e.g. "display", "CTV", "audio"). Empty array if not specified.
+          example:
+          - CTV
+          - display
+          type: array
+          items:
+            type: string
         regions:
           description: Operator-curated regions this storefront covers (ISO 3166-1 alpha-2 country codes or group codes like WORLDWIDE, EMEA, NORAM). Empty array if not specified.
           example:
@@ -2978,25 +2709,18 @@ components:
           type: array
           items:
             type: string
-        connected:
-          description: Whether every inventory source the buyer needs is connected. This is buyer credential wiring, not storefront transaction readiness; use `readiness.canTransact` for availability.
-          type: boolean
-        requiresCredentials:
-          description: Whether the buyer must register credentials before they can transact with this storefront.
-          type: boolean
-        customerAccounts:
-          description: The buyer's registered accounts for this storefront, aggregated across its inventory sources and deduped by accountIdentifier.
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerStorefrontAccount'
-        adcpCapabilities:
-          description: AdCP capability manifest for the storefront's underlying agent(s). Non-null for agent-based storefronts with cached capability data; null for adapter storefronts or when no capability data has been fetched yet.
-          allOf:
-          - $ref: '#/components/schemas/BuyerStorefrontAdcpCapabilities'
-        discoveryPerformance:
-          description: Observed response-time stats from buyer product discovery. Use this to decide whether to ask the user before running a long discovery wait.
-          allOf:
-          - $ref: '#/components/schemas/BuyerStorefrontDiscoveryPerformance'
+        sourceCount:
+          description: Total number of inventory sources in this storefront. Replaces the embedded `sources[]` array on summary rows.
+          example: 5
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        connectedSourceCount:
+          description: Number of inventory sources the buyer is already wired to use, either because no buyer credentials are required or because credentials are active. Combined with `sourceCount`, gives a quick "is this wired up" signal.
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
       required:
       - id
       - platformId
@@ -3008,519 +2732,225 @@ components:
       - description
       - website
       - brandColors
-      - discoveryCard
       - displayStatus
       - readiness
-      - channels
       - adapterProviderType
       - adapterSourceKind
       - creativeCapabilities
       - adapterConnection
       - supportedRoutingTypes
       - supportedBilling
-      - regions
-      - connected
-      - requiresCredentials
-      - customerAccounts
-      - adcpCapabilities
       - discoveryPerformance
+      - discoveryCard
+      - channels
+      - regions
+      - sourceCount
+      - connectedSourceCount
       additionalProperties: false
-    BuyerStorefrontAccount:
-      description: A buyer's registered account for a storefront
+    DiscoveryCard:
+      description: Canonical buyer-visible storefront identity, coverage declaration, and optional Advertising Policies disclosure. Unknown coverage never means worldwide or all channels.
       type: object
       properties:
-        accountIdentifier:
-          description: The buyer's account identifier at the source
+        storefrontId:
           type: string
-        status:
-          description: Account registration status
+        platformId:
           type: string
-      required:
-      - accountIdentifier
-      - status
-      additionalProperties: false
-    StorefrontConnectionArchived:
-      type: object
-      properties:
-        archived:
-          type: boolean
-          enum:
-          - true
-      required:
-      - archived
-      additionalProperties: false
-    DirectedCampaignSubscription:
-      description: Durable provider-account subscription and its read-only mirror health.
-      type: object
-      properties:
-        id:
-          type: string
-        customerId:
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        advertiserId:
-          type: string
-        connectionId:
-          type: string
-        accountId:
-          type: string
-        sourceId:
-          type: string
-        providerType:
-          type: string
-        status:
+        storefrontKind:
           type: string
           enum:
-          - ACTIVE
-          - PAUSED
-          - ERROR
-        backfillStart:
+          - managed
+          - external_pass_through
+        displayName:
           type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        lastSyncedAt:
+        logoUrl:
           type:
           - string
           - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        lastSyncStatus:
+        logoBackground:
           type:
           - string
           - 'null'
           enum:
-          - SUCCESS
-          - ERROR
-        lastSyncError:
-          description: Fixed safe reconciliation summary. Provider messages and identifiers are never persisted or returned.
+          - dark-bg
+          - light-bg
+          - transparent-bg
+        description:
           type:
           - string
           - 'null'
-          enum:
-          - Connected provider account could not be synchronized.
-        errorCode:
-          description: Machine-readable diagnosis of the most recent failed periodic sweep. Stable Scope3 service error code; null after a successful sweep. Provider messages and request identifiers are never returned.
+        website:
           type:
           - string
           - 'null'
-          enum:
-          - NOT_FOUND
-          - ACCESS_DENIED
-          - VALIDATION_ERROR
-          - INVALID_REQUEST
-          - CONFLICT
-          - INTERNAL_ERROR
-          - RATE_LIMITED
-          - SERVICE_UNAVAILABLE
-          - FEATURE_NOT_ENABLED
-          - PRICING_NOT_CONFIGURED
-          - CURRENCY_MISMATCH
-          - INSUFFICIENT_MEDIA_BUDGET
-          - ROUTED_AGENT_REQUIRES_OPERATOR_AUTH
-          - ADAPTER_STOREFRONT_REQUIRES_ROUTED_CAMPAIGN
-          - CAPABILITY_NOT_SUPPORTED
-          - SELLER_APPROVAL_REQUIRED
-          - SALES_AGENT_NOT_ACTIVE
-          - CREDIT_LIMIT_EXCEEDED
-          - FX_QUOTE_EXPIRED
-          - FX_RATE_UNAVAILABLE
-        errorField:
-          description: Allowlisted request field associated with the most recent failed sweep, when one is safe to expose; null after success.
+        brandColors:
           type:
-          - string
+          - object
           - 'null'
-          enum:
-          - account.account_id
-          - accountId
-          - advertiserId
-          - assets
-          - assets.post.identity_id
-          - brief
-          - buying_mode
-          - clicks
-          - format_id
-          - impressions
-          - instagram_actor_id
-          - liveConformance.account
-          - liveConformance.inventory
-          - liveConformance.pagination
-          - liveConformance.providerInventory
-          - mediaBuy.canceled
-          - mediaBuys.account
-          - mediaBuys.currency
-          - mediaBuys.envelope
-          - mediaBuys.identity
-          - mediaBuys.lifecycle
-          - mediaBuys.numeric
-          - mediaBuys.packages
-          - mediaBuys.revision
-          - mediaBuys.retirement
-          - mediaBuys.schedule
-          - page_id
-          - pixel_id
-          - sourceId
-          - spend
-          - spotify.ads.identity
-          - spotify.ads.rejectReasons
-          - spotify.ads.status
-        errorReason:
-          description: Allowlisted machine-readable reconciliation reason from the most recent failed sweep; null after success.
-          type:
-          - string
-          - 'null'
-          enum:
-          - account_scope_mismatch
-          - catalog_shape_invalid
-          - cleanup_readback_mismatch
-          - create_account_mismatch
-          - delegated_auth_unready
-          - delivery_reconciliation_mismatch
-          - lifecycle_readback_mismatch
-          - missing_identity
-          - nested_subdivision_hierarchy_unproven
-          - pagination_incomplete
-          - pagination_page_bound_exceeded
-          - pagination_deadline_exceeded
-          - pagination_response_malformed
-          - pagination_list_malformed
-          - pagination_page_info_missing
-          - pagination_counters_invalid
-          - pagination_page_mismatch
-          - pagination_page_size_mismatch
-          - pagination_bounds_exceeded
-          - pagination_totals_inconsistent
-          - pagination_totals_changed
-          - pagination_page_count_mismatch
-          - pagination_page_oversized
-          - pagination_identity_invalid
-          - pagination_duplicate_identity
-          - pagination_terminal_confirmation_mismatch
-          - pagination_collected_count_mismatch
-          - provider_response_malformed
-          - readback_mismatch
-          - scope_insufficient
-          - selected_account_mismatch
-          - spark_provenance_inconsistent
-          - spark_tuple_inconsistent
-          - spark_provider_tuple_conflict
-          - carousel_provider_identity_mismatch
-          - carousel_child_owner_conflict
-          - carousel_child_standalone_conflict
-          - carousel_assignment_identity_mismatch
-          - active_identity_omitted
-          - video_format_provenance_inconsistent
-          - video_provider_digest_mismatch
-          - video_format_selector_missing
-          - image_format_provenance_inconsistent
-          - image_provider_digest_mismatch
-          - carousel_provider_inventory_missing
-          - image_format_selector_missing
-          - spark_provider_digest_mismatch
-        upstreamCode:
-          description: Allowlisted provider error category from the most recent failed sweep; null after success. Raw provider messages, request IDs, and resource IDs are excluded.
-          type:
-          - string
-          - 'null'
-          enum:
-          - ACCOUNT_NOT_AUTHORIZED
-          - ACCOUNT_NOT_FOUND
-          - ACCOUNT_SCOPE_MISMATCH
-          - ADVERTISER_INFO_DENIED
-          - ADVERTISER_INFO_MALFORMED
-          - AMBIGUOUS_AUDIENCE_DETAIL
-          - AUDIENCE_DETAIL_ID_MISMATCH
-          - AUDIENCE_UPLOAD_NOT_VERIFIED
-          - AUTH_REQUIRED
-          - BUDGET_TOO_LOW
-          - CATALOG_SCOPE_MISMATCH
-          - CONFIGURATION_ERROR
-          - INCOMPLETE_PAGINATION
-          - INVALID_AUDIENCE_DETAIL
-          - INVALID_AUDIENCE_INVENTORY
-          - INVALID_AUDIENCE_RESPONSE
-          - INVALID_ADVERTISER_SCOPE
-          - INVALID_PROVIDER_RESPONSE
-          - INVALID_REQUEST
-          - INVALID_SELECTED_ACCOUNT
-          - INVALID_SUCCESS_ENVELOPE
-          - NETWORK_ERROR
-          - NOT_FOUND
-          - OWNERSHIP_MISMATCH
-          - PERMISSION_DENIED
-          - PLATFORM_ERROR
-          - POLICY_VIOLATION
-          - RATE_LIMIT
-          - RATE_LIMITED
-          - SCOPE_INSUFFICIENT
-          - SERVICE_UNAVAILABLE
-          - SNAP_ME_MALFORMED
-          - TIMEOUT
-          - UPSTREAM_BAD_GATEWAY
-          - UPSTREAM_HTTP_ERROR
-          - UPSTREAM_NON_JSON
-          - UPSTREAM_UNAVAILABLE
-          - VALIDATION_ERROR
-        lastPresenceSyncedAt:
-          description: When the tracked-presence sweep (audiences and event sources) last visited this subscription; null until the first presence sweep runs.
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        lastPresenceSyncStatus:
-          description: Outcome of the most recent tracked-presence sweep. SKIPPED means the sweep visited the subscription but presence discovery did not apply (for example, the feature is not enabled for this customer); null until the first sweep.
-          type:
-          - string
-          - 'null'
-          enum:
-          - SUCCESS
-          - ERROR
-          - SKIPPED
-        lastPresenceSyncError:
-          description: Bounded, sanitized summary of the most recent presence sweep failure or skip reason; null after a fully successful sweep. Provider messages and identifiers are never returned.
-          type:
-          - string
-          - 'null'
-        createdAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        archivedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - id
-      - customerId
-      - advertiserId
-      - connectionId
-      - accountId
-      - sourceId
-      - providerType
-      - status
-      - backfillStart
-      - lastSyncedAt
-      - lastSyncStatus
-      - lastSyncError
-      - errorCode
-      - errorField
-      - errorReason
-      - upstreamCode
-      - lastPresenceSyncedAt
-      - lastPresenceSyncStatus
-      - lastPresenceSyncError
-      - createdAt
-      - updatedAt
-      - archivedAt
-      additionalProperties: false
-    BuyerStorefrontCapabilityDetails:
-      description: Capability summary for an external AdCP storefront source
-      type: object
-      properties:
-        version:
-          description: AdCP capability version
-          type: string
-        tools:
-          description: Tool names reported by the external AdCP source
-          type: array
-          items:
-            type: string
-        protocols:
-          description: Protocols advertised by the external AdCP source
-          type: array
-          items:
-            type: string
-        features:
-          description: Feature flags advertised by the external AdCP source
-          type: object
-          additionalProperties: {}
-        publisherDomains:
-          description: Publisher domains advertised by this source
-          type: array
-          items:
+          additionalProperties:
             type: string
         channels:
-          description: Advertising channels advertised by this source
+          description: Aggregate channel facets for search and display. Do not combine these with aggregate countries as a cross-product coverage promise.
           type: array
           items:
             type: string
         countries:
-          description: ISO 3166-1 alpha-2 primary countries advertised by this source; authoritative at a pure pass-through boundary and omitted when unknown
+          description: Aggregate ISO 3166-1 alpha-2 country facets for search and display. Do not combine these with aggregate channels as a cross-product coverage promise.
           type: array
           items:
             type: string
-        accountResolution:
-          description: How the source resolves buyer accounts; null when not advertised.
-          type:
-          - string
-          - 'null'
-          enum:
-          - explicit_account_id
-          - implicit_from_sync
-        requireOperatorAuth:
-          description: Capability-payload copy of whether buyer-provided credentials are required.
+            pattern: ^[A-Z]{2}$
+        acceptsAllCountries:
+          description: True only when the storefront explicitly accepts briefs from every country.
           type: boolean
-        defaultBilling:
-          description: Default billing mode advertised by the source
-          type:
-          - string
-          - 'null'
-        supportedBillings:
-          description: Billing modes supported by the source
+        coverageDeclarations:
+          description: Channel and country coverage claims preserved at their source boundaries. A combined filter matches only when one declaration satisfies both dimensions.
           type: array
           items:
-            type: string
-        reportingDeliveryMethods:
+            description: One source-level coverage claim. Channels and countries are correlated within this declaration; an empty dimension is unknown, not unrestricted.
+            type: object
+            properties:
+              channels:
+                description: Channels accepted by this correlated source declaration.
+                type: array
+                items:
+                  type: string
+              countries:
+                description: ISO 3166-1 alpha-2 countries accepted by this correlated source declaration.
+                type: array
+                items:
+                  type: string
+                  pattern: ^[A-Z]{2}$
+              acceptsAllCountries:
+                description: True only when this correlated source declaration explicitly accepts every country.
+                type: boolean
+            required:
+            - channels
+            - countries
+            - acceptsAllCountries
+            additionalProperties: false
+        advertisingPolicies:
           type:
-          - array
+          - string
           - 'null'
-          items:
-            type: string
-            enum:
-            - webhook
-            - offline
-        sandboxSupported:
-          description: Whether the source advertises sandbox support
-          type: boolean
-        synthetic:
-          description: Whether capabilities were synthesized rather than returned directly by the source
-          type: boolean
+          maxLength: 10000
+        coverage:
+          type: object
+          properties:
+            channels:
+              type: string
+              enum:
+              - declared
+              - partial
+              - unknown
+            countries:
+              type: string
+              enum:
+              - declared
+              - partial
+              - unknown
+          required:
+          - channels
+          - countries
+          additionalProperties: false
+        provenance:
+          type: object
+          properties:
+            identity:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  enum:
+                  - operator
+                  - registry
+                  - upstream_capabilities
+                  - unknown
+                logoUrl:
+                  type: string
+                  enum:
+                  - operator
+                  - registry
+                  - upstream_capabilities
+                  - unknown
+                description:
+                  type: string
+                  enum:
+                  - operator
+                  - registry
+                  - upstream_capabilities
+                  - unknown
+                website:
+                  type: string
+                  enum:
+                  - operator
+                  - registry
+                  - upstream_capabilities
+                  - unknown
+                brandColors:
+                  type: string
+                  enum:
+                  - operator
+                  - registry
+                  - upstream_capabilities
+                  - unknown
+              required:
+              - displayName
+              - logoUrl
+              - description
+              - website
+              - brandColors
+              additionalProperties: false
+            coverage:
+              type: object
+              properties:
+                channels:
+                  type: string
+                  enum:
+                  - operator
+                  - registry
+                  - upstream_capabilities
+                  - unknown
+                countries:
+                  type: string
+                  enum:
+                  - operator
+                  - registry
+                  - upstream_capabilities
+                  - unknown
+              required:
+              - channels
+              - countries
+              additionalProperties: false
+            advertisingPolicies:
+              type: string
+              enum:
+              - operator
+              - registry
+              - upstream_capabilities
+              - unknown
+          required:
+          - identity
+          - coverage
+          - advertisingPolicies
+          additionalProperties: false
       required:
-      - version
-      - tools
-      - protocols
-      - features
-      - accountResolution
-      - requireOperatorAuth
-      - defaultBilling
-      - supportedBillings
-      - reportingDeliveryMethods
-      - sandboxSupported
-      - synthetic
+      - storefrontId
+      - platformId
+      - storefrontKind
+      - displayName
+      - logoUrl
+      - logoBackground
+      - description
+      - website
+      - brandColors
+      - channels
+      - countries
+      - acceptsAllCountries
+      - coverageDeclarations
+      - advertisingPolicies
+      - coverage
+      - provenance
       additionalProperties: false
-    StorefrontConnectionAccountMappingItem:
-      description: External provider account row for integration-to-advertiser mapping management.
-      type: object
-      properties:
-        id:
-          type: string
-        connectionId:
-          type: string
-        accountId:
-          description: Connection account row id. For preserved unreachable mappings whose archived account row no longer exists, this is a 'link-{linkId}' placeholder — do not feed it back into account endpoints; use the mapping entry's linkId for unmap instead.
-          type: string
-        sourceId:
-          description: Canonical provider ID for an official adapter, or the inventory source ID for an external AdCP connection.
-          type: string
-        sourceName:
-          type: string
-        agentId:
-          type: string
-        providerType:
-          type: string
-        providerDisplayName:
-          type: string
-        connectionName:
-          type: string
-        accountName:
-          type: string
-        externalAccountId:
-          type: string
-        selected:
-          type: boolean
-        status:
-          type: string
-          enum:
-          - PENDING
-          - ACTIVE
-          - DISABLED
-          - ERROR
-        accountType:
-          description: 'Classification of the account within the platform''s hierarchy: ''advertiser'' for buyable ad accounts, or a platform-specific subtype. Never ''organization'' — manager containers are not mappable rows; they appear only as parent grouping fields.'
-          default: null
-          type:
-          - string
-          - 'null'
-        parentExternalId:
-          description: 'External id of the parent account, when known: a manager container (Meta Business Manager, Google MCC, Snap Organization, …). Group rows by (providerType, parentExternalId) to render the platform → organization hierarchy.'
-          default: null
-          type:
-          - string
-          - 'null'
-        parentName:
-          description: Display name of the parent account, when known.
-          default: null
-          type:
-          - string
-          - 'null'
-        mappedAdvertisers:
-          type: array
-          items:
-            $ref: '#/components/schemas/StorefrontConnectionAccountAdvertiserMapping'
-        updatedAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - id
-      - connectionId
-      - accountId
-      - sourceId
-      - sourceName
-      - agentId
-      - providerType
-      - providerDisplayName
-      - connectionName
-      - accountName
-      - externalAccountId
-      - selected
-      - status
-      - accountType
-      - parentExternalId
-      - parentName
-      - mappedAdvertisers
-      - updatedAt
-      additionalProperties: false
-    StorefrontConnectionFeaturePolicy:
-      description: Buyer-controlled feature policy for a storefront connection row.
-      type: object
-      properties:
-        buyEnabled:
-          description: Whether this buyer account should buy through this integration.
-          type: boolean
-        eventsEnabled:
-          description: Whether this integration should receive buyer event/CAPI signals.
-          type: boolean
-        feedsEnabled:
-          description: Whether buyer audience and feed data should be shared with this integration.
-          type: boolean
-        updatedAt:
-          description: When the buyer last customized this policy, or null when defaults apply.
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - buyEnabled
-      - eventsEnabled
-      - feedsEnabled
-      - updatedAt
-      additionalProperties: false
-    BuyerStorefrontBrandColors:
-      description: Validated brand.json colors object for rendering buyer discovery cards. Null when unresolved.
-      type:
-      - object
-      - 'null'
-      additionalProperties:
-        type: string
     StorefrontConnectionAccount:
       description: Provider account discovered for a buyer storefront connection.
       type: object
@@ -3641,39 +3071,159 @@ components:
       - updatedAt
       - mappedAdvertisers
       additionalProperties: false
-    ConnectAdcpStorefrontBody:
-      description: Project a registered and advertiser-mapped AdCP storefront source into the connected-account campaign connection plane.
+    StorefrontConnectionAccountAdvertiserMapping:
+      description: Advertiser mapping for an external account discovered through an integration.
       type: object
       properties:
+        linkId:
+          description: Identifier of the advertiser-account link row. Pass to DELETE /advertisers/{advertiserId}/accounts/{linkId} to unmap.
+          type: string
+        sourceId:
+          description: Canonical provider ID for an official adapter, or the inventory source ID for an external AdCP connection.
+          type: string
+        sourceName:
+          description: Display name for the inventory source.
+          type: string
+        agentId:
+          description: Partner agent ID that receives this mapping.
+          type: string
         advertiserId:
-          description: Advertiser already mapped to the selected AdCP source account.
+          description: Advertiser linked to this discovered provider account.
           type: string
-          pattern: ^[1-9]\d*$
-        accountId:
-          description: AdCP account identifier returned by list_available_accounts.
+        advertiserName:
+          description: Display name for the linked advertiser.
           type: string
-          minLength: 1
-        credentialId:
-          description: Credential identifier returned by list_available_accounts. Required when more than one credential exposes the same account identifier.
-          type: string
-          pattern: ^[1-9]\d*$
+        unreachableAt:
+          description: When set, this mapping is preserved but its platform account is no longer reachable through any active connection — relink the platform (or re-map the account) to restore it. Unreachable mappings never resolve at buy time.
+          default: null
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        linkedAt:
+          description: When the provider account was first linked.
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the provider account mapping was last updated.
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
+      - linkId
+      - sourceId
+      - sourceName
+      - agentId
       - advertiserId
-      - accountId
+      - advertiserName
+      - unreachableAt
+      - linkedAt
+      - updatedAt
       additionalProperties: false
-    StorefrontConnectionsResponse:
-      description: Storefront connection rows and feature policies visible to a buyer.
+    BuyerCreativeStorefrontCapability:
+      description: Machine-readable creative generation capability summary for an adapter storefront.
       type: object
       properties:
-        items:
+        kind:
+          description: Capability kind for creative-generation storefronts.
+          type: string
+          enum:
+          - creative_generation
+        modalities:
+          description: Creative media modalities this adapter can generate, such as image, audio, or video.
           type: array
           items:
-            $ref: '#/components/schemas/StorefrontConnectionSummary'
+            type: string
+            enum:
+            - image
+            - video
+            - audio
+        transformerIds:
+          description: Transformer identifiers accepted by this adapter when generating creatives. Empty when the adapter discovers transformer details dynamically.
+          type: array
+          items:
+            type: string
+        supportedFormatIds:
+          description: Representative AdCP creative format IDs this adapter can generate. Empty when exact formats must be discovered from list_creative_formats.
+          type: array
+          items:
+            type: string
+        supportedFormatCount:
+          description: Number of supported AdCP creative formats known without making an adapter call.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        supportsBuildCreative:
+          description: Whether this storefront exposes build_creative.
+          type: boolean
+        supportsPreviewCreative:
+          description: Whether this storefront exposes preview_creative.
+          type: boolean
+        formatDiscovery:
+          description: How exact creative formats are discovered for this adapter.
+          type: string
+          enum:
+          - canonical
+          - static_catalog
+          - aao_registry
       required:
-      - items
+      - kind
+      - modalities
+      - transformerIds
+      - supportedFormatIds
+      - supportedFormatCount
+      - supportsBuildCreative
+      - supportsPreviewCreative
+      - formatDiscovery
       additionalProperties: false
-    BuyerCredentialRegistrationResponse:
-      description: Response for registering credentials against a storefront inventory source
+    StorefrontConnectionFeaturePolicy:
+      description: Buyer-controlled feature policy for a storefront connection row.
+      type: object
+      properties:
+        buyEnabled:
+          description: Whether this buyer account should buy through this integration.
+          type: boolean
+        eventsEnabled:
+          description: Whether this integration should receive buyer event/CAPI signals.
+          type: boolean
+        feedsEnabled:
+          description: Whether buyer audience and feed data should be shared with this integration.
+          type: boolean
+        updatedAt:
+          description: When the buyer last customized this policy, or null when defaults apply.
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - buyEnabled
+      - eventsEnabled
+      - feedsEnabled
+      - updatedAt
+      additionalProperties: false
+    StorefrontPresenceListResponse:
+      description: Paginated list of tracked/pushed presences for a storefront connection account. Offset pagination rides the standard response meta, not the body.
+      type: object
+      properties:
+        presences:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontPresence'
+        total:
+          type: number
+      required:
+      - presences
+      - total
+      additionalProperties: false
+    BuyerCredential:
+      description: A buyer's registered credential, scoped to the storefront sources it gives access to
       type: object
       properties:
         id:
@@ -3681,6 +3231,9 @@ components:
           type: string
         accountIdentifier:
           description: The buyer's account identifier at the source
+          type: string
+        accountType:
+          description: Account type (e.g. CLIENT, MARKETPLACE)
           type: string
         status:
           description: Credential status
@@ -3693,30 +3246,193 @@ components:
         createdAt:
           description: When the credential was created (ISO 8601)
           type: string
-        oauth:
-          description: Present when the source uses OAuth — the buyer must visit `authorizationUrl` to complete consent
-          allOf:
-          - $ref: '#/components/schemas/BuyerCredentialOAuthInfo'
+        updatedAt:
+          description: When the credential was last updated (ISO 8601)
+          type: string
+        sources:
+          description: Storefront sources this credential gives the buyer access to. A single credential may cover multiple sources when the same agent backs the same source across storefronts. Can be empty when the credential's underlying agent is no longer linked to any active storefront source — the credential row is preserved so buyers can see (and clean up) orphaned registrations.
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerCredentialSourceRef'
       required:
       - id
       - accountIdentifier
+      - accountType
       - status
       - registeredBy
       - createdAt
+      - updatedAt
+      - sources
       additionalProperties: false
-    UnsubscribeDirectedCampaignsResponse:
-      description: The archived directed-campaign subscription and number of retired mirrors.
+    BuyerStorefrontAdcpCapabilities:
+      description: AdCP capability manifest for a storefront's underlying agent(s), derived from the cached `get_adcp_capabilities` response. Check `capabilitiesCachedAt` for data freshness.
       type: object
       properties:
-        subscription:
-          $ref: '#/components/schemas/DirectedCampaignSubscription'
-        retired:
-          type: integer
+        supportsUpdateMediaBuy:
+          description: Whether the agent declares support for `update_media_buy`. When false, buyers should not attempt to modify a campaign after booking.
+          type: boolean
+        supportsCreateMediaBuy:
+          description: Whether the agent declares support for `create_media_buy`.
+          type: boolean
+        supportsGetReporting:
+          description: Whether the agent supports delivery reporting via `get_media_buy_delivery`.
+          type: boolean
+        supportsSandbox:
+          description: Whether the agent declares sandbox mode — useful for integration testing without live spend.
+          type: boolean
+        extensions:
+          description: AdCP extension identifiers the agent declares support for (e.g. `"sandbox"`, `"custom_targeting"`).
+          type: array
+          items:
+            type: string
+        protocols:
+          description: AdCP protocol versions the agent speaks (e.g. `["adcp-v3"]`).
+          type: array
+          items:
+            type: string
+        publisherDomains:
+          description: Publisher domains declared across the storefront’s source-agent portfolios.
+          type: array
+          items:
+            type: string
+        channels:
+          description: Standard primary channels declared across source-agent portfolios. Authoritative for a pure pass-through storefront; inventory evidence for managed ingredient sources.
+          type: array
+          items:
+            type: string
+        countries:
+          description: Standard primary countries declared across source-agent portfolios. Authoritative for a pure pass-through storefront; inventory evidence for managed ingredient sources.
+          type: array
+          items:
+            type: string
+        countriesComplete:
+          description: Whether every routed source declared at least one primary country. False means the country union is partial evidence.
+          type: boolean
+        channelsComplete:
+          description: Whether every routed source declared at least one primary channel. False means the channel union is partial evidence.
+          type: boolean
+        version:
+          description: AdCP version string reported by the agent.
+          type:
+          - string
+          - 'null'
+        reportingDeliveryMethods:
+          description: Push-based delivery methods the agent supports for reporting. Polling via `get_media_buy_delivery` is always available as a baseline. Null when the agent has not declared delivery methods.
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            enum:
+            - webhook
+            - offline
+        offlineDeliveryProtocols:
+          description: Cloud storage protocols supported for offline reporting delivery. Relevant only when `reportingDeliveryMethods` includes `"offline"`. Null when not declared.
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            enum:
+            - s3
+            - gcs
+            - azure_blob
+        capabilitiesCachedAt:
+          description: When the capability manifest was last fetched from the agent. Capabilities are cached up to 24 hours.
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - supportsUpdateMediaBuy
+      - supportsCreateMediaBuy
+      - supportsGetReporting
+      - supportsSandbox
+      - extensions
+      - protocols
+      - countriesComplete
+      - channelsComplete
+      - version
+      - reportingDeliveryMethods
+      - offlineDeliveryProtocols
+      - capabilitiesCachedAt
+      additionalProperties: false
+    StorefrontPresence:
+      description: Read-only wire projection of a storefront-connection-account presence edge -- identity, status, and counts only, never member lists or event payloads.
+      type: object
+      properties:
+        id:
+          description: The presence edge id.
+          type: string
+          minLength: 1
+        objectType:
+          type: string
+          enum:
+          - audience
+          - event_source
+        direction:
+          type: string
+          enum:
+          - pushed
+          - tracked
+        upstreamObjectId:
+          description: The seller's own identifier for the object.
+          type: string
+          minLength: 1
+        audienceId:
+          description: The buyer-level audience this edge belongs to. Present only when direction is "pushed" and objectType is "audience".
+          type: string
+          minLength: 1
+        eventSourceId:
+          description: The buyer-level event source this edge belongs to. Present only when direction is "pushed" and objectType is "event_source".
+          type: string
+          minLength: 1
+        syncState:
+          type: string
+          enum:
+          - live
+          - stale
+          - error
+        lastSyncedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        rowCount:
+          description: Row/member or event count reported by the last sync, when the provider returns one. Never the rows or events themselves.
+          type:
+          - integer
+          - 'null'
           minimum: 0
           maximum: 9007199254740991
+        retiredAt:
+          description: Null unless the edge has been retired.
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - subscription
-      - retired
+      - id
+      - objectType
+      - direction
+      - upstreamObjectId
+      - syncState
+      - lastSyncedAt
+      - rowCount
+      - retiredAt
+      - createdAt
+      - updatedAt
       additionalProperties: false
     StorefrontConnectionSummary:
       description: Buyer-side storefront connection row. Adapter storefronts include auth status; all storefronts include feature policy.
@@ -4003,113 +3719,88 @@ components:
       - credential
       - selectedAccount
       additionalProperties: false
-    BuyerStorefrontAdcpCapabilities:
-      description: AdCP capability manifest for a storefront's underlying agent(s), derived from the cached `get_adcp_capabilities` response. Check `capabilitiesCachedAt` for data freshness.
+    StorefrontConnectionAccountMappingItem:
+      description: External provider account row for integration-to-advertiser mapping management.
       type: object
       properties:
-        supportsUpdateMediaBuy:
-          description: Whether the agent declares support for `update_media_buy`. When false, buyers should not attempt to modify a campaign after booking.
+        id:
+          type: string
+        connectionId:
+          type: string
+        accountId:
+          description: Connection account row id. For preserved unreachable mappings whose archived account row no longer exists, this is a 'link-{linkId}' placeholder — do not feed it back into account endpoints; use the mapping entry's linkId for unmap instead.
+          type: string
+        sourceId:
+          description: Canonical provider ID for an official adapter, or the inventory source ID for an external AdCP connection.
+          type: string
+        sourceName:
+          type: string
+        agentId:
+          type: string
+        providerType:
+          type: string
+        providerDisplayName:
+          type: string
+        connectionName:
+          type: string
+        accountName:
+          type: string
+        externalAccountId:
+          type: string
+        selected:
           type: boolean
-        supportsCreateMediaBuy:
-          description: Whether the agent declares support for `create_media_buy`.
-          type: boolean
-        supportsGetReporting:
-          description: Whether the agent supports delivery reporting via `get_media_buy_delivery`.
-          type: boolean
-        supportsSandbox:
-          description: Whether the agent declares sandbox mode — useful for integration testing without live spend.
-          type: boolean
-        extensions:
-          description: AdCP extension identifiers the agent declares support for (e.g. `"sandbox"`, `"custom_targeting"`).
-          type: array
-          items:
-            type: string
-        protocols:
-          description: AdCP protocol versions the agent speaks (e.g. `["adcp-v3"]`).
-          type: array
-          items:
-            type: string
-        publisherDomains:
-          description: Publisher domains declared across the storefront’s source-agent portfolios.
-          type: array
-          items:
-            type: string
-        channels:
-          description: Standard primary channels declared across source-agent portfolios. Authoritative for a pure pass-through storefront; inventory evidence for managed ingredient sources.
-          type: array
-          items:
-            type: string
-        countries:
-          description: Standard primary countries declared across source-agent portfolios. Authoritative for a pure pass-through storefront; inventory evidence for managed ingredient sources.
-          type: array
-          items:
-            type: string
-        countriesComplete:
-          description: Whether every routed source declared at least one primary country. False means the country union is partial evidence.
-          type: boolean
-        channelsComplete:
-          description: Whether every routed source declared at least one primary channel. False means the channel union is partial evidence.
-          type: boolean
-        version:
-          description: AdCP version string reported by the agent.
+        status:
+          type: string
+          enum:
+          - PENDING
+          - ACTIVE
+          - DISABLED
+          - ERROR
+        accountType:
+          description: 'Classification of the account within the platform''s hierarchy: ''advertiser'' for buyable ad accounts, or a platform-specific subtype. Never ''organization'' — manager containers are not mappable rows; they appear only as parent grouping fields.'
+          default: null
           type:
           - string
           - 'null'
-        reportingDeliveryMethods:
-          description: Push-based delivery methods the agent supports for reporting. Polling via `get_media_buy_delivery` is always available as a baseline. Null when the agent has not declared delivery methods.
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-            enum:
-            - webhook
-            - offline
-        offlineDeliveryProtocols:
-          description: Cloud storage protocols supported for offline reporting delivery. Relevant only when `reportingDeliveryMethods` includes `"offline"`. Null when not declared.
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-            enum:
-            - s3
-            - gcs
-            - azure_blob
-        capabilitiesCachedAt:
-          description: When the capability manifest was last fetched from the agent. Capabilities are cached up to 24 hours.
+        parentExternalId:
+          description: 'External id of the parent account, when known: a manager container (Meta Business Manager, Google MCC, Snap Organization, …). Group rows by (providerType, parentExternalId) to render the platform → organization hierarchy.'
+          default: null
           type:
           - string
           - 'null'
+        parentName:
+          description: Display name of the parent account, when known.
+          default: null
+          type:
+          - string
+          - 'null'
+        mappedAdvertisers:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontConnectionAccountAdvertiserMapping'
+        updatedAt:
+          type: string
           format: date-time
           pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - supportsUpdateMediaBuy
-      - supportsCreateMediaBuy
-      - supportsGetReporting
-      - supportsSandbox
-      - extensions
-      - protocols
-      - countriesComplete
-      - channelsComplete
-      - version
-      - reportingDeliveryMethods
-      - offlineDeliveryProtocols
-      - capabilitiesCachedAt
-      additionalProperties: false
-    StorefrontConnectionAgentSource:
-      description: Agent-backed inventory source eligible for external account mappings.
-      type: object
-      properties:
-        sourceId:
-          description: Canonical provider ID for an official adapter (for example, meta), or the inventory source ID for an external AdCP connection.
-          type: string
-        name:
-          description: Display name for the inventory source.
-          type: string
-      required:
+      - id
+      - connectionId
+      - accountId
       - sourceId
-      - name
+      - sourceName
+      - agentId
+      - providerType
+      - providerDisplayName
+      - connectionName
+      - accountName
+      - externalAccountId
+      - selected
+      - status
+      - accountType
+      - parentExternalId
+      - parentName
+      - mappedAdvertisers
+      - updatedAt
       additionalProperties: false
     ApiError:
       description: Structured error object
@@ -4132,61 +3823,370 @@ components:
       - code
       - message
       additionalProperties: false
-    BuyerCreativeStorefrontCapability:
-      description: Machine-readable creative generation capability summary for an adapter storefront.
+    DirectedCampaignSubscription:
+      description: Durable provider-account subscription and its read-only mirror health.
       type: object
       properties:
-        kind:
-          description: Capability kind for creative-generation storefronts.
+        id:
+          type: string
+        customerId:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        advertiserId:
+          type: string
+        connectionId:
+          type: string
+        accountId:
+          type: string
+        sourceId:
+          type: string
+        providerType:
+          type: string
+        status:
           type: string
           enum:
-          - creative_generation
-        modalities:
-          description: Creative media modalities this adapter can generate, such as image, audio, or video.
+          - ACTIVE
+          - PAUSED
+          - ERROR
+        backfillStart:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastSyncedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastSyncStatus:
+          type:
+          - string
+          - 'null'
+          enum:
+          - SUCCESS
+          - ERROR
+        lastSyncError:
+          description: Fixed safe reconciliation summary. Provider messages and identifiers are never persisted or returned.
+          type:
+          - string
+          - 'null'
+          enum:
+          - Connected provider account could not be synchronized.
+        errorCode:
+          description: Machine-readable diagnosis of the most recent failed periodic sweep. Stable Scope3 service error code; null after a successful sweep. Provider messages and request identifiers are never returned.
+          type:
+          - string
+          - 'null'
+          enum:
+          - NOT_FOUND
+          - ACCESS_DENIED
+          - VALIDATION_ERROR
+          - INVALID_REQUEST
+          - CONFLICT
+          - INTERNAL_ERROR
+          - RATE_LIMITED
+          - SERVICE_UNAVAILABLE
+          - FEATURE_NOT_ENABLED
+          - PRICING_NOT_CONFIGURED
+          - CURRENCY_MISMATCH
+          - INSUFFICIENT_MEDIA_BUDGET
+          - ROUTED_AGENT_REQUIRES_OPERATOR_AUTH
+          - ADAPTER_STOREFRONT_REQUIRES_ROUTED_CAMPAIGN
+          - CAPABILITY_NOT_SUPPORTED
+          - SELLER_APPROVAL_REQUIRED
+          - SALES_AGENT_NOT_ACTIVE
+          - CREDIT_LIMIT_EXCEEDED
+          - FX_QUOTE_EXPIRED
+          - FX_RATE_UNAVAILABLE
+        errorField:
+          description: Allowlisted request field associated with the most recent failed sweep, when one is safe to expose; null after success.
+          type:
+          - string
+          - 'null'
+          enum:
+          - account.account_id
+          - accountId
+          - advertiserId
+          - assets
+          - assets.post.identity_id
+          - brief
+          - buying_mode
+          - clicks
+          - format_id
+          - impressions
+          - instagram_actor_id
+          - liveConformance.account
+          - liveConformance.inventory
+          - liveConformance.pagination
+          - liveConformance.providerInventory
+          - mediaBuy.canceled
+          - mediaBuys.account
+          - mediaBuys.currency
+          - mediaBuys.envelope
+          - mediaBuys.identity
+          - mediaBuys.lifecycle
+          - mediaBuys.numeric
+          - mediaBuys.packages
+          - mediaBuys.revision
+          - mediaBuys.retirement
+          - mediaBuys.schedule
+          - page_id
+          - pixel_id
+          - sourceId
+          - spend
+          - spotify.ads.identity
+          - spotify.ads.rejectReasons
+          - spotify.ads.status
+        errorReason:
+          description: Allowlisted machine-readable reconciliation reason from the most recent failed sweep; null after success.
+          type:
+          - string
+          - 'null'
+          enum:
+          - account_scope_mismatch
+          - catalog_shape_invalid
+          - cleanup_readback_mismatch
+          - create_account_mismatch
+          - delegated_auth_unready
+          - delivery_reconciliation_mismatch
+          - lifecycle_readback_mismatch
+          - missing_identity
+          - nested_subdivision_hierarchy_unproven
+          - pagination_incomplete
+          - pagination_page_bound_exceeded
+          - pagination_deadline_exceeded
+          - pagination_response_malformed
+          - pagination_list_malformed
+          - pagination_page_info_missing
+          - pagination_counters_invalid
+          - pagination_page_mismatch
+          - pagination_page_size_mismatch
+          - pagination_bounds_exceeded
+          - pagination_totals_inconsistent
+          - pagination_totals_changed
+          - pagination_page_count_mismatch
+          - pagination_page_oversized
+          - pagination_identity_invalid
+          - pagination_duplicate_identity
+          - pagination_terminal_confirmation_mismatch
+          - pagination_collected_count_mismatch
+          - provider_response_malformed
+          - readback_mismatch
+          - scope_insufficient
+          - selected_account_mismatch
+          - spark_provenance_inconsistent
+          - spark_tuple_inconsistent
+          - spark_provider_tuple_conflict
+          - carousel_provider_identity_mismatch
+          - carousel_child_owner_conflict
+          - carousel_child_standalone_conflict
+          - carousel_assignment_identity_mismatch
+          - active_identity_omitted
+          - video_format_provenance_inconsistent
+          - video_provider_digest_mismatch
+          - video_format_selector_missing
+          - image_format_provenance_inconsistent
+          - image_provider_digest_mismatch
+          - carousel_provider_inventory_missing
+          - image_format_selector_missing
+          - spark_provider_digest_mismatch
+        upstreamCode:
+          description: Allowlisted provider error category from the most recent failed sweep; null after success. Raw provider messages, request IDs, and resource IDs are excluded.
+          type:
+          - string
+          - 'null'
+          enum:
+          - ACCOUNT_NOT_AUTHORIZED
+          - ACCOUNT_NOT_FOUND
+          - ACCOUNT_SCOPE_MISMATCH
+          - ADVERTISER_INFO_DENIED
+          - ADVERTISER_INFO_MALFORMED
+          - AMBIGUOUS_AUDIENCE_DETAIL
+          - AUDIENCE_DETAIL_ID_MISMATCH
+          - AUDIENCE_UPLOAD_NOT_VERIFIED
+          - AUTH_REQUIRED
+          - BUDGET_TOO_LOW
+          - CATALOG_SCOPE_MISMATCH
+          - CONFIGURATION_ERROR
+          - INCOMPLETE_PAGINATION
+          - INVALID_AUDIENCE_DETAIL
+          - INVALID_AUDIENCE_INVENTORY
+          - INVALID_AUDIENCE_RESPONSE
+          - INVALID_ADVERTISER_SCOPE
+          - INVALID_PROVIDER_RESPONSE
+          - INVALID_REQUEST
+          - INVALID_SELECTED_ACCOUNT
+          - INVALID_SUCCESS_ENVELOPE
+          - NETWORK_ERROR
+          - NOT_FOUND
+          - OWNERSHIP_MISMATCH
+          - PERMISSION_DENIED
+          - PLATFORM_ERROR
+          - POLICY_VIOLATION
+          - RATE_LIMIT
+          - RATE_LIMITED
+          - SCOPE_INSUFFICIENT
+          - SERVICE_UNAVAILABLE
+          - SNAP_ME_MALFORMED
+          - TIMEOUT
+          - UPSTREAM_BAD_GATEWAY
+          - UPSTREAM_HTTP_ERROR
+          - UPSTREAM_NON_JSON
+          - UPSTREAM_UNAVAILABLE
+          - VALIDATION_ERROR
+        lastPresenceSyncedAt:
+          description: When the tracked-presence sweep (audiences and event sources) last visited this subscription; null until the first presence sweep runs.
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastPresenceSyncStatus:
+          description: Outcome of the most recent tracked-presence sweep. SKIPPED means the sweep visited the subscription but presence discovery did not apply (for example, the feature is not enabled for this customer); null until the first sweep.
+          type:
+          - string
+          - 'null'
+          enum:
+          - SUCCESS
+          - ERROR
+          - SKIPPED
+        lastPresenceSyncError:
+          description: Bounded, sanitized summary of the most recent presence sweep failure or skip reason; null after a fully successful sweep. Provider messages and identifiers are never returned.
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        archivedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - customerId
+      - advertiserId
+      - connectionId
+      - accountId
+      - sourceId
+      - providerType
+      - status
+      - backfillStart
+      - lastSyncedAt
+      - lastSyncStatus
+      - lastSyncError
+      - errorCode
+      - errorField
+      - errorReason
+      - upstreamCode
+      - lastPresenceSyncedAt
+      - lastPresenceSyncStatus
+      - lastPresenceSyncError
+      - createdAt
+      - updatedAt
+      - archivedAt
+      additionalProperties: false
+    UnsubscribeDirectedCampaignsResponse:
+      description: The archived directed-campaign subscription and number of retired mirrors.
+      type: object
+      properties:
+        subscription:
+          $ref: '#/components/schemas/DirectedCampaignSubscription'
+        retired:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - subscription
+      - retired
+      additionalProperties: false
+    BuyerAdapterConnectionStatus:
+      description: Buyer-specific delegated-auth status for an official adapter storefront.
+      type: object
+      properties:
+        status:
+          description: Whether this buyer already has delegated credentials for the adapter storefront.
+          type: string
+          enum:
+          - not_connected
+          - connected
+          - needs_account_selection
+          - error
+        authModes:
+          description: Credential flows supported by this adapter storefront for the buyer.
           type: array
           items:
             type: string
             enum:
-            - image
-            - video
-            - audio
-        transformerIds:
-          description: Transformer identifiers accepted by this adapter when generating creatives. Empty when the adapter discovers transformer details dynamically.
-          type: array
-          items:
-            type: string
-        supportedFormatIds:
-          description: Representative AdCP creative format IDs this adapter can generate. Empty when exact formats must be discovered from list_creative_formats.
-          type: array
-          items:
-            type: string
-        supportedFormatCount:
-          description: Number of supported AdCP creative formats known without making an adapter call.
+            - oauth
+            - bearer
+        accountCount:
+          description: Number of active provider accounts discovered for this buyer connection.
           type: integer
           minimum: 0
           maximum: 9007199254740991
-        supportsBuildCreative:
-          description: Whether this storefront exposes build_creative.
-          type: boolean
-        supportsPreviewCreative:
-          description: Whether this storefront exposes preview_creative.
-          type: boolean
-        formatDiscovery:
-          description: How exact creative formats are discovered for this adapter.
+        mappedAdvertiserCount:
+          description: 'Distinct advertisers with an active mapping to one of this connection''s currently active accounts. 0 on a connected storefront means connected-but-not-yet-buyable: a media buy for an unmapped advertiser fails with account_mapping_required until it is mapped under Settings → Connections.'
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        selectedAccountName:
+          description: Selected provider account display name, if one has been selected.
+          type:
+          - string
+          - 'null'
+      required:
+      - status
+      - authModes
+      - accountCount
+      - mappedAdvertiserCount
+      - selectedAccountName
+      additionalProperties: false
+    ConnectedAdcpStorefront:
+      description: Connection/account identifiers for a registered AdCP storefront source ready for an explicit tracked-campaign subscription.
+      type: object
+      properties:
+        connectionId:
+          type: string
+        connectionAccountId:
+          type: string
+        storefrontId:
+          type: string
+        sourceId:
+          type: string
+        agentId:
+          type: string
+        advertiserId:
+          type: string
+        externalAccountId:
+          type: string
+        providerType:
           type: string
           enum:
-          - canonical
-          - static_catalog
-          - aao_registry
+          - adcp
+        connectionKind:
+          type: string
+          enum:
+          - THIRD_PARTY_AGENT
       required:
-      - kind
-      - modalities
-      - transformerIds
-      - supportedFormatIds
-      - supportedFormatCount
-      - supportsBuildCreative
-      - supportsPreviewCreative
-      - formatDiscovery
+      - connectionId
+      - connectionAccountId
+      - storefrontId
+      - sourceId
+      - agentId
+      - advertiserId
+      - externalAccountId
+      - providerType
+      - connectionKind
       additionalProperties: false
   securitySchemes:
     bearerAuth:

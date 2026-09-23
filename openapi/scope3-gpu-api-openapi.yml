@@ -230,24 +230,12 @@ paths:
       - Gpu
 components:
   schemas:
-    GPUCreateRequest:
+    GPUUpdateRequest:
       type: object
-      required:
-      - id
-      - name
-      - max_power_w
-      - embodied_emissions_kgco2e
-      - embodied_water_mlh2o
-      - performance_ratio_to_h200
-      - ols_intercept
-      - ols_coefficient_gpu_count
       properties:
         name:
           type: string
           example: NVIDIA A100 40GB
-        id:
-          type: string
-          example: a100_40gb
         max_power_w:
           type: number
           example: 700
@@ -356,12 +344,24 @@ components:
           maxItems: 100
           items:
             $ref: '#/components/schemas/GPU'
-    GPUUpdateRequest:
+    GPUCreateRequest:
       type: object
+      required:
+      - id
+      - name
+      - max_power_w
+      - embodied_emissions_kgco2e
+      - embodied_water_mlh2o
+      - performance_ratio_to_h200
+      - ols_intercept
+      - ols_coefficient_gpu_count
       properties:
         name:
           type: string
           example: NVIDIA A100 40GB
+        id:
+          type: string
+          example: a100_40gb
         max_power_w:
           type: number
           example: 700

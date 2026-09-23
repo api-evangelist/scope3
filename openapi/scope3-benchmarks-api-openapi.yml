@@ -43,13 +43,6 @@ paths:
       - Benchmarks
 components:
   schemas:
-    RequestId:
-      type: string
-      description: Auto generated request identifier
-    CountryInput:
-      type: string
-      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
-      example: US
     BenchmarksResponse:
       type: object
       required:
@@ -61,6 +54,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BenchmarkInformation'
+    CountryInput:
+      type: string
+      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
+      example: US
+    RequestId:
+      type: string
+      description: Auto generated request identifier
+    ChannelWithBenchmarks:
+      type: string
+      enum:
+      - app
+      - web
+      - streaming-video
+      - social
+      - ctv-bvod
+      example: web
     BenchmarkInformation:
       type: object
       required:
@@ -95,15 +104,6 @@ components:
           type: string
           description: 'Year-month which specifies which month''s benchmarks to use. (Supported Formats: YYYY-MM, YYYYMM, or YYYY/MM)'
           example: 2023-04
-    ChannelWithBenchmarks:
-      type: string
-      enum:
-      - app
-      - web
-      - streaming-video
-      - social
-      - ctv-bvod
-      example: web
   securitySchemes:
     bearerAuth:
       type: http

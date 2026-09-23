@@ -224,33 +224,6 @@ components:
       - items
       - total
       additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    SyndicateResponse:
-      description: Response after toggling syndication for one or more ADCP agents
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SyndicationStatusOutput'
-      required:
-      - data
-      additionalProperties: false
     ApiError:
       description: Structured error object
       type: object
@@ -371,6 +344,33 @@ components:
       - createdAt
       - updatedAt
       - completedAt
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    SyndicateResponse:
+      description: Response after toggling syndication for one or more ADCP agents
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyndicationStatusOutput'
+      required:
+      - data
       additionalProperties: false
   securitySchemes:
     bearerAuth:

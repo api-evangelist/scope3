@@ -230,120 +230,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    SupplyRequestItem:
-      type: object
-      properties:
-        domain:
-          type: string
-        channel:
-          type: string
-        trackingSource:
-          type: string
-          enum:
-          - explicit
-          - shared_channel
-        removable:
-          type: boolean
-        market:
-          type:
-          - string
-          - 'null'
-        desiredSupply:
-          type:
-          - string
-          - 'null'
-          maxLength: 1000
-        publicStatus:
-          $ref: '#/components/schemas/PublicSupplyRequestStatus'
-        customerNeed:
-          type:
-          - object
-          - 'null'
-          properties:
-            createdAt:
-              type:
-              - string
-              - 'null'
-            updatedAt:
-              type:
-              - string
-              - 'null'
-          required:
-          - createdAt
-          - updatedAt
-          additionalProperties: false
-      required:
-      - domain
-      - channel
-      - trackingSource
-      - removable
-      - market
-      - desiredSupply
-      - publicStatus
-      - customerNeed
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    PublicSupplyRequestStatus:
-      type: object
-      properties:
-        key:
-          type: string
-          enum:
-          - tracked
-          - available
-        label:
-          type: string
-        description:
-          type: string
-        asOf:
-          type:
-          - string
-          - 'null'
-      required:
-      - key
-      - label
-      - description
-      additionalProperties: false
-    SupplyRequestSuggestionItem:
-      type: object
-      properties:
-        domain:
-          type: string
-        name:
-          type:
-          - string
-          - 'null'
-        kind:
-          type: string
-          enum:
-          - brand
-          - publisher
-          - property
-        source:
-          type:
-          - string
-          - 'null'
-      required:
-      - domain
-      - name
-      - kind
-      - source
-      additionalProperties: false
     RemoveSupplyRequestResponse:
       type: object
       properties:
@@ -401,26 +287,30 @@ components:
       - truncated
       - hasMore
       additionalProperties: false
-    ApiError:
-      description: Structured error object
+    SupplyRequestSuggestionItem:
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        domain:
           type: string
-        message:
-          description: Human-readable error message
+        name:
+          type:
+          - string
+          - 'null'
+        kind:
           type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+          enum:
+          - brand
+          - publisher
+          - property
+        source:
+          type:
+          - string
+          - 'null'
       required:
-      - code
-      - message
+      - domain
+      - name
+      - kind
+      - source
       additionalProperties: false
     RequestSupplyResponse:
       type: object
@@ -442,6 +332,116 @@ components:
       - updated
       - registryStatus
       - request
+      additionalProperties: false
+    PublicSupplyRequestStatus:
+      type: object
+      properties:
+        key:
+          type: string
+          enum:
+          - tracked
+          - available
+        label:
+          type: string
+        description:
+          type: string
+        asOf:
+          type:
+          - string
+          - 'null'
+      required:
+      - key
+      - label
+      - description
+      additionalProperties: false
+    SupplyRequestItem:
+      type: object
+      properties:
+        domain:
+          type: string
+        channel:
+          type: string
+        trackingSource:
+          type: string
+          enum:
+          - explicit
+          - shared_channel
+        removable:
+          type: boolean
+        market:
+          type:
+          - string
+          - 'null'
+        desiredSupply:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+        publicStatus:
+          $ref: '#/components/schemas/PublicSupplyRequestStatus'
+        customerNeed:
+          type:
+          - object
+          - 'null'
+          properties:
+            createdAt:
+              type:
+              - string
+              - 'null'
+            updatedAt:
+              type:
+              - string
+              - 'null'
+          required:
+          - createdAt
+          - updatedAt
+          additionalProperties: false
+      required:
+      - domain
+      - channel
+      - trackingSource
+      - removable
+      - market
+      - desiredSupply
+      - publicStatus
+      - customerNeed
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
       additionalProperties: false
     SupplyRequestSuggestionsResponse:
       type: object

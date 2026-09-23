@@ -814,20 +814,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    GamCustomTargetingKeyEntry:
-      type: object
-      properties:
-        name:
-          type: string
-        keyId:
-          type: string
-        displayName:
-          type: string
-      required:
-      - name
-      - keyId
-      - displayName
-      additionalProperties: false
     AdapterAdvertiser:
       type: object
       properties:
@@ -841,6 +827,292 @@ components:
       - id
       - name
       - status
+      additionalProperties: false
+    EnsureGamAdvertiserResponse:
+      type: object
+      properties:
+        advertiser:
+          $ref: '#/components/schemas/GamAdvertiser'
+        created:
+          type: boolean
+        dryRun:
+          type: boolean
+      required:
+      - advertiser
+      - created
+      additionalProperties: false
+    EnsureGamAdvertiserBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        dryRun:
+          type: boolean
+      required:
+      - name
+    ConfigureAxeKeysBody:
+      type: object
+      properties:
+        axeIncludeKey:
+          type: string
+          minLength: 1
+        axeExcludeKey:
+          type: string
+          minLength: 1
+        axeMacroKey:
+          type: string
+          enum:
+          - axem
+      required:
+      - axeIncludeKey
+      - axeExcludeKey
+      - axeMacroKey
+    ConfigureAxeKeysResponse:
+      type: object
+      properties:
+        setupTask:
+          $ref: '#/components/schemas/AxeKeysSetupTask'
+      required:
+      - setupTask
+      additionalProperties: false
+    AxeKeysSetupTask:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        isComplete:
+          type: boolean
+        actionUrl:
+          type:
+          - string
+          - 'null'
+        details:
+          type:
+          - string
+          - 'null'
+      required:
+      - key
+      - name
+      - isComplete
+      additionalProperties: false
+    EsaSandboxAccountStatus:
+      description: Readiness of the ESA tenant-managed sandbox advertiser account used for no-spend buyer tests.
+      type: object
+      properties:
+        esaId:
+          type: string
+        tenantId:
+          type: string
+        ready:
+          type: boolean
+        account:
+          allOf:
+          - $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        missingReason:
+          type:
+          - string
+          - 'null'
+      required:
+      - esaId
+      - tenantId
+      - ready
+      - account
+      - accounts
+      - missingReason
+      additionalProperties: false
+    EsaEnsureSandboxAccountResponse:
+      description: Result of idempotently ensuring the ESA tenant-managed sandbox account.
+      type: object
+      properties:
+        esaId:
+          type: string
+        tenantId:
+          type: string
+        ready:
+          type: boolean
+        account:
+          allOf:
+          - $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaSandboxAccountSummary'
+        missingReason:
+          type:
+          - string
+          - 'null'
+        ensured:
+          type: boolean
+      required:
+      - esaId
+      - tenantId
+      - ready
+      - account
+      - accounts
+      - missingReason
+      - ensured
+      additionalProperties: false
+    BuyerAdvertiserMappingList:
+      type: object
+      properties:
+        mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerAdvertiserMapping'
+      required:
+      - mappings
+      additionalProperties: false
+    GamAdvertiser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        currencyCode:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - name
+      - status
+      additionalProperties: false
+    SetDefaultGamAdvertiserBody:
+      type: object
+      properties:
+        gamAdvertiserId:
+          type: string
+          minLength: 1
+      required:
+      - gamAdvertiserId
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    BuyerAdvertiserMappingPatchBody:
+      type: object
+      properties:
+        brandHouse:
+          type:
+          - string
+          - 'null'
+        brandId:
+          type:
+          - string
+          - 'null'
+        gamAdvertiserId:
+          type:
+          - string
+          - 'null'
+        principalId:
+          type:
+          - string
+          - 'null'
+    EnsureGamCustomTargetingKeysBody:
+      type: object
+      properties:
+        keys:
+          minItems: 1
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                minLength: 1
+              displayName:
+                type: string
+                minLength: 1
+            required:
+            - name
+            - displayName
+      required:
+      - keys
+    EnsureGamCustomTargetingKeysResponse:
+      type: object
+      properties:
+        created:
+          type: array
+          items:
+            $ref: '#/components/schemas/GamCustomTargetingKeyEntry'
+        alreadyExisted:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              keyId:
+                type: string
+              displayName:
+                type: string
+            required:
+            - name
+            - keyId
+            - displayName
+            additionalProperties: false
+      required:
+      - created
+      - alreadyExisted
+      additionalProperties: false
+    AdapterAdvertiserList:
+      type: object
+      properties:
+        adapterType:
+          type: string
+        advertisers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdapterAdvertiser'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+        syncedAt:
+          type:
+          - string
+          - 'null'
+        authoritative:
+          type: boolean
+        truncated:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+      required:
+      - adapterType
+      - advertisers
+      - nextCursor
+      - syncedAt
+      - authoritative
+      - truncated
+      - errors
       additionalProperties: false
     EsaSandboxAccountSummary:
       description: Sandbox account row from the managed ad-server source tenant. Sandbox accounts route to the tenant-managed sandbox advertiser and do not carry a caller-selected GAM advertiser id.
@@ -896,67 +1168,6 @@ components:
       - buyerAgentPrincipalId
       - sandbox
       additionalProperties: false
-    EsaEnsureSandboxAccountResponse:
-      description: Result of idempotently ensuring the ESA tenant-managed sandbox account.
-      type: object
-      properties:
-        esaId:
-          type: string
-        tenantId:
-          type: string
-        ready:
-          type: boolean
-        account:
-          allOf:
-          - $ref: '#/components/schemas/EsaSandboxAccountSummary'
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/EsaSandboxAccountSummary'
-        missingReason:
-          type:
-          - string
-          - 'null'
-        ensured:
-          type: boolean
-      required:
-      - esaId
-      - tenantId
-      - ready
-      - account
-      - accounts
-      - missingReason
-      - ensured
-      additionalProperties: false
-    SetDefaultAdvertiserBody:
-      type: object
-      properties:
-        advertiserId:
-          type: string
-          minLength: 1
-          maxLength: 64
-      required:
-      - advertiserId
-    EnsureGamCustomTargetingKeysBody:
-      type: object
-      properties:
-        keys:
-          minItems: 1
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                minLength: 1
-              displayName:
-                type: string
-                minLength: 1
-            required:
-            - name
-            - displayName
-      required:
-      - keys
     BuyerAdvertiserMappingBody:
       type: object
       properties:
@@ -981,29 +1192,46 @@ components:
       required:
       - operatorDomain
       - gamAdvertiserId
-    AxeKeysSetupTask:
+    GamAdvertiserPage:
       type: object
       properties:
-        key:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        isComplete:
-          type: boolean
-        actionUrl:
+        advertisers:
+          type: array
+          items:
+            $ref: '#/components/schemas/GamAdvertiser'
+        nextCursor:
           type:
           - string
           - 'null'
-        details:
+        syncedAt:
           type:
           - string
           - 'null'
       required:
-      - key
+      - advertisers
+      additionalProperties: false
+    SetDefaultAdvertiserBody:
+      type: object
+      properties:
+        advertiserId:
+          type: string
+          minLength: 1
+          maxLength: 64
+      required:
+      - advertiserId
+    GamCustomTargetingKeyEntry:
+      type: object
+      properties:
+        name:
+          type: string
+        keyId:
+          type: string
+        displayName:
+          type: string
+      required:
       - name
-      - isComplete
+      - keyId
+      - displayName
       additionalProperties: false
     RecentBuyerList:
       type: object
@@ -1015,39 +1243,6 @@ components:
       required:
       - buyers
       additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    ConfigureAxeKeysBody:
-      type: object
-      properties:
-        axeIncludeKey:
-          type: string
-          minLength: 1
-        axeExcludeKey:
-          type: string
-          minLength: 1
-        axeMacroKey:
-          type: string
-          enum:
-          - axem
-      required:
-      - axeIncludeKey
-      - axeExcludeKey
-      - axeMacroKey
     RecentBuyer:
       type: object
       properties:
@@ -1079,191 +1274,6 @@ components:
           - 'null'
       required:
       - operatorDomain
-      additionalProperties: false
-    GamAdvertiser:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        status:
-          type: string
-        currencyCode:
-          type:
-          - string
-          - 'null'
-      required:
-      - id
-      - name
-      - status
-      additionalProperties: false
-    SetDefaultGamAdvertiserBody:
-      type: object
-      properties:
-        gamAdvertiserId:
-          type: string
-          minLength: 1
-      required:
-      - gamAdvertiserId
-    EnsureGamAdvertiserResponse:
-      type: object
-      properties:
-        advertiser:
-          $ref: '#/components/schemas/GamAdvertiser'
-        created:
-          type: boolean
-        dryRun:
-          type: boolean
-      required:
-      - advertiser
-      - created
-      additionalProperties: false
-    EnsureGamAdvertiserBody:
-      type: object
-      properties:
-        name:
-          type: string
-          minLength: 1
-          maxLength: 255
-        dryRun:
-          type: boolean
-      required:
-      - name
-    BuyerAdvertiserMappingPatchBody:
-      type: object
-      properties:
-        brandHouse:
-          type:
-          - string
-          - 'null'
-        brandId:
-          type:
-          - string
-          - 'null'
-        gamAdvertiserId:
-          type:
-          - string
-          - 'null'
-        principalId:
-          type:
-          - string
-          - 'null'
-    AdapterAdvertiserList:
-      type: object
-      properties:
-        adapterType:
-          type: string
-        advertisers:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdapterAdvertiser'
-        nextCursor:
-          type:
-          - string
-          - 'null'
-        syncedAt:
-          type:
-          - string
-          - 'null'
-        authoritative:
-          type: boolean
-        truncated:
-          type: boolean
-        errors:
-          type: array
-          items:
-            type: string
-      required:
-      - adapterType
-      - advertisers
-      - nextCursor
-      - syncedAt
-      - authoritative
-      - truncated
-      - errors
-      additionalProperties: false
-    BuyerAdvertiserMappingList:
-      type: object
-      properties:
-        mappings:
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerAdvertiserMapping'
-      required:
-      - mappings
-      additionalProperties: false
-    SetDefaultGamAdvertiserResponse:
-      type: object
-      properties:
-        defaultGamAdvertiserId:
-          type: string
-      required:
-      - defaultGamAdvertiserId
-      additionalProperties: false
-    EsaSandboxAccountStatus:
-      description: Readiness of the ESA tenant-managed sandbox advertiser account used for no-spend buyer tests.
-      type: object
-      properties:
-        esaId:
-          type: string
-        tenantId:
-          type: string
-        ready:
-          type: boolean
-        account:
-          allOf:
-          - $ref: '#/components/schemas/EsaSandboxAccountSummary'
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/EsaSandboxAccountSummary'
-        missingReason:
-          type:
-          - string
-          - 'null'
-      required:
-      - esaId
-      - tenantId
-      - ready
-      - account
-      - accounts
-      - missingReason
-      additionalProperties: false
-    EnsureGamCustomTargetingKeysResponse:
-      type: object
-      properties:
-        created:
-          type: array
-          items:
-            $ref: '#/components/schemas/GamCustomTargetingKeyEntry'
-        alreadyExisted:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-              keyId:
-                type: string
-              displayName:
-                type: string
-            required:
-            - name
-            - keyId
-            - displayName
-            additionalProperties: false
-      required:
-      - created
-      - alreadyExisted
-      additionalProperties: false
-    SetDefaultAdvertiserResponse:
-      type: object
-      properties:
-        advertiserId:
-          type: string
-      required:
-      - advertiserId
       additionalProperties: false
     BuyerAdvertiserMapping:
       type: object
@@ -1297,14 +1307,6 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    ConfigureAxeKeysResponse:
-      type: object
-      properties:
-        setupTask:
-          $ref: '#/components/schemas/AxeKeysSetupTask'
-      required:
-      - setupTask
-      additionalProperties: false
     ApiError:
       description: Structured error object
       type: object
@@ -1326,23 +1328,21 @@ components:
       - code
       - message
       additionalProperties: false
-    GamAdvertiserPage:
+    SetDefaultAdvertiserResponse:
       type: object
       properties:
-        advertisers:
-          type: array
-          items:
-            $ref: '#/components/schemas/GamAdvertiser'
-        nextCursor:
-          type:
-          - string
-          - 'null'
-        syncedAt:
-          type:
-          - string
-          - 'null'
+        advertiserId:
+          type: string
       required:
-      - advertisers
+      - advertiserId
+      additionalProperties: false
+    SetDefaultGamAdvertiserResponse:
+      type: object
+      properties:
+        defaultGamAdvertiserId:
+          type: string
+      required:
+      - defaultGamAdvertiserId
       additionalProperties: false
   securitySchemes:
     bearerAuth:

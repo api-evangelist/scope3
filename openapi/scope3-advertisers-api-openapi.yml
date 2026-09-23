@@ -3543,183 +3543,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    AzureBlobAuthInput:
-      description: How Scope3 authenticates to the buyer-owned Azure Blob container. SAS_TOKEN uses a container-scoped Shared Access Signature.
-      oneOf:
-      - $ref: '#/components/schemas/AzureBlobSasAuthInput'
-      type: object
-      discriminator:
-        propertyName: mode
-        mapping:
-          SAS_TOKEN: '#/components/schemas/AzureBlobSasAuthInput'
-    DeliveryConfigOutput:
-      description: Per-Output destination shape (non-secret). Additional destination types are added as new variants in this discriminated union.
-      oneOf:
-      - $ref: '#/components/schemas/GcsDeliveryConfigOutput'
-      - $ref: '#/components/schemas/S3DeliveryConfigOutput'
-      - $ref: '#/components/schemas/AzureBlobDeliveryConfigOutput'
-      type: object
-      discriminator:
-        propertyName: type
-        mapping:
-          GCS: '#/components/schemas/GcsDeliveryConfigOutput'
-          S3: '#/components/schemas/S3DeliveryConfigOutput'
-          AZURE_BLOB: '#/components/schemas/AzureBlobDeliveryConfigOutput'
-    AvailableAccountListResponse:
-      description: Response containing a list of available accounts from a partner
-      type: object
-      properties:
-        accounts:
-          description: List of available (discovered) accounts
-          type: array
-          items:
-            $ref: '#/components/schemas/AvailableAccountOutput'
-        total:
-          description: Total count of available accounts
-          example: 8
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        synced:
-          description: True when no accounts matched and a sync_accounts call was automatically triggered to provision this account at the partner. The list reflects the post-sync state.
-          type: boolean
-        billingOptions:
-          description: Billing options supported by this partner agent, as reported in its ADCP capabilities.
-          type: object
-          properties:
-            default:
-              type:
-              - string
-              - 'null'
-            supported:
-              type: array
-              items:
-                type: string
-          required:
-          - default
-          - supported
-          additionalProperties: false
-      required:
-      - accounts
-      - total
-      additionalProperties: false
-    FrequencyCapWindow:
-      description: Rolling time window over which max_impressions applies (AdCP Duration shape).
-      type: object
-      properties:
-        interval:
-          type: number
-          minimum: 1
-        unit:
-          anyOf:
-          - type: string
-            enum:
-            - seconds
-          - type: string
-            enum:
-            - minutes
-          - type: string
-            enum:
-            - hours
-          - type: string
-            enum:
-            - days
-          - type: string
-            enum:
-            - campaign
-      required:
-      - interval
-      - unit
-      additionalProperties: {}
-    RevalidateDataDeliveryCredentialResponse:
-      description: Updated credential after re-running the destination Probe.
-      type: object
-      properties:
-        credential:
-          $ref: '#/components/schemas/DataDeliveryCredential'
-      required:
-      - credential
-      additionalProperties: false
-    UpdateReportingBucketBody:
-      description: Request body for updating the offline reporting bucket on a linked partner account
-      type: object
-      properties:
-        reporting_bucket:
-          description: Reporting bucket configuration to set on the linked account, or null to clear it.
-          allOf:
-          - $ref: '#/components/schemas/ReportingBucket'
-      required:
-      - reporting_bucket
-    LinkedAccountInput:
-      description: An account to link to the advertiser
-      type: object
-      properties:
-        storefrontId:
-          description: Storefront the source lives on. Pair with `sourceId` to identify the source whose account is being linked.
-          example: 42
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        sourceId:
-          description: Inventory source within `storefrontId` whose account is being linked.
-          example: src_main
-          type: string
-          minLength: 1
-        accountId:
-          description: Account ID at the source to link to this advertiser. Must come from `list_available_accounts`.
-          example: acc_123
-          type: string
-          minLength: 1
-        credentialId:
-          description: Credential ID returned by `list_available_accounts`. Include it when multiple mapped connections expose the same account ID.
-          example: '42'
-          type: string
-        billingType:
-          description: Billing arrangement type (e.g. "advertiser", "operator", "agent")
-          example: advertiser
-          type: string
-      required:
-      - storefrontId
-      - sourceId
-      - accountId
-    GcsCredentialConfig:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - GCS
-        bucket:
-          description: Target GCS bucket the Probe writes to and Data Delivery Outputs ship objects into. The Scope3 service account must have objectCreator on this bucket.
-          type: string
-          minLength: 1
-          maxLength: 222
-          pattern: ^[a-z0-9][a-z0-9._-]*[a-z0-9]$
-      required:
-      - type
-      - bucket
-    AudienceListResponse:
-      description: Paginated list of audience summaries
-      type: object
-      properties:
-        audiences:
-          type: array
-          items:
-            $ref: '#/components/schemas/AudienceSummary'
-        total:
-          type: number
-        take:
-          type: number
-        skip:
-          type: number
-      required:
-      - audiences
-      - total
-      - take
-      - skip
-      additionalProperties: false
-    Advertiser:
-      description: Advertiser resource representation
+    AdvertiserSummary:
+      description: Compact advertiser view returned by list endpoints. Use `get_advertiser` for the full resource.
       type: object
       properties:
         id:
@@ -3730,28 +3555,19 @@ components:
           description: Name of the advertiser
           example: Acme Corp
           type: string
-        description:
-          description: Description of the advertiser
-          example: Global advertising account for Acme Corporation
-          type: string
         status:
           description: Current status of the advertiser
           type: string
           enum:
           - ACTIVE
           - ARCHIVED
-        createdAt:
-          description: When the advertiser was created (ISO 8601)
-          example: '2025-01-15T10:30:00Z'
+        sandbox:
+          description: When true, this advertiser is in sandbox mode. All ADCP operations use sandbox-flagged accounts. Cannot be changed after creation.
+          type: boolean
+        brand:
+          description: The brand domain associated with this advertiser
+          example: nike.com
           type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: When the advertiser was last updated (ISO 8601)
-          example: '2025-01-20T14:45:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
         linkedBrand:
           description: The brand linked to this advertiser. Only present when includeBrand=true is passed to the list endpoint.
           type: object
@@ -3801,20 +3617,6 @@ components:
           - domain
           - manifest
           additionalProperties: false
-        brand:
-          description: The brand domain associated with this advertiser
-          example: nike.com
-          type: string
-        brandWarning:
-          description: Warning about brand resolution (e.g., manifest not found)
-          type: string
-        sandbox:
-          description: When true, this advertiser is in sandbox mode. All ADCP operations use sandbox-flagged accounts. Cannot be changed after creation.
-          type: boolean
-        optimizationApplyMode:
-          description: Default mode for applying Scope3 AI model optimizations to media buys for campaigns under this advertiser. When set to "AUTO", optimizations are applied automatically; when "MANUAL", they require approval.
-          allOf:
-          - $ref: '#/components/schemas/OptimizationApplyMode'
         primaryCurrency:
           description: Primary ISO 4217 currency for this advertiser. Every campaign under this advertiser is created in this currency, and selected product pricing must match it.
           example: USD
@@ -3825,370 +3627,243 @@ components:
         currencyLocked:
           description: True once the advertiser has at least one campaign. While false, `primaryCurrency` can still be changed; once true it is locked.
           type: boolean
+        createdAt:
+          description: When the advertiser was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the advertiser was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        linkedAccountCount:
+          description: Number of partner accounts linked to this advertiser. Replaces the embedded `linkedAccounts[]` array on summary rows; call `get_advertiser` for the full account list.
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - id
+      - name
+      - status
+      - sandbox
+      - primaryCurrency
+      - currencyLocked
+      - createdAt
+      - updatedAt
+      - linkedAccountCount
+      additionalProperties: false
+    UpdateAdvertiserBody:
+      description: Request body for updating an advertiser
+      type: object
+      properties:
+        name:
+          description: Updated name of the advertiser
+          example: Acme Corporation
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Updated description of the advertiser
+          example: Updated description for Acme Corporation
+          type: string
+          maxLength: 1000
+        brand:
+          description: Updated brand domain (e.g., "nike.com"). Re-resolves brand identity from /.well-known/brand.json, the AdCP registry, or Brandfetch enrichment.
+          example: nike.com
+          type: string
+          minLength: 1
+        saveBrand:
+          description: When true, auto-saves the resolved brand identity to the AdCP registry if the brand is not yet registered. Normally not required for advertiser updates; requires brand when sent on update. Set this only after reviewing enrichment or when the user confirms registry persistence is desired.
+          default: false
+          type: boolean
         linkedAccounts:
-          description: Linked partner accounts for this advertiser. Only present when includeAccounts=true is passed to the list endpoint.
+          description: Accounts to add to this advertiser. Existing linked accounts are not removed.
           type: array
           items:
-            $ref: '#/components/schemas/LinkedAccount'
+            $ref: '#/components/schemas/LinkedAccountInput'
+        optimizationApplyMode:
+          description: Default mode for applying Scope3 AI model optimizations to media buys for campaigns under this advertiser. When set to "AUTO", optimizations are applied automatically; when "MANUAL", they require approval.
+          allOf:
+          - $ref: '#/components/schemas/OptimizationApplyMode'
+        primaryCurrency:
+          description: Primary ISO 4217 currency for this advertiser. Can only be changed while the advertiser has no campaigns; once the first campaign is created the currency is locked, because every campaign under an advertiser shares the advertiser's single currency.
+          example: USD
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Za-z]{3}$
         utmConfig:
-          description: Advertiser-level UTM parameter configuration. Only present when UTM params are configured for this advertiser.
+          description: Default UTM (Urchin Tracking Module) parameters for this advertiser. Replaces all existing advertiser-level UTM params. Pass an empty array to clear.
+          maxItems: 20
           type: array
           items:
             type: object
             properties:
               paramKey:
-                description: Output query parameter key
+                description: Output query parameter key appended to landing URL (e.g., "utm_source", "bg_campaign")
                 example: utm_campaign
                 type: string
+                pattern: ^[a-zA-Z0-9_-]{1,100}$
               paramValue:
-                description: Macro or static value
+                description: Macro name (e.g., "{CAMPAIGN_ID}") or static string (e.g., "scope3") to resolve as the value
                 example: '{CAMPAIGN_ID}'
                 type: string
-              source:
-                description: Where this param was configured — "advertiser" for advertiser default, "campaign" for campaign override
-                type: string
-                enum:
-                - advertiser
-                - campaign
+                minLength: 1
+                maxLength: 200
             required:
             - paramKey
             - paramValue
-            - source
-            additionalProperties: false
         dataDelivery:
-          $ref: '#/components/schemas/AdvertiserDataDelivery'
+          description: Data-delivery configuration for this advertiser. Groups standing Data Delivery Outputs and the credentials they reference. Omit to leave existing config untouched.
+          type: object
+          properties:
+            credentials:
+              description: Data Delivery Credentials owned by this advertiser. When provided, replaces all existing live credentials (pass an empty array to archive — rejected if any live Output references a credential). Omit to leave existing credentials untouched. Applied before `outputs` so newly created credentials can be referenced by name.
+              allOf:
+              - $ref: '#/components/schemas/DataDeliveryCredentialArrayInput'
+            outputs:
+              description: Standing log-level data subscriptions to ship from Scope3 to a buyer-owned destination. Replaces all existing advertiser-scoped Data Delivery Outputs when provided. Pass an empty array to clear. Omit to leave existing Outputs untouched.
+              allOf:
+              - $ref: '#/components/schemas/DataDeliveryOutputArrayInput'
         frequencyCaps:
-          description: Buyer-side frequency cap configs for this advertiser. Always present on single-GET; on LIST only when includeFrequencyCaps=true.
+          description: Buyer-side frequency cap configs to apply to this advertiser. When provided, replaces all existing non-archived caps for this advertiser (pass an empty array to clear). Omit to leave existing caps untouched.
           type: array
           items:
-            $ref: '#/components/schemas/FrequencyCapConfig'
-      required:
-      - id
-      - name
-      - status
-      - createdAt
-      - updatedAt
-      - sandbox
-      - optimizationApplyMode
-      - primaryCurrency
-      - currencyLocked
-      additionalProperties: false
-    RemoveMember:
-      description: Member to remove from the audience
-      type: object
-      properties:
-        externalId:
-          description: Unique identifier for this member within the audience
-          type: string
-          minLength: 1
-        hashedEmail:
-          description: SHA-256 hash of lowercase, trimmed email (64-char hex)
-          example: a1b2c3d4e5f6...
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        hashedPhone:
-          description: SHA-256 hash of E.164-formatted phone number (64-char hex)
-          example: f6e5d4c3b2a1...
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        uids:
-          description: Universal IDs for user matching
-          minItems: 1
-          type: array
-          items:
-            type: object
-            properties:
-              type:
-                description: Universal ID type (rampid, uid2, maid, etc.)
-                type: string
-                minLength: 1
-              value:
-                description: Universal ID value
-                type: string
-                minLength: 1
-            required:
-            - type
-            - value
-      required:
-      - externalId
-    ReportingBucket:
-      description: Customer-owned object storage bucket where sales agents can write offline delivery reports
-      type: object
-      properties:
-        protocol:
-          description: Object storage protocol
-          example: s3
-          type: string
-          enum:
-          - s3
-          - gcs
-          - azure_blob
-        bucket:
-          description: Bucket name. Lowercase alphanumerics, dots and hyphens; must start and end with an alphanumeric; 3-63 chars.
-          example: my-org.adcp.reports
-          type: string
-          minLength: 3
-          maxLength: 63
-          pattern: ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$
-        prefix:
-          description: Object key prefix within the bucket
-          example: reports/
-          type: string
-          maxLength: 512
-          pattern: ^[a-zA-Z0-9/_.-]+$
-        region:
-          description: Storage region identifier (lowercase alphanumerics and hyphens)
-          example: us-east-1
-          type: string
-          maxLength: 64
-          pattern: ^[a-z0-9-]+$
-        format:
-          description: Report file format
-          default: jsonl
-          type: string
-          enum:
-          - jsonl
-          - csv
-          - parquet
-          - avro
-          - orc
-        compression:
-          description: Compression applied to report files
-          default: gzip
-          type: string
-          enum:
-          - gzip
-          - none
-        file_retention_days:
-          description: Number of days the customer retains report files in the bucket
-          example: 30
-          type: integer
-          minimum: 1
-          maximum: 9007199254740991
-        setup_instructions:
-          description: Optional URL pointing to setup instructions for granting the agent access to the bucket
-          example: https://example.com/adcp/bucket-setup
-          type: string
-          format: uri
-      required:
-      - protocol
-      - bucket
-      - file_retention_days
-    AudienceItem:
-      description: Audience to sync with member changes
-      type: object
-      properties:
-        audienceId:
-          description: Buyer's identifier for this audience. Used in targeting overlays.
-          type: string
-          minLength: 1
-          maxLength: 255
-        name:
-          description: Human-readable name
-          type: string
-          maxLength: 255
-        add:
-          description: Members to add to this audience
-          maxItems: 100000
-          type: array
-          items:
-            type: object
-            properties:
-              externalId:
-                description: Unique identifier for this member within the audience
-                type: string
-                minLength: 1
-              hashedEmail:
-                description: SHA-256 hash of lowercase, trimmed email (64-char hex)
-                example: a1b2c3d4e5f6...
-                type: string
-                pattern: ^[0-9a-f]{64}$
-              hashedPhone:
-                description: SHA-256 hash of E.164-formatted phone number (64-char hex)
-                example: f6e5d4c3b2a1...
-                type: string
-                pattern: ^[0-9a-f]{64}$
-              uids:
-                description: Universal IDs for user matching
-                minItems: 1
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type:
-                      description: Universal ID type (rampid, uid2, maid, etc.)
-                      type: string
-                      minLength: 1
-                    value:
-                      description: Universal ID value
-                      type: string
-                      minLength: 1
-                  required:
-                  - type
-                  - value
-            required:
-            - externalId
-        remove:
-          description: Members to remove by external ID
-          maxItems: 100000
-          type: array
-          items:
-            $ref: '#/components/schemas/RemoveMember'
-        delete:
-          description: When true, delete this audience entirely
-          type: boolean
-        consentBasis:
-          description: GDPR lawful basis for processing this audience
-          type: string
-          enum:
-          - consent
-          - legitimate_interest
-          - contract
-          - legal_obligation
-      required:
-      - audienceId
-    S3CredentialConfigOutput:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - S3
-        bucket:
-          description: Target S3 bucket the Probe writes to and Data Delivery Outputs ship objects into. The bucket policy must grant the Scope3 AWS IAM principal s3:PutObject (and s3:DeleteObject for the Probe sweep) on objects under the Output path prefix.
-          type: string
-          minLength: 3
-          maxLength: 63
-          pattern: ^[a-z0-9][a-z0-9.-]*[a-z0-9]$
-        region:
-          description: AWS region of the target bucket. Supports commercial, GovCloud, and ISO partitions (e.g., us-east-1, us-gov-east-1).
-          type: string
-          pattern: ^[a-z]{2}(-[a-z]+)+-\d+$
-      required:
-      - type
-      - bucket
-      - region
-      additionalProperties: false
-    GcsDeliveryConfigOutput:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - GCS
-        pathPrefix:
-          description: Object key prefix within the credential's bucket. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
-          default: ''
-          type: string
-          maxLength: 1024
-        format:
-          default: JSONL
-          type: string
-          enum:
-          - JSONL
-          - PARQUET
-          - CSV
-      required:
-      - type
-      - pathPrefix
-      - format
-      additionalProperties: false
-    FrequencyCapConfigInput:
-      description: Frequency cap entry supplied inside a parent advertiser/campaign/creative request body. On PUT, the full array replaces all existing caps for that target.
-      type: object
-      properties:
-        max_impressions:
-          description: Maximum number of impressions allowed within the window
-          example: 3
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        window:
-          $ref: '#/components/schemas/FrequencyCapWindow'
-      required:
-      - max_impressions
-      - window
-      additionalProperties: {}
-    SyncAudiencesResponse:
-      description: Audience sync accepted for async processing
-      type: object
-      properties:
-        success:
-          type: boolean
-        accountId:
-          description: Advertiser ID (numeric string, e.g. "25") — same as the path parameter
-          example: '25'
-          type: string
-        operationId:
-          description: Batch operation UUID for tracking async processing
-          type: string
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-        taskId:
-          description: Task ID for polling progress via GET /tasks/{taskId}. Same value as operationId.
-          type: string
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-      required:
-      - success
-      - accountId
-      - operationId
-      - taskId
-      additionalProperties: false
-    AssignAccountBody:
-      description: Request body for assigning a source account to an advertiser
-      type: object
-      properties:
-        storefrontId:
-          description: Storefront the source lives on. Pair with `sourceId`.
-          example: 42
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        sourceId:
-          description: Inventory source within `storefrontId` to register this account against.
-          example: src_main
-          type: string
-          minLength: 1
-        accountId:
-          description: Account ID at the source to assign to this advertiser. Must come from `list_available_accounts`.
-          example: acc_67890
-          type: string
-          minLength: 1
-        credentialId:
-          description: Credential ID returned by `list_available_accounts`. Required when the same account ID is exposed by more than one mapped connection.
-          example: '42'
-          type: string
-        billingType:
-          description: Billing arrangement type for this account (e.g. "advertiser", "operator", "agent"). Defaults to the source's default billing type.
-          example: advertiser
-          type: string
-      required:
-      - storefrontId
-      - sourceId
-      - accountId
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
+            $ref: '#/components/schemas/FrequencyCapConfigInput'
     OptimizationApplyMode:
       description: Whether optimization suggestions are automatically applied or require human approval.
       type: string
       enum:
       - AUTO
       - MANUAL
+    AdvertiserDataDelivery:
+      description: Data-delivery configuration for this advertiser. Groups standing Data Delivery Outputs and the credentials they reference. Distinct from media-buy reporting fields elsewhere in the API.
+      type: object
+      properties:
+        credentials:
+          description: Live Data Delivery Credentials owned by this advertiser. Only present when at least one credential exists.
+          type: array
+          items:
+            $ref: '#/components/schemas/DataDeliveryCredential'
+        outputs:
+          description: Advertiser-scoped Data Delivery Outputs (standing LLD subscriptions). Only present when at least one Output is configured.
+          type: array
+          items:
+            $ref: '#/components/schemas/DataDeliveryOutput'
+      additionalProperties: false
+    DeliveryConfigOutput:
+      description: Per-Output destination shape (non-secret). Additional destination types are added as new variants in this discriminated union.
+      oneOf:
+      - $ref: '#/components/schemas/GcsDeliveryConfigOutput'
+      - $ref: '#/components/schemas/S3DeliveryConfigOutput'
+      - $ref: '#/components/schemas/AzureBlobDeliveryConfigOutput'
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          GCS: '#/components/schemas/GcsDeliveryConfigOutput'
+          S3: '#/components/schemas/S3DeliveryConfigOutput'
+          AZURE_BLOB: '#/components/schemas/AzureBlobDeliveryConfigOutput'
+    AccountOutput:
+      description: Linked account resource on a partner platform
+      type: object
+      properties:
+        linkId:
+          description: Unique identifier for the advertiser-account link
+          example: '42'
+          type: string
+        accountId:
+          description: Partner account identifier
+          example: acc_acme_pinnacle
+          type: string
+        credentialId:
+          description: Credential row that owns this linked account. Include this value when updating linked accounts so duplicate account IDs across mapped connections remain unambiguous.
+          example: '42'
+          type:
+          - string
+          - 'null'
+        name:
+          description: Human-readable account name from the partner
+          example: Acme c/o Pinnacle
+          type:
+          - string
+          - 'null'
+        advertiser:
+          description: Advertiser name as recorded by the partner platform
+          example: Acme Corp
+          type:
+          - string
+          - 'null'
+        billingProxy:
+          description: Billing proxy entity (e.g. agency buying on behalf of advertiser)
+          example: Pinnacle Media
+          type:
+          - string
+          - 'null'
+        house:
+          description: Domain or house identifier for the account
+          example: acme-corp.com
+          type:
+          - string
+          - 'null'
+        billing:
+          description: Billing arrangement type
+          example: advertiser
+          type:
+          - string
+          - 'null'
+        sources:
+          description: Storefront sources that surface this account to the buyer. A single linked account may be reachable through multiple sources when the underlying agent is shared across storefronts. Empty when the underlying agent is no longer linked to any active storefront source.
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerCredentialSourceRef'
+        advertiserId:
+          description: Advertiser that owns this account link
+          example: '12345'
+          type: string
+        status:
+          description: Current account status
+          type: string
+          enum:
+          - active
+          - pending_approval
+          - payment_required
+          - suspended
+          - closed
+          - unreachable
+        unreachableAt:
+          description: When set, the mapping is preserved but its platform account is no longer reachable through any active connection — the connection that surfaced it was unlinked. Relink the provider (or re-map the account) to restore it. Unreachable mappings never resolve at buy time.
+          example: '2025-01-22T09:00:00Z'
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdAt:
+          description: When the account was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the account was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - linkId
+      - accountId
+      - sources
+      - advertiserId
+      - status
+      - createdAt
+      - updatedAt
+      additionalProperties: false
     DataDeliveryCredential:
       description: Resolved Data Delivery Credential as returned by the API.
       type: object
@@ -4237,6 +3912,74 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
+    DataDeliveryCredentialInput:
+      description: A single Data Delivery Credential entry. Used inline on advertiser create+update; full-replace by name within one request.
+      type: object
+      properties:
+        name:
+          description: Buyer-meaningful identifier for this credential, unique per advertiser among live credentials. Data Delivery Outputs reference this by name.
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+        config:
+          $ref: '#/components/schemas/CredentialConfigInput'
+      required:
+      - name
+      - config
+    AzureBlobSasAuthInput:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+          - SAS_TOKEN
+        sasToken:
+          description: Shared Access Signature (SAS) query string. Provide the part after the `?` from the SAS URL — leading `?` is tolerated. Accepts either a Service SAS scoped to the container (`sr=c`) or an Account SAS with `srt` including `o` (Object); blob-scoped Service SAS (`sr=b`) is not supported because the Probe writes to a randomized path. The SAS must grant Create + Write + Delete (`sp=cwd`). Persisted to Google Secret Manager; the credential row stores only a resource reference. Not returned on subsequent GETs — to rotate, submit a new credential.
+          type: string
+          minLength: 1
+          maxLength: 4096
+      required:
+      - mode
+      - sasToken
+    RemoveMember:
+      description: Member to remove from the audience
+      type: object
+      properties:
+        externalId:
+          description: Unique identifier for this member within the audience
+          type: string
+          minLength: 1
+        hashedEmail:
+          description: SHA-256 hash of lowercase, trimmed email (64-char hex)
+          example: a1b2c3d4e5f6...
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        hashedPhone:
+          description: SHA-256 hash of E.164-formatted phone number (64-char hex)
+          example: f6e5d4c3b2a1...
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        uids:
+          description: Universal IDs for user matching
+          minItems: 1
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                description: Universal ID type (rampid, uid2, maid, etc.)
+                type: string
+                minLength: 1
+              value:
+                description: Universal ID value
+                type: string
+                minLength: 1
+            required:
+            - type
+            - value
+      required:
+      - externalId
     BrandManifestJson:
       description: Full brand.json profile conforming to the ADCP v2 schema
       type: object
@@ -4603,400 +4346,14 @@ components:
       required:
       - name
       additionalProperties: {}
-    AzureBlobAuthStored:
-      oneOf:
-      - $ref: '#/components/schemas/AzureBlobSasAuthStored'
-      type: object
-      discriminator:
-        propertyName: mode
-        mapping:
-          SAS_TOKEN: '#/components/schemas/AzureBlobSasAuthStored'
-    GcsDeliveryConfig:
+    AccountResponse:
+      description: Response containing a single linked account
       type: object
       properties:
-        type:
-          type: string
-          enum:
-          - GCS
-        pathPrefix:
-          description: Object key prefix within the credential's bucket. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
-          default: ''
-          type: string
-          maxLength: 1024
-        format:
-          default: JSONL
-          type: string
-          enum:
-          - JSONL
-          - PARQUET
-          - CSV
+        account:
+          $ref: '#/components/schemas/AccountOutput'
       required:
-      - type
-    DataDeliveryOutputInput:
-      description: A single Data Delivery Output entry. Used inline on advertiser/campaign create+update.
-      type: object
-      properties:
-        dataDeliveryType:
-          description: The kind of LLD shipped by this Output.
-          type: string
-          enum:
-          - MB_DELIVERY
-          - IMPRESSIONS
-          - CLICKS
-          - VAST_EVENTS
-          - CAPI_ATTRIBUTION
-          - MMP_POSTBACKS
-        cadence:
-          description: Firing rate. HOURLY fires at minute 0 every hour, DAILY at 00:00 UTC, WEEKLY at 00:00 UTC on syncWeeklyDay.
-          type: string
-          enum:
-          - HOURLY
-          - DAILY
-          - WEEKLY
-        syncWeeklyDay:
-          description: Day of week for WEEKLY cadence (0=Sunday..6=Saturday). Required when cadence=WEEKLY, ignored otherwise.
-          type: integer
-          minimum: 0
-          maximum: 6
-        enabled:
-          description: When false, the Temporal schedule is paused — no new runs fire, in-flight runs continue. Defaults to true.
-          default: true
-          type: boolean
-        credentialName:
-          description: Name of the Data Delivery Credential (within the same advertiser) that authenticates this Output. The credential carries the auth target (e.g., GCS bucket) and is Probe-validated. Must reference a credential whose destinationType matches deliveryConfig.type.
-          type: string
-          minLength: 1
-          maxLength: 64
-          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
-        deliveryConfig:
-          $ref: '#/components/schemas/DeliveryConfig'
-      required:
-      - dataDeliveryType
-      - cadence
-      - credentialName
-      - deliveryConfig
-    AdvertiserSummary:
-      description: Compact advertiser view returned by list endpoints. Use `get_advertiser` for the full resource.
-      type: object
-      properties:
-        id:
-          description: Unique identifier for the advertiser
-          example: '12345'
-          type: string
-        name:
-          description: Name of the advertiser
-          example: Acme Corp
-          type: string
-        status:
-          description: Current status of the advertiser
-          type: string
-          enum:
-          - ACTIVE
-          - ARCHIVED
-        sandbox:
-          description: When true, this advertiser is in sandbox mode. All ADCP operations use sandbox-flagged accounts. Cannot be changed after creation.
-          type: boolean
-        brand:
-          description: The brand domain associated with this advertiser
-          example: nike.com
-          type: string
-        linkedBrand:
-          description: The brand linked to this advertiser. Only present when includeBrand=true is passed to the list endpoint.
-          type: object
-          properties:
-            id:
-              description: Brand ID
-              example: brand_123
-              type: string
-            name:
-              description: Brand name
-              example: Acme Brand
-              type: string
-            domain:
-              description: Brand domain
-              example: acme.com
-              type: string
-            manifest:
-              description: Full resolved brand identity data — includes logos, colors, fonts, tone, tagline, assets, product catalog, disclaimers, and more
-              allOf:
-              - $ref: '#/components/schemas/BrandManifestJson'
-            logoUrl:
-              description: Primary brand logo URL
-              example: https://acme.com/logo.png
-              type: string
-            industry:
-              description: Brand industry
-              example: Technology
-              type: string
-            colors:
-              description: Brand color palette
-              example:
-                primary: '#FF5733'
-              type: object
-              additionalProperties:
-                type: string
-            tagline:
-              description: Brand tagline
-              example: Innovation for Everyone
-              type: string
-            tone:
-              description: Brand voice and tone
-              example: Professional, friendly, and innovative
-              type: string
-          required:
-          - id
-          - name
-          - domain
-          - manifest
-          additionalProperties: false
-        primaryCurrency:
-          description: Primary ISO 4217 currency for this advertiser. Every campaign under this advertiser is created in this currency, and selected product pricing must match it.
-          example: USD
-          type: string
-          minLength: 3
-          maxLength: 3
-          pattern: ^[A-Z]{3}$
-        currencyLocked:
-          description: True once the advertiser has at least one campaign. While false, `primaryCurrency` can still be changed; once true it is locked.
-          type: boolean
-        createdAt:
-          description: When the advertiser was created (ISO 8601)
-          example: '2025-01-15T10:30:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: When the advertiser was last updated (ISO 8601)
-          example: '2025-01-20T14:45:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        linkedAccountCount:
-          description: Number of partner accounts linked to this advertiser. Replaces the embedded `linkedAccounts[]` array on summary rows; call `get_advertiser` for the full account list.
-          example: 3
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - id
-      - name
-      - status
-      - sandbox
-      - primaryCurrency
-      - currencyLocked
-      - createdAt
-      - updatedAt
-      - linkedAccountCount
-      additionalProperties: false
-    AudienceSummary:
-      description: Compact audience view returned by list endpoints. Use `get_audience` for the full resource.
-      type: object
-      properties:
-        audienceId:
-          type: string
-        name:
-          type:
-          - string
-          - 'null'
-        accountId:
-          description: Advertiser ID (numeric string, e.g. "25")
-          example: '25'
-          type: string
-        status:
-          description: Processing status of this audience
-          type: string
-          enum:
-          - PROCESSING
-          - ERROR
-          - READY
-          - TOO_SMALL
-        deleted:
-          type: boolean
-        uploadedCount:
-          type:
-          - number
-          - 'null'
-        matchedCount:
-          type:
-          - number
-          - 'null'
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-      required:
-      - audienceId
-      - name
-      - accountId
-      - status
-      - deleted
-      - uploadedCount
-      - matchedCount
-      - createdAt
-      - updatedAt
-      additionalProperties: false
-    FrequencyCapConfig:
-      description: Buyer-side frequency cap configuration
-      type: object
-      properties:
-        max_impressions:
-          description: Maximum number of impressions allowed within the window
-          example: 3
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        window:
-          $ref: '#/components/schemas/FrequencyCapWindow'
-        id:
-          description: Unique identifier for the frequency cap config
-          example: '12345'
-          type: string
-        targetLevel:
-          description: Level of the entity the cap applies to
-          allOf:
-          - $ref: '#/components/schemas/FrequencyCapTargetLevel'
-        targetId:
-          description: 'Identifier of the entity at the chosen target level: advertiser_id when targetLevel is ADVERTISER, campaign_id when CAMPAIGN, creative_id when CREATIVE.'
-          example: camp_abc123
-          type: string
-        createdAt:
-          description: ISO 8601 creation timestamp
-          type: string
-        updatedAt:
-          description: ISO 8601 last-updated timestamp
-          type: string
-        archivedAt:
-          description: ISO 8601 archive timestamp; null for active configs
-          type:
-          - string
-          - 'null'
-      required:
-      - max_impressions
-      - window
-      - id
-      - targetLevel
-      - targetId
-      - createdAt
-      - updatedAt
-      additionalProperties: {}
-    DeliveryConfig:
-      description: Per-Output destination shape (non-secret). Additional destination types are added as new variants in this discriminated union.
-      oneOf:
-      - $ref: '#/components/schemas/GcsDeliveryConfig'
-      - $ref: '#/components/schemas/S3DeliveryConfig'
-      - $ref: '#/components/schemas/AzureBlobDeliveryConfig'
-      type: object
-      discriminator:
-        propertyName: type
-        mapping:
-          GCS: '#/components/schemas/GcsDeliveryConfig'
-          S3: '#/components/schemas/S3DeliveryConfig'
-          AZURE_BLOB: '#/components/schemas/AzureBlobDeliveryConfig'
-    AccountOutput:
-      description: Linked account resource on a partner platform
-      type: object
-      properties:
-        linkId:
-          description: Unique identifier for the advertiser-account link
-          example: '42'
-          type: string
-        accountId:
-          description: Partner account identifier
-          example: acc_acme_pinnacle
-          type: string
-        credentialId:
-          description: Credential row that owns this linked account. Include this value when updating linked accounts so duplicate account IDs across mapped connections remain unambiguous.
-          example: '42'
-          type:
-          - string
-          - 'null'
-        name:
-          description: Human-readable account name from the partner
-          example: Acme c/o Pinnacle
-          type:
-          - string
-          - 'null'
-        advertiser:
-          description: Advertiser name as recorded by the partner platform
-          example: Acme Corp
-          type:
-          - string
-          - 'null'
-        billingProxy:
-          description: Billing proxy entity (e.g. agency buying on behalf of advertiser)
-          example: Pinnacle Media
-          type:
-          - string
-          - 'null'
-        house:
-          description: Domain or house identifier for the account
-          example: acme-corp.com
-          type:
-          - string
-          - 'null'
-        billing:
-          description: Billing arrangement type
-          example: advertiser
-          type:
-          - string
-          - 'null'
-        sources:
-          description: Storefront sources that surface this account to the buyer. A single linked account may be reachable through multiple sources when the underlying agent is shared across storefronts. Empty when the underlying agent is no longer linked to any active storefront source.
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerCredentialSourceRef'
-        advertiserId:
-          description: Advertiser that owns this account link
-          example: '12345'
-          type: string
-        status:
-          description: Current account status
-          type: string
-          enum:
-          - active
-          - pending_approval
-          - payment_required
-          - suspended
-          - closed
-          - unreachable
-        unreachableAt:
-          description: When set, the mapping is preserved but its platform account is no longer reachable through any active connection — the connection that surfaced it was unlinked. Relink the provider (or re-map the account) to restore it. Unreachable mappings never resolve at buy time.
-          example: '2025-01-22T09:00:00Z'
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        createdAt:
-          description: When the account was created (ISO 8601)
-          example: '2025-01-15T10:30:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: When the account was last updated (ISO 8601)
-          example: '2025-01-20T14:45:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - linkId
-      - accountId
-      - sources
-      - advertiserId
-      - status
-      - createdAt
-      - updatedAt
-      additionalProperties: false
-    AccountUnlinked:
-      type: object
-      properties:
-        unlinked:
-          type: boolean
-          enum:
-          - true
-      required:
-      - unlinked
+      - account
       additionalProperties: false
     LinkedAccount:
       description: A partner account linked to this advertiser
@@ -5046,84 +4403,171 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    BuyerCredentialSourceRef:
-      description: A storefront/source pair that a single credential row gives the buyer access to
+    AssignAccountBody:
+      description: Request body for assigning a source account to an advertiser
       type: object
       properties:
         storefrontId:
-          description: Storefront ID this credential covers
+          description: Storefront the source lives on. Pair with `sourceId`.
+          example: 42
           type: integer
-          minimum: -9007199254740991
           maximum: 9007199254740991
-        storefrontName:
-          description: Storefront display name
-          type: string
+          minimum: 1
         sourceId:
-          description: Inventory source ID within the storefront
+          description: Inventory source within `storefrontId` to register this account against.
+          example: src_main
           type: string
-        sourceName:
-          description: Inventory source display name
+          minLength: 1
+        accountId:
+          description: Account ID at the source to assign to this advertiser. Must come from `list_available_accounts`.
+          example: acc_67890
+          type: string
+          minLength: 1
+        credentialId:
+          description: Credential ID returned by `list_available_accounts`. Required when the same account ID is exposed by more than one mapped connection.
+          example: '42'
+          type: string
+        billingType:
+          description: Billing arrangement type for this account (e.g. "advertiser", "operator", "agent"). Defaults to the source's default billing type.
+          example: advertiser
           type: string
       required:
       - storefrontId
-      - storefrontName
       - sourceId
-      - sourceName
-      additionalProperties: false
-    AdvertiserListResponse:
-      description: Response containing a paginated list of advertiser summaries
+      - accountId
+    AzureBlobDeliveryConfig:
       type: object
       properties:
-        items:
-          description: Advertisers projected to the summary shape. Use `get_advertiser` for the full resource.
-          type: array
-          items:
-            $ref: '#/components/schemas/AdvertiserSummary'
-        total:
-          description: Total count of advertisers matching the query
-          example: 42
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        hasMore:
-          description: Whether there are more results available
-          type: boolean
-        nextOffset:
-          description: Offset to use for the next page of results, or null if no more results
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-          maximum: 9007199254740991
-        currentAdvertiserId:
-          description: The advertiser ID currently scoped by the caller (from X-SCOPE3-SEAT-ID header). Present only when the caller has an active advertiser scope (AI-5568). Used by the all-advertisers-home widget to mark the current advertiser.
-          example: '12345'
+        type:
           type: string
+          enum:
+          - AZURE_BLOB
+        pathPrefix:
+          description: Blob name prefix within the credential's Azure container. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
+          default: ''
+          type: string
+          maxLength: 1024
+        format:
+          default: JSONL
+          type: string
+          enum:
+          - JSONL
+          - PARQUET
+          - CSV
       required:
-      - items
-      - total
-      - hasMore
-      - nextOffset
-      additionalProperties: false
-    AccountListResponse:
-      description: Response containing a paginated list of linked-account summaries
+      - type
+    S3CredentialConfig:
       type: object
       properties:
-        accounts:
-          description: Linked accounts projected to the summary shape. Use `get_advertiser_account` for the full resource.
+        type:
+          type: string
+          enum:
+          - S3
+        bucket:
+          description: Target S3 bucket the Probe writes to and Data Delivery Outputs ship objects into. The bucket policy must grant the Scope3 AWS IAM principal s3:PutObject (and s3:DeleteObject for the Probe sweep) on objects under the Output path prefix.
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-z0-9][a-z0-9.-]*[a-z0-9]$
+        region:
+          description: AWS region of the target bucket. Supports commercial, GovCloud, and ISO partitions (e.g., us-east-1, us-gov-east-1).
+          type: string
+          pattern: ^[a-z]{2}(-[a-z]+)+-\d+$
+      required:
+      - type
+      - bucket
+      - region
+    AzureBlobCredentialConfig:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - AZURE_BLOB
+        storageAccountName:
+          description: Azure Storage account hosting the target container, e.g. `datareports`. The container is accessed at `https://<storageAccountName>.blob.core.windows.net/`.
+          type: string
+          minLength: 3
+          maxLength: 24
+          pattern: ^[a-z0-9]+$
+        containerName:
+          description: Azure Blob container that the Probe writes to and Data Delivery Outputs ship objects into.
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^(?!.*--)[a-z0-9][a-z0-9-]*[a-z0-9]$
+        auth:
+          $ref: '#/components/schemas/AzureBlobAuthStored'
+      required:
+      - type
+      - storageAccountName
+      - containerName
+      - auth
+      additionalProperties: false
+    AdvertiserDataDeliveryInput:
+      description: Data-delivery configuration for this advertiser. Groups standing Data Delivery Outputs and the credentials they reference. Distinct from media-buy reporting fields elsewhere in the API.
+      type: object
+      properties:
+        credentials:
+          description: Data Delivery Credentials owned by this advertiser. Replaces all existing live credentials when provided. Pass an empty array to archive every live credential (only allowed when no live Output references one). Applied before `outputs` so newly created credentials can be referenced by name.
+          allOf:
+          - $ref: '#/components/schemas/DataDeliveryCredentialArrayInput'
+        outputs:
+          description: Standing log-level data subscriptions to ship from Scope3 to a buyer-owned destination. Replaces all existing advertiser-scoped Data Delivery Outputs when provided. Pass an empty array to clear.
+          allOf:
+          - $ref: '#/components/schemas/DataDeliveryOutputArrayInput'
+    SyncAudiencesBody:
+      description: Sync audience data into Scope3
+      type: object
+      properties:
+        audiences:
+          description: Audiences to sync
+          minItems: 1
           type: array
           items:
-            $ref: '#/components/schemas/AccountSummary'
-        total:
-          description: Total count of accounts matching the query
-          example: 15
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
+            $ref: '#/components/schemas/AudienceItem'
+        deleteMissing:
+          description: When true, audiences not in this request are marked as deleted.
+          type: boolean
+        pushNotificationConfig:
+          type: object
+          properties:
+            url:
+              type: string
+            operation_id:
+              type: string
+              minLength: 1
+              maxLength: 255
+              pattern: ^[A-Za-z0-9_.:-]{1,255}$
+            token:
+              type: string
+              minLength: 16
+              maxLength: 4096
+            authentication:
+              type: object
+              properties:
+                schemes:
+                  type: array
+                  items:
+                    anyOf:
+                    - type: string
+                      enum:
+                      - Bearer
+                    - type: string
+                      enum:
+                      - HMAC-SHA256
+                credentials:
+                  type: string
+                  minLength: 32
+              required:
+              - schemes
+              - credentials
+              additionalProperties: {}
+          required:
+          - url
+          additionalProperties: {}
       required:
-      - accounts
-      - total
-      additionalProperties: false
+      - audiences
     AvailableAccountOutput:
       description: Discovered account available to be linked to an advertiser
       type: object
@@ -5188,21 +4632,225 @@ components:
       - sources
       - status
       additionalProperties: false
-    AccountResponse:
-      description: Response containing a single linked account
+    LinkedAccountInput:
+      description: An account to link to the advertiser
       type: object
       properties:
-        account:
-          $ref: '#/components/schemas/AccountOutput'
+        storefrontId:
+          description: Storefront the source lives on. Pair with `sourceId` to identify the source whose account is being linked.
+          example: 42
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        sourceId:
+          description: Inventory source within `storefrontId` whose account is being linked.
+          example: src_main
+          type: string
+          minLength: 1
+        accountId:
+          description: Account ID at the source to link to this advertiser. Must come from `list_available_accounts`.
+          example: acc_123
+          type: string
+          minLength: 1
+        credentialId:
+          description: Credential ID returned by `list_available_accounts`. Include it when multiple mapped connections expose the same account ID.
+          example: '42'
+          type: string
+        billingType:
+          description: Billing arrangement type (e.g. "advertiser", "operator", "agent")
+          example: advertiser
+          type: string
       required:
-      - account
+      - storefrontId
+      - sourceId
+      - accountId
+    AccountUnlinked:
+      type: object
+      properties:
+        unlinked:
+          type: boolean
+          enum:
+          - true
+      required:
+      - unlinked
       additionalProperties: false
-    DataDeliveryCredentialArrayInput:
-      description: Array of Data Delivery Credentials for one advertiser. Names must be unique within the array.
-      maxItems: 20
-      type: array
-      items:
-        $ref: '#/components/schemas/DataDeliveryCredentialInput'
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    CredentialConfig:
+      description: Destination-specific auth target as stored on the credential row. AZURE_BLOB omits the SAS token — the token lives in Google Secret Manager and is fetched at probe / delivery time.
+      oneOf:
+      - $ref: '#/components/schemas/GcsCredentialConfigOutput'
+      - $ref: '#/components/schemas/S3CredentialConfigOutput'
+      - $ref: '#/components/schemas/AzureBlobCredentialConfig'
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          GCS: '#/components/schemas/GcsCredentialConfigOutput'
+          S3: '#/components/schemas/S3CredentialConfigOutput'
+          AZURE_BLOB: '#/components/schemas/AzureBlobCredentialConfig'
+    RevalidateDataDeliveryCredentialResponse:
+      description: Updated credential after re-running the destination Probe.
+      type: object
+      properties:
+        credential:
+          $ref: '#/components/schemas/DataDeliveryCredential'
+      required:
+      - credential
+      additionalProperties: false
+    AudienceListResponse:
+      description: Paginated list of audience summaries
+      type: object
+      properties:
+        audiences:
+          type: array
+          items:
+            $ref: '#/components/schemas/AudienceSummary'
+        total:
+          type: number
+        take:
+          type: number
+        skip:
+          type: number
+      required:
+      - audiences
+      - total
+      - take
+      - skip
+      additionalProperties: false
+    AudienceItem:
+      description: Audience to sync with member changes
+      type: object
+      properties:
+        audienceId:
+          description: Buyer's identifier for this audience. Used in targeting overlays.
+          type: string
+          minLength: 1
+          maxLength: 255
+        name:
+          description: Human-readable name
+          type: string
+          maxLength: 255
+        add:
+          description: Members to add to this audience
+          maxItems: 100000
+          type: array
+          items:
+            type: object
+            properties:
+              externalId:
+                description: Unique identifier for this member within the audience
+                type: string
+                minLength: 1
+              hashedEmail:
+                description: SHA-256 hash of lowercase, trimmed email (64-char hex)
+                example: a1b2c3d4e5f6...
+                type: string
+                pattern: ^[0-9a-f]{64}$
+              hashedPhone:
+                description: SHA-256 hash of E.164-formatted phone number (64-char hex)
+                example: f6e5d4c3b2a1...
+                type: string
+                pattern: ^[0-9a-f]{64}$
+              uids:
+                description: Universal IDs for user matching
+                minItems: 1
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      description: Universal ID type (rampid, uid2, maid, etc.)
+                      type: string
+                      minLength: 1
+                    value:
+                      description: Universal ID value
+                      type: string
+                      minLength: 1
+                  required:
+                  - type
+                  - value
+            required:
+            - externalId
+        remove:
+          description: Members to remove by external ID
+          maxItems: 100000
+          type: array
+          items:
+            $ref: '#/components/schemas/RemoveMember'
+        delete:
+          description: When true, delete this audience entirely
+          type: boolean
+        consentBasis:
+          description: GDPR lawful basis for processing this audience
+          type: string
+          enum:
+          - consent
+          - legitimate_interest
+          - contract
+          - legal_obligation
+      required:
+      - audienceId
+    FrequencyCapTargetLevel:
+      description: Level of the entity the frequency cap applies to
+      type: string
+      enum:
+      - ADVERTISER
+      - CAMPAIGN
+      - CREATIVE
+    SyncAudiencesResponse:
+      description: Audience sync accepted for async processing
+      type: object
+      properties:
+        success:
+          type: boolean
+        accountId:
+          description: Advertiser ID (numeric string, e.g. "25") — same as the path parameter
+          example: '25'
+          type: string
+        operationId:
+          description: Batch operation UUID for tracking async processing
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        taskId:
+          description: Task ID for polling progress via GET /tasks/{taskId}. Same value as operationId.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+      required:
+      - success
+      - accountId
+      - operationId
+      - taskId
+      additionalProperties: false
+    DeliveryConfig:
+      description: Per-Output destination shape (non-secret). Additional destination types are added as new variants in this discriminated union.
+      oneOf:
+      - $ref: '#/components/schemas/GcsDeliveryConfig'
+      - $ref: '#/components/schemas/S3DeliveryConfig'
+      - $ref: '#/components/schemas/AzureBlobDeliveryConfig'
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          GCS: '#/components/schemas/GcsDeliveryConfig'
+          S3: '#/components/schemas/S3DeliveryConfig'
+          AZURE_BLOB: '#/components/schemas/AzureBlobDeliveryConfig'
     DataDeliveryOutput:
       description: Resolved Data Delivery Output as returned by the API.
       type: object
@@ -5261,116 +4909,16 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    GcsCredentialConfigOutput:
+    UpdateReportingBucketBody:
+      description: Request body for updating the offline reporting bucket on a linked partner account
       type: object
       properties:
-        type:
-          type: string
-          enum:
-          - GCS
-        bucket:
-          description: Target GCS bucket the Probe writes to and Data Delivery Outputs ship objects into. The Scope3 service account must have objectCreator on this bucket.
-          type: string
-          minLength: 1
-          maxLength: 222
-          pattern: ^[a-z0-9][a-z0-9._-]*[a-z0-9]$
+        reporting_bucket:
+          description: Reporting bucket configuration to set on the linked account, or null to clear it.
+          allOf:
+          - $ref: '#/components/schemas/ReportingBucket'
       required:
-      - type
-      - bucket
-      additionalProperties: false
-    AzureBlobCredentialConfigInput:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - AZURE_BLOB
-        storageAccountName:
-          description: Azure Storage account hosting the target container, e.g. `datareports`. The container is accessed at `https://<storageAccountName>.blob.core.windows.net/`.
-          type: string
-          minLength: 3
-          maxLength: 24
-          pattern: ^[a-z0-9]+$
-        containerName:
-          description: Azure Blob container that the Probe writes to and Data Delivery Outputs ship objects into.
-          type: string
-          minLength: 3
-          maxLength: 63
-          pattern: ^(?!.*--)[a-z0-9][a-z0-9-]*[a-z0-9]$
-        auth:
-          $ref: '#/components/schemas/AzureBlobAuthInput'
-      required:
-      - type
-      - storageAccountName
-      - containerName
-      - auth
-    AzureBlobDeliveryConfigOutput:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - AZURE_BLOB
-        pathPrefix:
-          description: Blob name prefix within the credential's Azure container. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
-          default: ''
-          type: string
-          maxLength: 1024
-        format:
-          default: JSONL
-          type: string
-          enum:
-          - JSONL
-          - PARQUET
-          - CSV
-      required:
-      - type
-      - pathPrefix
-      - format
-      additionalProperties: false
-    FrequencyCapTargetLevel:
-      description: Level of the entity the frequency cap applies to
-      type: string
-      enum:
-      - ADVERTISER
-      - CAMPAIGN
-      - CREATIVE
-    AzureBlobDeliveryConfig:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - AZURE_BLOB
-        pathPrefix:
-          description: Blob name prefix within the credential's Azure container. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
-          default: ''
-          type: string
-          maxLength: 1024
-        format:
-          default: JSONL
-          type: string
-          enum:
-          - JSONL
-          - PARQUET
-          - CSV
-      required:
-      - type
-    AzureBlobSasAuthInput:
-      type: object
-      properties:
-        mode:
-          type: string
-          enum:
-          - SAS_TOKEN
-        sasToken:
-          description: Shared Access Signature (SAS) query string. Provide the part after the `?` from the SAS URL — leading `?` is tolerated. Accepts either a Service SAS scoped to the container (`sr=c`) or an Account SAS with `srt` including `o` (Object); blob-scoped Service SAS (`sr=b`) is not supported because the Probe writes to a randomized path. The SAS must grant Create + Write + Delete (`sp=cwd`). Persisted to Google Secret Manager; the credential row stores only a resource reference. Not returned on subsequent GETs — to rotate, submit a new credential.
-          type: string
-          minLength: 1
-          maxLength: 4096
-      required:
-      - mode
-      - sasToken
+      - reporting_bucket
     CreateAdvertiserBody:
       description: Request body for creating a new advertiser
       type: object
@@ -5447,274 +4995,160 @@ components:
       - name
       - brand
       - primaryCurrency
-    S3CredentialConfig:
+    BuyerCredentialSourceRef:
+      description: A storefront/source pair that a single credential row gives the buyer access to
       type: object
       properties:
-        type:
+        storefrontId:
+          description: Storefront ID this credential covers
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        storefrontName:
+          description: Storefront display name
+          type: string
+        sourceId:
+          description: Inventory source ID within the storefront
+          type: string
+        sourceName:
+          description: Inventory source display name
+          type: string
+      required:
+      - storefrontId
+      - storefrontName
+      - sourceId
+      - sourceName
+      additionalProperties: false
+    DataDeliveryOutputInput:
+      description: A single Data Delivery Output entry. Used inline on advertiser/campaign create+update.
+      type: object
+      properties:
+        dataDeliveryType:
+          description: The kind of LLD shipped by this Output.
           type: string
           enum:
-          - S3
-        bucket:
-          description: Target S3 bucket the Probe writes to and Data Delivery Outputs ship objects into. The bucket policy must grant the Scope3 AWS IAM principal s3:PutObject (and s3:DeleteObject for the Probe sweep) on objects under the Output path prefix.
+          - MB_DELIVERY
+          - IMPRESSIONS
+          - CLICKS
+          - VAST_EVENTS
+          - CAPI_ATTRIBUTION
+          - MMP_POSTBACKS
+        cadence:
+          description: Firing rate. HOURLY fires at minute 0 every hour, DAILY at 00:00 UTC, WEEKLY at 00:00 UTC on syncWeeklyDay.
           type: string
-          minLength: 3
-          maxLength: 63
-          pattern: ^[a-z0-9][a-z0-9.-]*[a-z0-9]$
-        region:
-          description: AWS region of the target bucket. Supports commercial, GovCloud, and ISO partitions (e.g., us-east-1, us-gov-east-1).
+          enum:
+          - HOURLY
+          - DAILY
+          - WEEKLY
+        syncWeeklyDay:
+          description: Day of week for WEEKLY cadence (0=Sunday..6=Saturday). Required when cadence=WEEKLY, ignored otherwise.
+          type: integer
+          minimum: 0
+          maximum: 6
+        enabled:
+          description: When false, the Temporal schedule is paused — no new runs fire, in-flight runs continue. Defaults to true.
+          default: true
+          type: boolean
+        credentialName:
+          description: Name of the Data Delivery Credential (within the same advertiser) that authenticates this Output. The credential carries the auth target (e.g., GCS bucket) and is Probe-validated. Must reference a credential whose destinationType matches deliveryConfig.type.
           type: string
-          pattern: ^[a-z]{2}(-[a-z]+)+-\d+$
+          minLength: 1
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+        deliveryConfig:
+          $ref: '#/components/schemas/DeliveryConfig'
       required:
-      - type
-      - bucket
-      - region
-    UpdateAdvertiserBody:
-      description: Request body for updating an advertiser
+      - dataDeliveryType
+      - cadence
+      - credentialName
+      - deliveryConfig
+    AudienceSummary:
+      description: Compact audience view returned by list endpoints. Use `get_audience` for the full resource.
       type: object
       properties:
+        audienceId:
+          type: string
         name:
-          description: Updated name of the advertiser
-          example: Acme Corporation
+          type:
+          - string
+          - 'null'
+        accountId:
+          description: Advertiser ID (numeric string, e.g. "25")
+          example: '25'
           type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          description: Updated description of the advertiser
-          example: Updated description for Acme Corporation
+        status:
+          description: Processing status of this audience
           type: string
-          maxLength: 1000
-        brand:
-          description: Updated brand domain (e.g., "nike.com"). Re-resolves brand identity from /.well-known/brand.json, the AdCP registry, or Brandfetch enrichment.
-          example: nike.com
-          type: string
-          minLength: 1
-        saveBrand:
-          description: When true, auto-saves the resolved brand identity to the AdCP registry if the brand is not yet registered. Normally not required for advertiser updates; requires brand when sent on update. Set this only after reviewing enrichment or when the user confirms registry persistence is desired.
-          default: false
+          enum:
+          - PROCESSING
+          - ERROR
+          - READY
+          - TOO_SMALL
+        deleted:
           type: boolean
-        linkedAccounts:
-          description: Accounts to add to this advertiser. Existing linked accounts are not removed.
-          type: array
-          items:
-            $ref: '#/components/schemas/LinkedAccountInput'
-        optimizationApplyMode:
-          description: Default mode for applying Scope3 AI model optimizations to media buys for campaigns under this advertiser. When set to "AUTO", optimizations are applied automatically; when "MANUAL", they require approval.
-          allOf:
-          - $ref: '#/components/schemas/OptimizationApplyMode'
-        primaryCurrency:
-          description: Primary ISO 4217 currency for this advertiser. Can only be changed while the advertiser has no campaigns; once the first campaign is created the currency is locked, because every campaign under an advertiser shares the advertiser's single currency.
-          example: USD
+        uploadedCount:
+          type:
+          - number
+          - 'null'
+        matchedCount:
+          type:
+          - number
+          - 'null'
+        createdAt:
           type: string
-          minLength: 3
-          maxLength: 3
-          pattern: ^[A-Za-z]{3}$
-        utmConfig:
-          description: Default UTM (Urchin Tracking Module) parameters for this advertiser. Replaces all existing advertiser-level UTM params. Pass an empty array to clear.
-          maxItems: 20
-          type: array
-          items:
-            type: object
-            properties:
-              paramKey:
-                description: Output query parameter key appended to landing URL (e.g., "utm_source", "bg_campaign")
-                example: utm_campaign
-                type: string
-                pattern: ^[a-zA-Z0-9_-]{1,100}$
-              paramValue:
-                description: Macro name (e.g., "{CAMPAIGN_ID}") or static string (e.g., "scope3") to resolve as the value
-                example: '{CAMPAIGN_ID}'
-                type: string
-                minLength: 1
-                maxLength: 200
-            required:
-            - paramKey
-            - paramValue
-        dataDelivery:
-          description: Data-delivery configuration for this advertiser. Groups standing Data Delivery Outputs and the credentials they reference. Omit to leave existing config untouched.
-          type: object
-          properties:
-            credentials:
-              description: Data Delivery Credentials owned by this advertiser. When provided, replaces all existing live credentials (pass an empty array to archive — rejected if any live Output references a credential). Omit to leave existing credentials untouched. Applied before `outputs` so newly created credentials can be referenced by name.
-              allOf:
-              - $ref: '#/components/schemas/DataDeliveryCredentialArrayInput'
-            outputs:
-              description: Standing log-level data subscriptions to ship from Scope3 to a buyer-owned destination. Replaces all existing advertiser-scoped Data Delivery Outputs when provided. Pass an empty array to clear. Omit to leave existing Outputs untouched.
-              allOf:
-              - $ref: '#/components/schemas/DataDeliveryOutputArrayInput'
-        frequencyCaps:
-          description: Buyer-side frequency cap configs to apply to this advertiser. When provided, replaces all existing non-archived caps for this advertiser (pass an empty array to clear). Omit to leave existing caps untouched.
-          type: array
-          items:
-            $ref: '#/components/schemas/FrequencyCapConfigInput'
-    DataDeliveryOutputArrayInput:
-      description: Array of Data Delivery Outputs for one scope (advertiser or campaign). At most one Output per (dataDeliveryType, credentialName) pair — the same data type can ship to multiple credentials by listing one Output per destination.
-      maxItems: 20
-      type: array
-      items:
-        $ref: '#/components/schemas/DataDeliveryOutputInput'
-    AzureBlobCredentialConfig:
+        updatedAt:
+          type: string
+      required:
+      - audienceId
+      - name
+      - accountId
+      - status
+      - deleted
+      - uploadedCount
+      - matchedCount
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    GcsDeliveryConfigOutput:
       type: object
       properties:
         type:
           type: string
           enum:
-          - AZURE_BLOB
-        storageAccountName:
-          description: Azure Storage account hosting the target container, e.g. `datareports`. The container is accessed at `https://<storageAccountName>.blob.core.windows.net/`.
+          - GCS
+        pathPrefix:
+          description: Object key prefix within the credential's bucket. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
+          default: ''
           type: string
-          minLength: 3
-          maxLength: 24
-          pattern: ^[a-z0-9]+$
-        containerName:
-          description: Azure Blob container that the Probe writes to and Data Delivery Outputs ship objects into.
-          type: string
-          minLength: 3
-          maxLength: 63
-          pattern: ^(?!.*--)[a-z0-9][a-z0-9-]*[a-z0-9]$
-        auth:
-          $ref: '#/components/schemas/AzureBlobAuthStored'
-      required:
-      - type
-      - storageAccountName
-      - containerName
-      - auth
-      additionalProperties: false
-    CredentialConfig:
-      description: Destination-specific auth target as stored on the credential row. AZURE_BLOB omits the SAS token — the token lives in Google Secret Manager and is fetched at probe / delivery time.
-      oneOf:
-      - $ref: '#/components/schemas/GcsCredentialConfigOutput'
-      - $ref: '#/components/schemas/S3CredentialConfigOutput'
-      - $ref: '#/components/schemas/AzureBlobCredentialConfig'
-      type: object
-      discriminator:
-        propertyName: type
-        mapping:
-          GCS: '#/components/schemas/GcsCredentialConfigOutput'
-          S3: '#/components/schemas/S3CredentialConfigOutput'
-          AZURE_BLOB: '#/components/schemas/AzureBlobCredentialConfig'
-    SyncAudiencesBody:
-      description: Sync audience data into Scope3
-      type: object
-      properties:
-        audiences:
-          description: Audiences to sync
-          minItems: 1
-          type: array
-          items:
-            $ref: '#/components/schemas/AudienceItem'
-        deleteMissing:
-          description: When true, audiences not in this request are marked as deleted.
-          type: boolean
-        pushNotificationConfig:
-          type: object
-          properties:
-            url:
-              type: string
-            operation_id:
-              type: string
-              minLength: 1
-              maxLength: 255
-              pattern: ^[A-Za-z0-9_.:-]{1,255}$
-            token:
-              type: string
-              minLength: 16
-              maxLength: 4096
-            authentication:
-              type: object
-              properties:
-                schemes:
-                  type: array
-                  items:
-                    anyOf:
-                    - type: string
-                      enum:
-                      - Bearer
-                    - type: string
-                      enum:
-                      - HMAC-SHA256
-                credentials:
-                  type: string
-                  minLength: 32
-              required:
-              - schemes
-              - credentials
-              additionalProperties: {}
-          required:
-          - url
-          additionalProperties: {}
-      required:
-      - audiences
-    AdvertiserDataDelivery:
-      description: Data-delivery configuration for this advertiser. Groups standing Data Delivery Outputs and the credentials they reference. Distinct from media-buy reporting fields elsewhere in the API.
-      type: object
-      properties:
-        credentials:
-          description: Live Data Delivery Credentials owned by this advertiser. Only present when at least one credential exists.
-          type: array
-          items:
-            $ref: '#/components/schemas/DataDeliveryCredential'
-        outputs:
-          description: Advertiser-scoped Data Delivery Outputs (standing LLD subscriptions). Only present when at least one Output is configured.
-          type: array
-          items:
-            $ref: '#/components/schemas/DataDeliveryOutput'
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
-      additionalProperties: false
-    AdvertiserDataDeliveryInput:
-      description: Data-delivery configuration for this advertiser. Groups standing Data Delivery Outputs and the credentials they reference. Distinct from media-buy reporting fields elsewhere in the API.
-      type: object
-      properties:
-        credentials:
-          description: Data Delivery Credentials owned by this advertiser. Replaces all existing live credentials when provided. Pass an empty array to archive every live credential (only allowed when no live Output references one). Applied before `outputs` so newly created credentials can be referenced by name.
-          allOf:
-          - $ref: '#/components/schemas/DataDeliveryCredentialArrayInput'
-        outputs:
-          description: Standing log-level data subscriptions to ship from Scope3 to a buyer-owned destination. Replaces all existing advertiser-scoped Data Delivery Outputs when provided. Pass an empty array to clear.
-          allOf:
-          - $ref: '#/components/schemas/DataDeliveryOutputArrayInput'
-    CredentialConfigInput:
-      description: Destination-specific auth target as submitted by the buyer. AZURE_BLOB carries the SAS token; the API persists it to Google Secret Manager and stores only a reference. Additional destination types are added as new variants.
-      oneOf:
-      - $ref: '#/components/schemas/GcsCredentialConfig'
-      - $ref: '#/components/schemas/S3CredentialConfig'
-      - $ref: '#/components/schemas/AzureBlobCredentialConfigInput'
-      type: object
-      discriminator:
-        propertyName: type
-        mapping:
-          GCS: '#/components/schemas/GcsCredentialConfig'
-          S3: '#/components/schemas/S3CredentialConfig'
-          AZURE_BLOB: '#/components/schemas/AzureBlobCredentialConfigInput'
-    AzureBlobSasAuthStored:
-      type: object
-      properties:
-        mode:
+          maxLength: 1024
+        format:
+          default: JSONL
           type: string
           enum:
-          - SAS_TOKEN
+          - JSONL
+          - PARQUET
+          - CSV
       required:
-      - mode
+      - type
+      - pathPrefix
+      - format
       additionalProperties: false
+    FrequencyCapConfigInput:
+      description: Frequency cap entry supplied inside a parent advertiser/campaign/creative request body. On PUT, the full array replaces all existing caps for that target.
+      type: object
+      properties:
+        max_impressions:
+          description: Maximum number of impressions allowed within the window
+          example: 3
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        window:
+          $ref: '#/components/schemas/FrequencyCapWindow'
+      required:
+      - max_impressions
+      - window
+      additionalProperties: {}
     S3DeliveryConfig:
       type: object
       properties:
@@ -5736,79 +5170,44 @@ components:
           - CSV
       required:
       - type
-    AdvertiserAccount:
+    AvailableAccountListResponse:
+      description: Response containing a list of available accounts from a partner
       type: object
       properties:
-        linkId:
-          type: string
-        accountId:
-          type: string
-        credentialId:
-          type:
-          - string
-          - 'null'
-        name:
-          type:
-          - string
-          - 'null'
-        advertiser:
-          type:
-          - string
-          - 'null'
-        billingProxy:
-          type:
-          - string
-          - 'null'
-        house:
-          type:
-          - string
-          - 'null'
-        billing:
-          type:
-          - string
-          - 'null'
-        sources:
+        accounts:
+          description: List of available (discovered) accounts
           type: array
           items:
-            type: object
-            additionalProperties: {}
-        advertiserId:
-          type: string
-        status:
-          type: string
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
+            $ref: '#/components/schemas/AvailableAccountOutput'
+        total:
+          description: Total count of available accounts
+          example: 8
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        synced:
+          description: True when no accounts matched and a sync_accounts call was automatically triggered to provision this account at the partner. The list reflects the post-sync state.
+          type: boolean
+        billingOptions:
+          description: Billing options supported by this partner agent, as reported in its ADCP capabilities.
+          type: object
+          properties:
+            default:
+              type:
+              - string
+              - 'null'
+            supported:
+              type: array
+              items:
+                type: string
+          required:
+          - default
+          - supported
+          additionalProperties: false
       required:
-      - linkId
-      - accountId
-      - name
-      - advertiser
-      - billingProxy
-      - house
-      - billing
-      - sources
-      - advertiserId
-      - status
-      - createdAt
-      - updatedAt
-      additionalProperties: {}
-    DataDeliveryCredentialInput:
-      description: A single Data Delivery Credential entry. Used inline on advertiser create+update; full-replace by name within one request.
-      type: object
-      properties:
-        name:
-          description: Buyer-meaningful identifier for this credential, unique per advertiser among live credentials. Data Delivery Outputs reference this by name.
-          type: string
-          minLength: 1
-          maxLength: 64
-          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
-        config:
-          $ref: '#/components/schemas/CredentialConfigInput'
-      required:
-      - name
-      - config
+      - accounts
+      - total
+      additionalProperties: false
     S3DeliveryConfigOutput:
       type: object
       properties:
@@ -5890,6 +5289,607 @@ components:
       - status
       - createdAt
       - updatedAt
+      additionalProperties: false
+    AccountListResponse:
+      description: Response containing a paginated list of linked-account summaries
+      type: object
+      properties:
+        accounts:
+          description: Linked accounts projected to the summary shape. Use `get_advertiser_account` for the full resource.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSummary'
+        total:
+          description: Total count of accounts matching the query
+          example: 15
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - accounts
+      - total
+      additionalProperties: false
+    AzureBlobAuthInput:
+      description: How Scope3 authenticates to the buyer-owned Azure Blob container. SAS_TOKEN uses a container-scoped Shared Access Signature.
+      oneOf:
+      - $ref: '#/components/schemas/AzureBlobSasAuthInput'
+      type: object
+      discriminator:
+        propertyName: mode
+        mapping:
+          SAS_TOKEN: '#/components/schemas/AzureBlobSasAuthInput'
+    GcsDeliveryConfig:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - GCS
+        pathPrefix:
+          description: Object key prefix within the credential's bucket. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
+          default: ''
+          type: string
+          maxLength: 1024
+        format:
+          default: JSONL
+          type: string
+          enum:
+          - JSONL
+          - PARQUET
+          - CSV
+      required:
+      - type
+    AdvertiserAccount:
+      type: object
+      properties:
+        linkId:
+          type: string
+        accountId:
+          type: string
+        credentialId:
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        advertiser:
+          type:
+          - string
+          - 'null'
+        billingProxy:
+          type:
+          - string
+          - 'null'
+        house:
+          type:
+          - string
+          - 'null'
+        billing:
+          type:
+          - string
+          - 'null'
+        sources:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        advertiserId:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - linkId
+      - accountId
+      - name
+      - advertiser
+      - billingProxy
+      - house
+      - billing
+      - sources
+      - advertiserId
+      - status
+      - createdAt
+      - updatedAt
+      additionalProperties: {}
+    FrequencyCapConfig:
+      description: Buyer-side frequency cap configuration
+      type: object
+      properties:
+        max_impressions:
+          description: Maximum number of impressions allowed within the window
+          example: 3
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        window:
+          $ref: '#/components/schemas/FrequencyCapWindow'
+        id:
+          description: Unique identifier for the frequency cap config
+          example: '12345'
+          type: string
+        targetLevel:
+          description: Level of the entity the cap applies to
+          allOf:
+          - $ref: '#/components/schemas/FrequencyCapTargetLevel'
+        targetId:
+          description: 'Identifier of the entity at the chosen target level: advertiser_id when targetLevel is ADVERTISER, campaign_id when CAMPAIGN, creative_id when CREATIVE.'
+          example: camp_abc123
+          type: string
+        createdAt:
+          description: ISO 8601 creation timestamp
+          type: string
+        updatedAt:
+          description: ISO 8601 last-updated timestamp
+          type: string
+        archivedAt:
+          description: ISO 8601 archive timestamp; null for active configs
+          type:
+          - string
+          - 'null'
+      required:
+      - max_impressions
+      - window
+      - id
+      - targetLevel
+      - targetId
+      - createdAt
+      - updatedAt
+      additionalProperties: {}
+    ReportingBucket:
+      description: Customer-owned object storage bucket where sales agents can write offline delivery reports
+      type: object
+      properties:
+        protocol:
+          description: Object storage protocol
+          example: s3
+          type: string
+          enum:
+          - s3
+          - gcs
+          - azure_blob
+        bucket:
+          description: Bucket name. Lowercase alphanumerics, dots and hyphens; must start and end with an alphanumeric; 3-63 chars.
+          example: my-org.adcp.reports
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$
+        prefix:
+          description: Object key prefix within the bucket
+          example: reports/
+          type: string
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9/_.-]+$
+        region:
+          description: Storage region identifier (lowercase alphanumerics and hyphens)
+          example: us-east-1
+          type: string
+          maxLength: 64
+          pattern: ^[a-z0-9-]+$
+        format:
+          description: Report file format
+          default: jsonl
+          type: string
+          enum:
+          - jsonl
+          - csv
+          - parquet
+          - avro
+          - orc
+        compression:
+          description: Compression applied to report files
+          default: gzip
+          type: string
+          enum:
+          - gzip
+          - none
+        file_retention_days:
+          description: Number of days the customer retains report files in the bucket
+          example: 30
+          type: integer
+          minimum: 1
+          maximum: 9007199254740991
+        setup_instructions:
+          description: Optional URL pointing to setup instructions for granting the agent access to the bucket
+          example: https://example.com/adcp/bucket-setup
+          type: string
+          format: uri
+      required:
+      - protocol
+      - bucket
+      - file_retention_days
+    AzureBlobAuthStored:
+      oneOf:
+      - $ref: '#/components/schemas/AzureBlobSasAuthStored'
+      type: object
+      discriminator:
+        propertyName: mode
+        mapping:
+          SAS_TOKEN: '#/components/schemas/AzureBlobSasAuthStored'
+    AzureBlobDeliveryConfigOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - AZURE_BLOB
+        pathPrefix:
+          description: Blob name prefix within the credential's Azure container. Leading slashes are not stripped. The tokens {YYYY}, {MM}, {DD}, {HH} (from the delivery period start, UTC) and {DATA_DELIVERY_TYPE} are substituted at delivery time — e.g. "lld/{YYYY}/{MM}/{DD}/{HH}/{DATA_DELIVERY_TYPE}/" → "lld/2026/06/03/14/IMPRESSIONS/". Any other text is used verbatim.
+          default: ''
+          type: string
+          maxLength: 1024
+        format:
+          default: JSONL
+          type: string
+          enum:
+          - JSONL
+          - PARQUET
+          - CSV
+      required:
+      - type
+      - pathPrefix
+      - format
+      additionalProperties: false
+    S3CredentialConfigOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - S3
+        bucket:
+          description: Target S3 bucket the Probe writes to and Data Delivery Outputs ship objects into. The bucket policy must grant the Scope3 AWS IAM principal s3:PutObject (and s3:DeleteObject for the Probe sweep) on objects under the Output path prefix.
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-z0-9][a-z0-9.-]*[a-z0-9]$
+        region:
+          description: AWS region of the target bucket. Supports commercial, GovCloud, and ISO partitions (e.g., us-east-1, us-gov-east-1).
+          type: string
+          pattern: ^[a-z]{2}(-[a-z]+)+-\d+$
+      required:
+      - type
+      - bucket
+      - region
+      additionalProperties: false
+    Advertiser:
+      description: Advertiser resource representation
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
+        name:
+          description: Name of the advertiser
+          example: Acme Corp
+          type: string
+        description:
+          description: Description of the advertiser
+          example: Global advertising account for Acme Corporation
+          type: string
+        status:
+          description: Current status of the advertiser
+          type: string
+          enum:
+          - ACTIVE
+          - ARCHIVED
+        createdAt:
+          description: When the advertiser was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the advertiser was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        linkedBrand:
+          description: The brand linked to this advertiser. Only present when includeBrand=true is passed to the list endpoint.
+          type: object
+          properties:
+            id:
+              description: Brand ID
+              example: brand_123
+              type: string
+            name:
+              description: Brand name
+              example: Acme Brand
+              type: string
+            domain:
+              description: Brand domain
+              example: acme.com
+              type: string
+            manifest:
+              description: Full resolved brand identity data — includes logos, colors, fonts, tone, tagline, assets, product catalog, disclaimers, and more
+              allOf:
+              - $ref: '#/components/schemas/BrandManifestJson'
+            logoUrl:
+              description: Primary brand logo URL
+              example: https://acme.com/logo.png
+              type: string
+            industry:
+              description: Brand industry
+              example: Technology
+              type: string
+            colors:
+              description: Brand color palette
+              example:
+                primary: '#FF5733'
+              type: object
+              additionalProperties:
+                type: string
+            tagline:
+              description: Brand tagline
+              example: Innovation for Everyone
+              type: string
+            tone:
+              description: Brand voice and tone
+              example: Professional, friendly, and innovative
+              type: string
+          required:
+          - id
+          - name
+          - domain
+          - manifest
+          additionalProperties: false
+        brand:
+          description: The brand domain associated with this advertiser
+          example: nike.com
+          type: string
+        brandWarning:
+          description: Warning about brand resolution (e.g., manifest not found)
+          type: string
+        sandbox:
+          description: When true, this advertiser is in sandbox mode. All ADCP operations use sandbox-flagged accounts. Cannot be changed after creation.
+          type: boolean
+        optimizationApplyMode:
+          description: Default mode for applying Scope3 AI model optimizations to media buys for campaigns under this advertiser. When set to "AUTO", optimizations are applied automatically; when "MANUAL", they require approval.
+          allOf:
+          - $ref: '#/components/schemas/OptimizationApplyMode'
+        primaryCurrency:
+          description: Primary ISO 4217 currency for this advertiser. Every campaign under this advertiser is created in this currency, and selected product pricing must match it.
+          example: USD
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+        currencyLocked:
+          description: True once the advertiser has at least one campaign. While false, `primaryCurrency` can still be changed; once true it is locked.
+          type: boolean
+        linkedAccounts:
+          description: Linked partner accounts for this advertiser. Only present when includeAccounts=true is passed to the list endpoint.
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedAccount'
+        utmConfig:
+          description: Advertiser-level UTM parameter configuration. Only present when UTM params are configured for this advertiser.
+          type: array
+          items:
+            type: object
+            properties:
+              paramKey:
+                description: Output query parameter key
+                example: utm_campaign
+                type: string
+              paramValue:
+                description: Macro or static value
+                example: '{CAMPAIGN_ID}'
+                type: string
+              source:
+                description: Where this param was configured — "advertiser" for advertiser default, "campaign" for campaign override
+                type: string
+                enum:
+                - advertiser
+                - campaign
+            required:
+            - paramKey
+            - paramValue
+            - source
+            additionalProperties: false
+        dataDelivery:
+          $ref: '#/components/schemas/AdvertiserDataDelivery'
+        frequencyCaps:
+          description: Buyer-side frequency cap configs for this advertiser. Always present on single-GET; on LIST only when includeFrequencyCaps=true.
+          type: array
+          items:
+            $ref: '#/components/schemas/FrequencyCapConfig'
+      required:
+      - id
+      - name
+      - status
+      - createdAt
+      - updatedAt
+      - sandbox
+      - optimizationApplyMode
+      - primaryCurrency
+      - currencyLocked
+      additionalProperties: false
+    AzureBlobSasAuthStored:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+          - SAS_TOKEN
+      required:
+      - mode
+      additionalProperties: false
+    GcsCredentialConfigOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - GCS
+        bucket:
+          description: Target GCS bucket the Probe writes to and Data Delivery Outputs ship objects into. The Scope3 service account must have objectCreator on this bucket.
+          type: string
+          minLength: 1
+          maxLength: 222
+          pattern: ^[a-z0-9][a-z0-9._-]*[a-z0-9]$
+      required:
+      - type
+      - bucket
+      additionalProperties: false
+    CredentialConfigInput:
+      description: Destination-specific auth target as submitted by the buyer. AZURE_BLOB carries the SAS token; the API persists it to Google Secret Manager and stores only a reference. Additional destination types are added as new variants.
+      oneOf:
+      - $ref: '#/components/schemas/GcsCredentialConfig'
+      - $ref: '#/components/schemas/S3CredentialConfig'
+      - $ref: '#/components/schemas/AzureBlobCredentialConfigInput'
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          GCS: '#/components/schemas/GcsCredentialConfig'
+          S3: '#/components/schemas/S3CredentialConfig'
+          AZURE_BLOB: '#/components/schemas/AzureBlobCredentialConfigInput'
+    AzureBlobCredentialConfigInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - AZURE_BLOB
+        storageAccountName:
+          description: Azure Storage account hosting the target container, e.g. `datareports`. The container is accessed at `https://<storageAccountName>.blob.core.windows.net/`.
+          type: string
+          minLength: 3
+          maxLength: 24
+          pattern: ^[a-z0-9]+$
+        containerName:
+          description: Azure Blob container that the Probe writes to and Data Delivery Outputs ship objects into.
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^(?!.*--)[a-z0-9][a-z0-9-]*[a-z0-9]$
+        auth:
+          $ref: '#/components/schemas/AzureBlobAuthInput'
+      required:
+      - type
+      - storageAccountName
+      - containerName
+      - auth
+    GcsCredentialConfig:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - GCS
+        bucket:
+          description: Target GCS bucket the Probe writes to and Data Delivery Outputs ship objects into. The Scope3 service account must have objectCreator on this bucket.
+          type: string
+          minLength: 1
+          maxLength: 222
+          pattern: ^[a-z0-9][a-z0-9._-]*[a-z0-9]$
+      required:
+      - type
+      - bucket
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    FrequencyCapWindow:
+      description: Rolling time window over which max_impressions applies (AdCP Duration shape).
+      type: object
+      properties:
+        interval:
+          type: number
+          minimum: 1
+        unit:
+          anyOf:
+          - type: string
+            enum:
+            - seconds
+          - type: string
+            enum:
+            - minutes
+          - type: string
+            enum:
+            - hours
+          - type: string
+            enum:
+            - days
+          - type: string
+            enum:
+            - campaign
+      required:
+      - interval
+      - unit
+      additionalProperties: {}
+    DataDeliveryOutputArrayInput:
+      description: Array of Data Delivery Outputs for one scope (advertiser or campaign). At most one Output per (dataDeliveryType, credentialName) pair — the same data type can ship to multiple credentials by listing one Output per destination.
+      maxItems: 20
+      type: array
+      items:
+        $ref: '#/components/schemas/DataDeliveryOutputInput'
+    DataDeliveryCredentialArrayInput:
+      description: Array of Data Delivery Credentials for one advertiser. Names must be unique within the array.
+      maxItems: 20
+      type: array
+      items:
+        $ref: '#/components/schemas/DataDeliveryCredentialInput'
+    AdvertiserListResponse:
+      description: Response containing a paginated list of advertiser summaries
+      type: object
+      properties:
+        items:
+          description: Advertisers projected to the summary shape. Use `get_advertiser` for the full resource.
+          type: array
+          items:
+            $ref: '#/components/schemas/AdvertiserSummary'
+        total:
+          description: Total count of advertisers matching the query
+          example: 42
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        hasMore:
+          description: Whether there are more results available
+          type: boolean
+        nextOffset:
+          description: Offset to use for the next page of results, or null if no more results
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 9007199254740991
+        currentAdvertiserId:
+          description: The advertiser ID currently scoped by the caller (from X-SCOPE3-SEAT-ID header). Present only when the caller has an active advertiser scope (AI-5568). Used by the all-advertisers-home widget to mark the current advertiser.
+          example: '12345'
+          type: string
+      required:
+      - items
+      - total
+      - hasMore
+      - nextOffset
       additionalProperties: false
   securitySchemes:
     bearerAuth:

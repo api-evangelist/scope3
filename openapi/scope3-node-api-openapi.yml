@@ -245,6 +245,27 @@ paths:
       - Node
 components:
   schemas:
+    Node:
+      allOf:
+      - $ref: '#/components/schemas/NodeCreateRequest'
+      - type: object
+        required:
+        - created_at
+        - updated_at
+        properties:
+          customer_id:
+            type: integer
+            x-go-type: int64
+            description: ID of the customer who owns this node (visible to admins only)
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+          created_by:
+            type: string
+            description: ID of the user who created the node (admin or owner only)
     NodeUpdateRequest:
       type: object
       description: 'Update an existing node.
@@ -322,6 +343,35 @@ components:
           maximum: 30
           format: float
           x-go-type: float64
+    NodeResponse:
+      title: Node Response
+      type: object
+      additionalProperties: false
+      required:
+      - nodes
+      properties:
+        nodes:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Node'
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
     NodeCreateRequest:
       type: object
       required:
@@ -408,56 +458,6 @@ components:
           maximum: 30
           format: float
           x-go-type: float64
-    Node:
-      allOf:
-      - $ref: '#/components/schemas/NodeCreateRequest'
-      - type: object
-        required:
-        - created_at
-        - updated_at
-        properties:
-          customer_id:
-            type: integer
-            x-go-type: int64
-            description: ID of the customer who owns this node (visible to admins only)
-          created_at:
-            type: string
-            format: date-time
-          updated_at:
-            type: string
-            format: date-time
-          created_by:
-            type: string
-            description: ID of the user who created the node (admin or owner only)
-    NodeResponse:
-      title: Node Response
-      type: object
-      additionalProperties: false
-      required:
-      - nodes
-      properties:
-        nodes:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/Node'
-    Error:
-      type: object
-      additionalProperties: false
-      required:
-      - message
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        details:
-          type: object
-          properties:
-            reason:
-              type: string
-            field:
-              type: string
   securitySchemes:
     bearerAuth:
       type: http

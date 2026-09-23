@@ -79,24 +79,6 @@ components:
       - API_PULL
       - INTEGRATION
       description: The segment distribution method
-    PropertyList:
-      type: object
-      required:
-      - name
-      - countries
-      - isInclusion
-      properties:
-        name:
-          type: string
-          description: The property list name
-        countries:
-          type: array
-          items:
-            type: string
-          description: The countries included in the segment
-        isInclusion:
-          type: boolean
-          description: Whether the property list is included or excluded from the segment
     UpdateFrequency:
       type: string
       enum:
@@ -146,6 +128,69 @@ components:
           items:
             type: string
           description: The GPIDs excluded for the given property
+    SegmentDataResponse:
+      type: object
+      required:
+      - data
+      - paging
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentData'
+          description: The segment data
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SegmentList:
+      type: object
+      required:
+      - segments
+      - paging
+      properties:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SegmentPartner:
+      type: object
+      required:
+      - name
+      - segmentId
+      properties:
+        name:
+          type: string
+          description: The client partner's name
+        segmentId:
+          type: string
+          description: The client partner's segment id
+        seatId:
+          type:
+          - string
+          - 'null'
+          description: The client partner's seat id
+    SegmentDataType:
+      type: string
+      enum:
+      - INCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY_PLACEMENTS
+      description: The segment data type
+    PlacementList:
+      type: object
+      required:
+      - name
+      - countries
+      properties:
+        name:
+          type: string
+          description: The placement list name
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries included in the segment
     Segment:
       type: object
       required:
@@ -208,26 +253,6 @@ components:
           format: date-time
           description: Deactivated date and time
           example: '2021-01-30T08:30:00Z'
-    SegmentDataType:
-      type: string
-      enum:
-      - INCLUDED_PROPERTY
-      - EXCLUDED_PROPERTY
-      - EXCLUDED_PROPERTY_PLACEMENTS
-      description: The segment data type
-    SegmentDataResponse:
-      type: object
-      required:
-      - data
-      - paging
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SegmentData'
-          description: The segment data
-        paging:
-          $ref: '#/components/schemas/Paging'
     Paging:
       type: object
       required:
@@ -242,49 +267,24 @@ components:
         totalRecords:
           type: integer
           description: The total number of records
-    SegmentPartner:
-      type: object
-      required:
-      - name
-      - segmentId
-      properties:
-        name:
-          type: string
-          description: The client partner's name
-        segmentId:
-          type: string
-          description: The client partner's segment id
-        seatId:
-          type:
-          - string
-          - 'null'
-          description: The client partner's seat id
-    PlacementList:
+    PropertyList:
       type: object
       required:
       - name
       - countries
+      - isInclusion
       properties:
         name:
           type: string
-          description: The placement list name
+          description: The property list name
         countries:
           type: array
           items:
             type: string
           description: The countries included in the segment
-    SegmentList:
-      type: object
-      required:
-      - segments
-      - paging
-      properties:
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/Segment'
-        paging:
-          $ref: '#/components/schemas/Paging'
+        isInclusion:
+          type: boolean
+          description: Whether the property list is included or excluded from the segment
   securitySchemes:
     bearerAuth:
       type: http

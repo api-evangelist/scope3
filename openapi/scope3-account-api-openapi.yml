@@ -1381,6 +1381,143 @@ components:
             - channel
       required:
       - cells
+    CurrentAccountResponse:
+      description: Current customer account context
+      type: object
+      properties:
+        id:
+          description: Customer ID
+          example: 100
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        company:
+          description: Company name
+          example: Acme Inc
+          type: string
+        name:
+          description: Display name
+          example: Acme
+          type: string
+        role:
+          description: User role on this customer
+          example: ADMIN
+          type: string
+        customerDomain:
+          description: Registered organization domain on the customer
+          example: acme.com
+          type:
+          - string
+          - 'null'
+        standing:
+          description: 'Customer standing (credit limit). ADMIN-only: present only when the caller is ADMIN or above; omitted otherwise.'
+          type: object
+          properties:
+            creditLimit:
+              description: Credit limit beyond the funded balance, in minor currency units (USD cents). `null` or `0` means the organization has no credit line — it must apply for credit or contact Scope3; `>0` is the granted credit ceiling (absolute, not monthly).
+              example: 500000
+              type:
+              - integer
+              - 'null'
+              minimum: -9007199254740991
+              maximum: 9007199254740991
+            currency:
+              description: ISO 4217 currency code the credit limit is denominated in.
+              example: USD
+              type: string
+          required:
+          - creditLimit
+          - currency
+          additionalProperties: false
+      required:
+      - id
+      - company
+      - name
+      - customerDomain
+      additionalProperties: false
+    BuyerOperatorUpdate:
+      description: Confirmed buyer-account operator identity. Authentication organization membership is unchanged.
+      type: object
+      properties:
+        id:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        operatorDomain:
+          type: string
+        verified:
+          type: boolean
+        source:
+          type: string
+          enum:
+          - user_confirmed
+        confirmedAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - id
+      - operatorDomain
+      - verified
+      - source
+      - confirmedAt
+      additionalProperties: false
+    ListCustomerAccountsResponse:
+      description: List of customer accounts for the authenticated user
+      type: object
+      properties:
+        accounts:
+          description: Customer accounts the user has access to
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgAccountSummary'
+      required:
+      - accounts
+      additionalProperties: false
+    UpdateBuyerOperatorBody:
+      description: Confirm or change the authenticated buyer account's commercial operator domain.
+      type: object
+      properties:
+        operatorDomain:
+          description: Corporate domain of the organization operating this buyer account.
+          example: northstar.media
+          type: string
+          maxLength: 255
+          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$
+      required:
+      - operatorDomain
+    BuyerReadinessCheck:
+      type: object
+      properties:
+        id:
+          type: string
+          enum:
+          - operator_identity
+          - terms
+          - account_standing
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+          - complete
+          - missing
+          - blocked
+        isBlocker:
+          type: boolean
+        action:
+          allOf:
+          - $ref: '#/components/schemas/BuyerReadinessAction'
+      required:
+      - id
+      - name
+      - description
+      - status
+      - isBlocker
+      - action
+      additionalProperties: false
     BuyerDestinationReadiness:
       description: Buyer-specific readiness for one seller or buying platform. Seller availability, connection wiring, and commercial routing remain separate inputs.
       type: object
@@ -1434,81 +1571,382 @@ components:
       - reason
       - action
       additionalProperties: false
-    MarketReadinessSupplyItem:
-      description: Public-safe supply evidence for one scope. Unknown is distinct from a successful empty read.
+    BuyerReadiness:
+      description: Canonical buyer setup projection. mediaRateCard is the configured legacy media-pricing contract and is distinct from the feature-gated IU plan; interchangeClearingReady says whether the current Interchange clearing engine can execute the configured pricing with the other commercial prerequisites. Platform readiness requires a configured operator domain, but domain verification is informational and non-blocking. Destination rows add only seller availability, connection or mapping, and route-specific commercial requirements.
       type: object
       properties:
-        scope:
-          type: string
+        version:
+          type: number
           enum:
-          - domestic
-          - global
+          - 1
+        customer:
+          type: object
+          properties:
+            id:
+              type: integer
+              maximum: 9007199254740991
+              minimum: 1
+            company:
+              type: string
+          required:
+          - id
+          - company
+          additionalProperties: false
         status:
           type: string
           enum:
-          - available
-          - none
-          - unknown
-        storefrontCount:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-          maximum: 9007199254740991
-        namedStorefronts:
-          description: Up to 10 public-safe listed storefronts. storefrontCount is the full usable count.
-          maxItems: 10
+          - setup
+          - ready
+          - blocked
+        platformReady:
+          type: boolean
+        canBuyAnywhere:
+          type: boolean
+        identity:
+          type: object
+          properties:
+            operatorDomain:
+              type:
+              - string
+              - 'null'
+            operatorDomainSource:
+              type: string
+              enum:
+              - user_confirmed
+              - legacy_customer_domain
+              - none
+            status:
+              type: string
+              enum:
+              - missing
+              - unverified
+              - verified
+            organization:
+              type: object
+              properties:
+                domain:
+                  type:
+                  - string
+                  - 'null'
+                relationship:
+                  type: string
+                  enum:
+                  - same_organization
+                  - portfolio_brand
+                  - external_operator
+                  - unresolved
+                verificationSource:
+                  type: string
+                  enum:
+                  - member_or_admin
+                  - organization_domain
+                  - aao_house
+                  - none
+              required:
+              - domain
+              - relationship
+              - verificationSource
+              additionalProperties: false
+            aao:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - matched
+                  - not_found
+                  - unavailable
+                  - not_checked
+                canonicalDomain:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+                source:
+                  type:
+                  - string
+                  - 'null'
+              required:
+              - status
+              - canonicalDomain
+              - name
+              - source
+              additionalProperties: false
+          required:
+          - operatorDomain
+          - operatorDomainSource
+          - status
+          - organization
+          - aao
+          additionalProperties: false
+        commercial:
+          type: object
+          properties:
+            tosAccepted:
+              type: boolean
+            suspended:
+              type: boolean
+            interchangeClearingReady:
+              type: boolean
+            mediaRateCard:
+              description: Resolved media-pricing contract at the billing organization. ACTIVE means pricing is configured, including a UNIT contract. clearingSupported and clearingUnsupportedReason state whether the current Interchange clearing engine can execute it; interchangeClearingReady also includes terms, payment authority, and account standing.
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - ACTIVE
+                  - MISSING
+                billingCustomerId:
+                  type: integer
+                  maximum: 9007199254740991
+                  minimum: 1
+                inheritedFromOrganization:
+                  type: boolean
+                pricingSource:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - standard
+                  - custom
+                billingType:
+                  type: string
+                  enum:
+                  - DECISIONED
+                pricingType:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - MARGIN
+                  - UNIT
+                feeRatePercent:
+                  type:
+                  - number
+                  - 'null'
+                clearingSupported:
+                  type: boolean
+                clearingUnsupportedReason:
+                  type:
+                  - string
+                  - 'null'
+                  enum:
+                  - RATE_CARD_MISSING
+                  - PRICING_TYPE_UNSUPPORTED
+                  - PRICING_CONFIGURATION_INVALID
+              required:
+              - status
+              - billingCustomerId
+              - inheritedFromOrganization
+              - pricingSource
+              - billingType
+              - pricingType
+              - feeRatePercent
+              - clearingSupported
+              - clearingUnsupportedReason
+              additionalProperties: false
+            missing:
+              type: array
+              items:
+                type: string
+                enum:
+                - TOS
+                - STANDARD_RATE_CARD
+                - PAYMENT_AUTHORITY
+          required:
+          - tosAccepted
+          - suspended
+          - interchangeClearingReady
+          - mediaRateCard
+          - missing
+          additionalProperties: false
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerReadinessCheck'
+        destinations:
+          type: object
+          properties:
+            total:
+              description: Total destinations across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            ready:
+              description: Ready destinations across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            needsConnection:
+              description: Destinations needing connection work across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            blocked:
+              description: Blocked destinations across every page.
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            limit:
+              type: integer
+              maximum: 9007199254740991
+              minimum: 1
+            offset:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            hasMore:
+              type: boolean
+            nextOffset:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+              maximum: 9007199254740991
+            truncated:
+              description: True when this response contains fewer destination rows than the global total. Follow nextOffset while hasMore is true.
+              type: boolean
+            items:
+              description: Destination readiness rows for the requested page.
+              type: array
+              items:
+                $ref: '#/components/schemas/BuyerDestinationReadiness'
+          required:
+          - total
+          - ready
+          - needsConnection
+          - blocked
+          - limit
+          - offset
+          - hasMore
+          - nextOffset
+          - truncated
+          - items
+          additionalProperties: false
+      required:
+      - version
+      - customer
+      - status
+      - platformReady
+      - canBuyAnywhere
+      - identity
+      - commercial
+      - checks
+      - destinations
+      additionalProperties: false
+    CreateChildAccountResponse:
+      description: Full user context scoped to the new child customer
+      type: object
+      properties:
+        user:
+          description: User profile data
+          type: object
+          properties: {}
+          additionalProperties: {}
+        customer:
+          description: Customer context for the newly created child
+          type: object
+          properties: {}
+          additionalProperties: {}
+        customers:
+          description: All accessible customer accounts
           type: array
           items:
             type: object
-            properties:
-              name:
-                type: string
-              domain:
-                type:
-                - string
-                - 'null'
-            required:
-            - name
-            - domain
-            additionalProperties: false
-        sourceHealth:
+            properties: {}
+            additionalProperties: {}
+        showTosBox:
+          description: Whether to show the ToS acceptance dialog
+          type: boolean
+        canAcceptTos:
+          description: Whether the current user may accept Terms of Service for the organization governing this child.
+          type: boolean
+        tosUpdate:
+          description: Successor Terms of Service context inherited from the organization.
+          type: object
+          properties:
+            action:
+              type: string
+              enum:
+              - notice
+              - acceptance_due
+              - acceptance_required
+            changeLevel:
+              type: string
+              enum:
+              - PATCH
+              - MINOR
+              - MAJOR
+            acceptedVersion:
+              type:
+              - string
+              - 'null'
+            targetVersion:
+              type: string
+            deadline:
+              type:
+              - string
+              - 'null'
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            termsUrl:
+              type: string
+            changesUrl:
+              type:
+              - string
+              - 'null'
+          required:
+          - action
+          - changeLevel
+          - acceptedVersion
+          - targetVersion
+          - deadline
+          - termsUrl
+          - changesUrl
+          additionalProperties: false
+        organizationContractMissing:
+          description: True when the newly created account cannot operate because the organization it inherits from has no active contract. UI should render a block page until an organization admin accepts ToS.
+          type: boolean
+        hasContract:
+          description: Whether the customer has an active contract
+          type: boolean
+        latestTosVersion:
+          description: Latest embedded sales agent version identifier
           type: string
-          enum:
-          - healthy
-          - degraded
-          - unknown
+        convertedFromStandalone:
+          description: True if the request triggered a standalone-to-parent conversion
+          type: boolean
       required:
-      - scope
-      - status
-      - storefrontCount
-      - namedStorefronts
-      - sourceHealth
+      - user
+      - customer
+      - customers
+      - showTosBox
+      - canAcceptTos
+      - hasContract
+      - latestTosVersion
+      - convertedFromStandalone
       additionalProperties: false
-    UpdateBuyerOperatorBody:
-      description: Confirm or change the authenticated buyer account's commercial operator domain.
+    CreateBrowserOriginBody:
       type: object
       properties:
-        operatorDomain:
-          description: Corporate domain of the organization operating this buyer account.
-          example: northstar.media
+        origin:
+          description: Exact HTTPS browser origin to allow for browser MCP/OAuth calls. Do not include a path, query, fragment, wildcard, or userinfo.
+          example: https://mcp.example.com
           type: string
+          minLength: 1
           maxLength: 255
-          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$
-      required:
-      - operatorDomain
-    UpdateCustomerDomainBody:
-      description: Request body for updating a customer's organization domain
-      type: object
-      properties:
-        customerDomain:
-          description: Registered organization domain to set on the customer.
-          example: nike.com
+          pattern: ^https:\/\/[^/?#@]+$
+        label:
+          description: Optional human-readable label
           type: string
-          maxLength: 255
-          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$
+          minLength: 1
+          maxLength: 120
       required:
-      - customerDomain
+      - origin
     ErrorResponse:
       description: Standard error response
       type: object
@@ -1525,16 +1963,51 @@ components:
       - data
       - error
       additionalProperties: false
-    BrowserOriginsResponse:
+    BrowserOrigin:
       type: object
       properties:
-        origins:
-          description: Active browser origins for the selected account
-          type: array
-          items:
-            $ref: '#/components/schemas/BrowserOrigin'
+        id:
+          description: Browser origin registration ID
+          type: string
+        customerId:
+          description: Customer account that owns this origin
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        origin:
+          description: Exact browser origin, e.g. https://mcp.example.com
+          type: string
+          format: uri
+        label:
+          description: Optional human-readable label for this origin
+          type:
+          - string
+          - 'null'
+        createdByUserId:
+          description: User who registered the origin, when known
+          type:
+          - integer
+          - 'null'
+          maximum: 9007199254740991
+          minimum: 1
+        createdAt:
+          description: When this origin was registered
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When this origin was last updated
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - origins
+      - id
+      - customerId
+      - origin
+      - label
+      - createdByUserId
+      - createdAt
+      - updatedAt
       additionalProperties: false
     MembershipSettingsResponse:
       description: Customer membership access settings
@@ -1554,29 +2027,42 @@ components:
       - customerId
       - allowDomainAutoJoin
       additionalProperties: false
-    UpdateCustomerDomainResponse:
-      description: Updated customer domain
+    BuyerReadinessAction:
+      description: Server-owned continuation for one buyer setup step. Operations are executed through buyer api_call; pages are opened through their typed owner.
       type: object
       properties:
-        id:
-          description: Customer ID
-          example: 200
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        customerDomain:
-          description: Registered organization domain on the customer
-          example: nike.com
+        label:
+          type: string
+        operation:
           type:
           - string
           - 'null'
-        customerDomainApproved:
-          description: Whether the current domain is verified by an active member email or Scope3 administrator attestation.
-          type: boolean
+        pathParams:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: string
+        page:
+          type:
+          - string
+          - 'null'
       required:
-      - id
-      - customerDomain
-      - customerDomainApproved
+      - label
+      - operation
+      - pathParams
+      - page
+      additionalProperties: false
+    BrowserOriginsResponse:
+      type: object
+      properties:
+        origins:
+          description: Active browser origins for the selected account
+          type: array
+          items:
+            $ref: '#/components/schemas/BrowserOrigin'
+      required:
+      - origins
       additionalProperties: false
     MarketReadinessResponse:
       description: Human-decided pilot state with separate domestic and global-overlay supply evidence.
@@ -1876,115 +2362,28 @@ components:
       required:
       - cells
       additionalProperties: false
-    CreateChildAccountResponse:
-      description: Full user context scoped to the new child customer
+    UpdateCustomerDomainBody:
+      description: Request body for updating a customer's organization domain
       type: object
       properties:
-        user:
-          description: User profile data
-          type: object
-          properties: {}
-          additionalProperties: {}
-        customer:
-          description: Customer context for the newly created child
-          type: object
-          properties: {}
-          additionalProperties: {}
-        customers:
-          description: All accessible customer accounts
-          type: array
-          items:
-            type: object
-            properties: {}
-            additionalProperties: {}
-        showTosBox:
-          description: Whether to show the ToS acceptance dialog
-          type: boolean
-        canAcceptTos:
-          description: Whether the current user may accept Terms of Service for the organization governing this child.
-          type: boolean
-        tosUpdate:
-          description: Successor Terms of Service context inherited from the organization.
-          type: object
-          properties:
-            action:
-              type: string
-              enum:
-              - notice
-              - acceptance_due
-              - acceptance_required
-            changeLevel:
-              type: string
-              enum:
-              - PATCH
-              - MINOR
-              - MAJOR
-            acceptedVersion:
-              type:
-              - string
-              - 'null'
-            targetVersion:
-              type: string
-            deadline:
-              type:
-              - string
-              - 'null'
-              format: date-time
-              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-            termsUrl:
-              type: string
-            changesUrl:
-              type:
-              - string
-              - 'null'
-          required:
-          - action
-          - changeLevel
-          - acceptedVersion
-          - targetVersion
-          - deadline
-          - termsUrl
-          - changesUrl
-          additionalProperties: false
-        organizationContractMissing:
-          description: True when the newly created account cannot operate because the organization it inherits from has no active contract. UI should render a block page until an organization admin accepts ToS.
-          type: boolean
-        hasContract:
-          description: Whether the customer has an active contract
-          type: boolean
-        latestTosVersion:
-          description: Latest embedded sales agent version identifier
+        customerDomain:
+          description: Registered organization domain to set on the customer.
+          example: nike.com
           type: string
-        convertedFromStandalone:
-          description: True if the request triggered a standalone-to-parent conversion
-          type: boolean
-      required:
-      - user
-      - customer
-      - customers
-      - showTosBox
-      - canAcceptTos
-      - hasContract
-      - latestTosVersion
-      - convertedFromStandalone
-      additionalProperties: false
-    CreateBrowserOriginBody:
-      type: object
-      properties:
-        origin:
-          description: Exact HTTPS browser origin to allow for browser MCP/OAuth calls. Do not include a path, query, fragment, wildcard, or userinfo.
-          example: https://mcp.example.com
-          type: string
-          minLength: 1
           maxLength: 255
-          pattern: ^https:\/\/[^/?#@]+$
-        label:
-          description: Optional human-readable label
-          type: string
-          minLength: 1
-          maxLength: 120
+          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$
       required:
-      - origin
+      - customerDomain
+    UpdateMembershipSettingsBody:
+      description: Request body for updating customer membership settings
+      type: object
+      properties:
+        allowDomainAutoJoin:
+          description: When true, users with a verified matching domain email join immediately as members without admin approval. Set false to override the top-level organization default.
+          example: true
+          type: boolean
+      required:
+      - allowDomainAutoJoin
     CreateChildAccountBody:
       description: Request body for creating a child customer account
       type: object
@@ -2055,468 +2454,81 @@ components:
       required:
       - name
       - customerRole
-    BuyerReadinessCheck:
+    MarketReadinessSupplyItem:
+      description: Public-safe supply evidence for one scope. Unknown is distinct from a successful empty read.
       type: object
       properties:
-        id:
+        scope:
           type: string
           enum:
-          - operator_identity
-          - terms
-          - account_standing
-        name:
-          type: string
-        description:
-          type: string
+          - domestic
+          - global
         status:
           type: string
           enum:
-          - complete
-          - missing
-          - blocked
-        isBlocker:
-          type: boolean
-        action:
-          allOf:
-          - $ref: '#/components/schemas/BuyerReadinessAction'
-      required:
-      - id
-      - name
-      - description
-      - status
-      - isBlocker
-      - action
-      additionalProperties: false
-    BuyerReadinessAction:
-      description: Server-owned continuation for one buyer setup step. Operations are executed through buyer api_call; pages are opened through their typed owner.
-      type: object
-      properties:
-        label:
-          type: string
-        operation:
-          type:
-          - string
-          - 'null'
-        pathParams:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type: string
-        page:
-          type:
-          - string
-          - 'null'
-      required:
-      - label
-      - operation
-      - pathParams
-      - page
-      additionalProperties: false
-    BrowserOrigin:
-      type: object
-      properties:
-        id:
-          description: Browser origin registration ID
-          type: string
-        customerId:
-          description: Customer account that owns this origin
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        origin:
-          description: Exact browser origin, e.g. https://mcp.example.com
-          type: string
-          format: uri
-        label:
-          description: Optional human-readable label for this origin
-          type:
-          - string
-          - 'null'
-        createdByUserId:
-          description: User who registered the origin, when known
+          - available
+          - none
+          - unknown
+        storefrontCount:
           type:
           - integer
           - 'null'
+          minimum: 0
           maximum: 9007199254740991
-          minimum: 1
-        createdAt:
-          description: When this origin was registered
+        namedStorefronts:
+          description: Up to 10 public-safe listed storefronts. storefrontCount is the full usable count.
+          maxItems: 10
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              domain:
+                type:
+                - string
+                - 'null'
+            required:
+            - name
+            - domain
+            additionalProperties: false
+        sourceHealth:
           type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: When this origin was last updated
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          enum:
+          - healthy
+          - degraded
+          - unknown
       required:
-      - id
-      - customerId
-      - origin
-      - label
-      - createdByUserId
-      - createdAt
-      - updatedAt
+      - scope
+      - status
+      - storefrontCount
+      - namedStorefronts
+      - sourceHealth
       additionalProperties: false
-    CurrentAccountResponse:
-      description: Current customer account context
+    UpdateCustomerDomainResponse:
+      description: Updated customer domain
       type: object
       properties:
         id:
           description: Customer ID
-          example: 100
+          example: 200
           type: integer
           minimum: -9007199254740991
           maximum: 9007199254740991
-        company:
-          description: Company name
-          example: Acme Inc
-          type: string
-        name:
-          description: Display name
-          example: Acme
-          type: string
-        role:
-          description: User role on this customer
-          example: ADMIN
-          type: string
         customerDomain:
           description: Registered organization domain on the customer
-          example: acme.com
+          example: nike.com
           type:
           - string
           - 'null'
-        standing:
-          description: 'Customer standing (credit limit). ADMIN-only: present only when the caller is ADMIN or above; omitted otherwise.'
-          type: object
-          properties:
-            creditLimit:
-              description: Credit limit beyond the funded balance, in minor currency units (USD cents). `null` or `0` means the organization has no credit line — it must apply for credit or contact Scope3; `>0` is the granted credit ceiling (absolute, not monthly).
-              example: 500000
-              type:
-              - integer
-              - 'null'
-              minimum: -9007199254740991
-              maximum: 9007199254740991
-            currency:
-              description: ISO 4217 currency code the credit limit is denominated in.
-              example: USD
-              type: string
-          required:
-          - creditLimit
-          - currency
-          additionalProperties: false
+        customerDomainApproved:
+          description: Whether the current domain is verified by an active member email or Scope3 administrator attestation.
+          type: boolean
       required:
       - id
-      - company
-      - name
       - customerDomain
+      - customerDomainApproved
       additionalProperties: false
-    BuyerReadiness:
-      description: Canonical buyer setup projection. mediaRateCard is the configured legacy media-pricing contract and is distinct from the feature-gated IU plan; interchangeClearingReady says whether the current Interchange clearing engine can execute the configured pricing with the other commercial prerequisites. Platform readiness requires a configured operator domain, but domain verification is informational and non-blocking. Destination rows add only seller availability, connection or mapping, and route-specific commercial requirements.
-      type: object
-      properties:
-        version:
-          type: number
-          enum:
-          - 1
-        customer:
-          type: object
-          properties:
-            id:
-              type: integer
-              maximum: 9007199254740991
-              minimum: 1
-            company:
-              type: string
-          required:
-          - id
-          - company
-          additionalProperties: false
-        status:
-          type: string
-          enum:
-          - setup
-          - ready
-          - blocked
-        platformReady:
-          type: boolean
-        canBuyAnywhere:
-          type: boolean
-        identity:
-          type: object
-          properties:
-            operatorDomain:
-              type:
-              - string
-              - 'null'
-            operatorDomainSource:
-              type: string
-              enum:
-              - user_confirmed
-              - legacy_customer_domain
-              - none
-            status:
-              type: string
-              enum:
-              - missing
-              - unverified
-              - verified
-            organization:
-              type: object
-              properties:
-                domain:
-                  type:
-                  - string
-                  - 'null'
-                relationship:
-                  type: string
-                  enum:
-                  - same_organization
-                  - portfolio_brand
-                  - external_operator
-                  - unresolved
-                verificationSource:
-                  type: string
-                  enum:
-                  - member_or_admin
-                  - organization_domain
-                  - aao_house
-                  - none
-              required:
-              - domain
-              - relationship
-              - verificationSource
-              additionalProperties: false
-            aao:
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum:
-                  - matched
-                  - not_found
-                  - unavailable
-                  - not_checked
-                canonicalDomain:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-                source:
-                  type:
-                  - string
-                  - 'null'
-              required:
-              - status
-              - canonicalDomain
-              - name
-              - source
-              additionalProperties: false
-          required:
-          - operatorDomain
-          - operatorDomainSource
-          - status
-          - organization
-          - aao
-          additionalProperties: false
-        commercial:
-          type: object
-          properties:
-            tosAccepted:
-              type: boolean
-            suspended:
-              type: boolean
-            interchangeClearingReady:
-              type: boolean
-            mediaRateCard:
-              description: Resolved media-pricing contract at the billing organization. ACTIVE means pricing is configured, including a UNIT contract. clearingSupported and clearingUnsupportedReason state whether the current Interchange clearing engine can execute it; interchangeClearingReady also includes terms, payment authority, and account standing.
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum:
-                  - ACTIVE
-                  - MISSING
-                billingCustomerId:
-                  type: integer
-                  maximum: 9007199254740991
-                  minimum: 1
-                inheritedFromOrganization:
-                  type: boolean
-                pricingSource:
-                  type:
-                  - string
-                  - 'null'
-                  enum:
-                  - standard
-                  - custom
-                billingType:
-                  type: string
-                  enum:
-                  - DECISIONED
-                pricingType:
-                  type:
-                  - string
-                  - 'null'
-                  enum:
-                  - MARGIN
-                  - UNIT
-                feeRatePercent:
-                  type:
-                  - number
-                  - 'null'
-                clearingSupported:
-                  type: boolean
-                clearingUnsupportedReason:
-                  type:
-                  - string
-                  - 'null'
-                  enum:
-                  - RATE_CARD_MISSING
-                  - PRICING_TYPE_UNSUPPORTED
-                  - PRICING_CONFIGURATION_INVALID
-              required:
-              - status
-              - billingCustomerId
-              - inheritedFromOrganization
-              - pricingSource
-              - billingType
-              - pricingType
-              - feeRatePercent
-              - clearingSupported
-              - clearingUnsupportedReason
-              additionalProperties: false
-            missing:
-              type: array
-              items:
-                type: string
-                enum:
-                - TOS
-                - STANDARD_RATE_CARD
-                - PAYMENT_AUTHORITY
-          required:
-          - tosAccepted
-          - suspended
-          - interchangeClearingReady
-          - mediaRateCard
-          - missing
-          additionalProperties: false
-        checks:
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerReadinessCheck'
-        destinations:
-          type: object
-          properties:
-            total:
-              description: Total destinations across every page.
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            ready:
-              description: Ready destinations across every page.
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            needsConnection:
-              description: Destinations needing connection work across every page.
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            blocked:
-              description: Blocked destinations across every page.
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            limit:
-              type: integer
-              maximum: 9007199254740991
-              minimum: 1
-            offset:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            hasMore:
-              type: boolean
-            nextOffset:
-              type:
-              - integer
-              - 'null'
-              minimum: 0
-              maximum: 9007199254740991
-            truncated:
-              description: True when this response contains fewer destination rows than the global total. Follow nextOffset while hasMore is true.
-              type: boolean
-            items:
-              description: Destination readiness rows for the requested page.
-              type: array
-              items:
-                $ref: '#/components/schemas/BuyerDestinationReadiness'
-          required:
-          - total
-          - ready
-          - needsConnection
-          - blocked
-          - limit
-          - offset
-          - hasMore
-          - nextOffset
-          - truncated
-          - items
-          additionalProperties: false
-      required:
-      - version
-      - customer
-      - status
-      - platformReady
-      - canBuyAnywhere
-      - identity
-      - commercial
-      - checks
-      - destinations
-      additionalProperties: false
-    BuyerOperatorUpdate:
-      description: Confirmed buyer-account operator identity. Authentication organization membership is unchanged.
-      type: object
-      properties:
-        id:
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        operatorDomain:
-          type: string
-        verified:
-          type: boolean
-        source:
-          type: string
-          enum:
-          - user_confirmed
-        confirmedAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - id
-      - operatorDomain
-      - verified
-      - source
-      - confirmedAt
-      additionalProperties: false
-    UpdateMembershipSettingsBody:
-      description: Request body for updating customer membership settings
-      type: object
-      properties:
-        allowDomainAutoJoin:
-          description: When true, users with a verified matching domain email join immediately as members without admin approval. Set false to override the top-level organization default.
-          example: true
-          type: boolean
-      required:
-      - allowDomainAutoJoin
     ApiError:
       description: Structured error object
       type: object
@@ -2538,17 +2550,17 @@ components:
       - code
       - message
       additionalProperties: false
-    ListCustomerAccountsResponse:
-      description: List of customer accounts for the authenticated user
+    StorefrontLivenessBatchResponse:
+      description: Cheap, batched liveness verdicts for every storefront in the caller’s account list — powers the storefront switcher dot without one full readiness computation per storefront.
       type: object
       properties:
-        accounts:
-          description: Customer accounts the user has access to
-          type: array
-          items:
-            $ref: '#/components/schemas/OrgAccountSummary'
+        liveness:
+          description: Storefront liveness keyed by seller customer id (as a string). Entries are omitted for customer ids the caller cannot access or that have no storefront.
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/StorefrontLiveness'
       required:
-      - accounts
+      - liveness
       additionalProperties: false
     StorefrontLiveness:
       description: The projected storefront liveness verdict (AI-4698) — one derived status computed centrally and consumed by readiness, the seller-setup widget, and the storefront switcher.
@@ -2595,18 +2607,6 @@ components:
       - reason
       - remainingSteps
       - actionPath
-      additionalProperties: false
-    StorefrontLivenessBatchResponse:
-      description: Cheap, batched liveness verdicts for every storefront in the caller’s account list — powers the storefront switcher dot without one full readiness computation per storefront.
-      type: object
-      properties:
-        liveness:
-          description: Storefront liveness keyed by seller customer id (as a string). Entries are omitted for customer ids the caller cannot access or that have no storefront.
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/StorefrontLiveness'
-      required:
-      - liveness
       additionalProperties: false
   securitySchemes:
     bearerAuth:
