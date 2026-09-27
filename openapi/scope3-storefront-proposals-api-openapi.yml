@@ -291,354 +291,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    ProductFormatOption:
-      description: AdCP 3.1 format declaration for a product
-      type: object
-      properties:
-        format_kind:
-          description: AdCP format kind discriminator (e.g. video_hosted, image)
-          example: video_hosted
-          type: string
-        format_option_id:
-          description: Stable identifier buyers use to select this format via format_option_refs in create_media_buy
-          type: string
-        display_name:
-          description: Human-readable name for this format option
-          type: string
-        params:
-          description: Canonical params for this format option
-          allOf:
-          - $ref: '#/components/schemas/ProductFormatOptionParams'
-      additionalProperties: {}
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
-      additionalProperties: false
-    UpdateStorefrontProposalBody:
-      description: Request body for editing a storefront proposal
-      type: object
-      properties:
-        label:
-          description: Updated label
-          type: string
-          minLength: 1
-          maxLength: 255
-        notes:
-          description: Updated notes
-          type: string
-          maxLength: 4000
-        expiresAt:
-          description: Updated expiry (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-    ProductFormatOptionParams:
-      description: Canonical format params. For hosted video, carries accepted containers/codecs.
-      type: object
-      properties:
-        containers:
-          description: Accepted delivery containers for hosted video. A buyer should only send a creative whose container is listed here.
-          example:
-          - mp4
-          type: array
-          items:
-            type: string
-            enum:
-            - mp4
-            - webm
-            - mov
-        video_codecs:
-          description: Accepted video codecs for hosted video.
-          example:
-          - h264
-          type: array
-          items:
-            type: string
-            enum:
-            - h264
-            - h265
-            - vp8
-            - vp9
-            - av1
-            - prores
-        audio_codecs:
-          description: Accepted audio codecs for hosted video.
-          example:
-          - aac
-          type: array
-          items:
-            type: string
-            enum:
-            - aac
-            - mp3
-            - opus
-            - pcm
-      additionalProperties: {}
-    CreateStorefrontProposalBody:
-      description: Request body for creating a storefront proposal
-      type: object
-      properties:
-        operatorId:
-          description: 'Buyer identity for the proposal. Prefer { "domain": "brand.example" }. Legacy string values are accepted as domain strings, except customer:<id> which is decoded as { customerId }.'
-          example:
-            domain: acme.com
-          anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 255
-          - $ref: '#/components/schemas/StorefrontProposalOperatorReference'
-        label:
-          description: Seller's internal label for the proposal
-          example: Acme Q3 RFP — CTV
-          type: string
-          minLength: 1
-          maxLength: 255
-        notes:
-          description: Free-form notes about the offline RFP
-          type: string
-          maxLength: 4000
-        expiresAt:
-          description: When the proposal code expires (ISO 8601). Server enforces this is no later than the underlying proposal.expiresAt.
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        discoveryId:
-          description: Discovery session id from a recent discover-products call. The server reads the cached snapshot for this session and persists it as the frozen offer. The session must have been scoped to this seller and restricted to its storefront sales agents.
-          example: disc_a1b2c3
-          type: string
-          minLength: 1
-          maxLength: 255
-        proposalId:
-          description: Which proposal from the discovery snapshot to save with the proposal code.
-          example: proposal_abc123
-          type: string
-          minLength: 1
-          maxLength: 255
-      required:
-      - operatorId
-      - label
-      - expiresAt
-      - discoveryId
-      - proposalId
-    Proposal:
-      description: A recommended media plan with budget allocations across products (ADCP v3)
-      type: object
-      properties:
-        proposalId:
-          description: Unique identifier — used to refine or execute the proposal
-          type: string
-        name:
-          description: Human-readable name for this media plan proposal
-          type: string
-        description:
-          description: Strategic explanation of what the proposal achieves
-          type: string
-        briefAlignment:
-          description: Explanation of how this proposal aligns with the brief
-          type: string
-        salesAgentId:
-          description: Sales agent that generated this proposal
-          type: string
-        salesAgentName:
-          description: Human-readable sales agent name
-          type: string
-        storefrontId:
-          description: Storefront the proposal was surfaced through. The storefront is the buyer-facing seller identity; the underlying sales agent is internal routing detail.
-          type: string
-        storefrontName:
-          description: Human-readable storefront name. Use this as the seller label on proposal cards.
-          type: string
-        supportedRoutingTypes:
-          deprecated: true
-          description: Deprecated v2 compatibility field. It is not a storefront type or proposal capability and must not affect eligibility or execution.
-          type: array
-          items:
-            type: string
-            enum:
-            - DECISIONED
-            - ROUTED
-        allocations:
-          description: Budget distribution across products — percentages sum to 100
-          minItems: 1
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductAllocation'
-        expiresAt:
-          description: When the proposal expires (ISO 8601)
-          type: string
-        totalBudgetGuidance:
-          description: Budget guidance for this proposal
-          type: object
-          properties:
-            min:
-              type: number
-            recommended:
-              type: number
-            max:
-              type: number
-            currency:
-              type: string
-          additionalProperties: false
-      required:
-      - proposalId
-      - name
-      - allocations
-      additionalProperties: false
-    StorefrontProposalOperatorReference:
-      description: Resolvable buyer identity for a storefront proposal. Prefer { domain } for brand-backed buyers; use { customerId } only as an unbranded fallback.
-      anyOf:
-      - type: object
-        properties:
-          domain:
-            description: Buyer brand domain. The buyer must resolve to this brand domain when redeeming the proposal code.
-            example: acme.com
-            type: string
-            minLength: 1
-            maxLength: 255
-        required:
-        - domain
-      - type: object
-        properties:
-          customerId:
-            description: Buyer customer id fallback used only when the buyer does not have an advertiser brand domain.
-            example: 123
-            type: integer
-            maximum: 9007199254740991
-            minimum: 1
-        required:
-        - customerId
-    StorefrontProposalSummary:
-      description: Compact proposal summary for list views
-      type: object
-      properties:
-        id:
-          description: Proposal row id
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        proposalCode:
-          description: Short shareable handle. Sellers give this to buyers; buyers pass it to discover_products.
-          example: PRP-XK4A29
-          type: string
-        operatorId:
-          description: Encoded buyer identity retained for backwards compatibility. Use operatorRef for the structured form.
-          type: string
-        operatorRef:
-          description: Structured buyer identity for redemption auth.
-          allOf:
-          - $ref: '#/components/schemas/StorefrontProposalOperatorReferenceOutput'
-        label:
-          type: string
-        notes:
-          type:
-          - string
-          - 'null'
-        status:
-          description: 'Proposal lifecycle status. ''active'': available to redeem. ''redeemed'': buyer has applied it to a media buy. ''expired'': past TTL. ''revoked'': seller withdrew.'
-          type: string
-          enum:
-          - active
-          - redeemed
-          - expired
-          - revoked
-        expiresAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        proposalId:
-          description: The protocol-level proposalId from the saved discovery snapshot
-          type: string
-        discoverySessionId:
-          description: Discovery session id this proposal was captured from (for traceability)
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        createdBy:
-          type: string
-        firstViewedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        lastViewedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        redeemedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        redeemedInMediaBuyId:
-          type:
-          - string
-          - 'null'
-      required:
-      - id
-      - proposalCode
-      - operatorId
-      - operatorRef
-      - label
-      - notes
-      - status
-      - expiresAt
-      - proposalId
-      - discoverySessionId
-      - createdAt
-      - createdBy
-      - firstViewedAt
-      - lastViewedAt
-      - redeemedAt
-      - redeemedInMediaBuyId
-      additionalProperties: false
-    StorefrontProposalOperatorReferenceOutput:
-      description: Resolvable buyer identity for a storefront proposal. Prefer { domain } for brand-backed buyers; use { customerId } only as an unbranded fallback.
-      anyOf:
-      - type: object
-        properties:
-          domain:
-            description: Buyer brand domain. The buyer must resolve to this brand domain when redeeming the proposal code.
-            example: acme.com
-            type: string
-            minLength: 1
-            maxLength: 255
-        required:
-        - domain
-        additionalProperties: false
-      - type: object
-        properties:
-          customerId:
-            description: Buyer customer id fallback used only when the buyer does not have an advertiser brand domain.
-            example: 123
-            type: integer
-            maximum: 9007199254740991
-            minimum: 1
-        required:
-        - customerId
-        additionalProperties: false
     PricingOptionData:
       description: Pricing option from a sales agent
       type: object
@@ -682,167 +334,6 @@ components:
               - number
               - 'null'
           additionalProperties: false
-      additionalProperties: false
-    ProductAllocation:
-      description: Budget allocation for a product within a proposal
-      type: object
-      properties:
-        productId:
-          description: Product ID — references a product in the sibling products array
-          type: string
-        allocationPercentage:
-          description: Percentage of total budget allocated to this product
-          type: number
-          minimum: 0
-          maximum: 100
-        pricingOptionId:
-          description: Recommended pricing option ID from the product pricing_options
-          type: string
-        rationale:
-          description: Why this product and allocation are recommended
-          type: string
-        sequence:
-          description: Ordering hint for multi-line-item plans (1-based)
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        tags:
-          description: Categorical tags (e.g., "desktop", "mobile")
-          type: array
-          items:
-            type: string
-      required:
-      - productId
-      - allocationPercentage
-      additionalProperties: false
-    StorefrontProposal:
-      description: A persisted storefront proposal
-      type: object
-      properties:
-        id:
-          description: Proposal row id
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        proposalCode:
-          description: Short shareable handle. Sellers give this to buyers; buyers pass it to discover_products.
-          example: PRP-XK4A29
-          type: string
-        operatorId:
-          description: Encoded buyer identity retained for backwards compatibility. Use operatorRef for the structured form.
-          type: string
-        operatorRef:
-          description: Structured buyer identity for redemption auth.
-          allOf:
-          - $ref: '#/components/schemas/StorefrontProposalOperatorReferenceOutput'
-        label:
-          type: string
-        notes:
-          type:
-          - string
-          - 'null'
-        status:
-          description: 'Proposal lifecycle status. ''active'': available to redeem. ''redeemed'': buyer has applied it to a media buy. ''expired'': past TTL. ''revoked'': seller withdrew.'
-          type: string
-          enum:
-          - active
-          - redeemed
-          - expired
-          - revoked
-        expiresAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        proposalId:
-          description: The protocol-level proposalId from the saved discovery snapshot
-          type: string
-        discoverySessionId:
-          description: Discovery session id this proposal was captured from (for traceability)
-          type: string
-        snapshot:
-          description: The frozen products + proposals returned to the buyer on redemption
-          allOf:
-          - $ref: '#/components/schemas/ProposalSnapshot'
-        createdAt:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        createdBy:
-          type: string
-        firstViewedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        lastViewedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        redeemedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        redeemedInMediaBuyId:
-          type:
-          - string
-          - 'null'
-      required:
-      - id
-      - proposalCode
-      - operatorId
-      - operatorRef
-      - label
-      - notes
-      - status
-      - expiresAt
-      - proposalId
-      - discoverySessionId
-      - snapshot
-      - createdAt
-      - createdBy
-      - firstViewedAt
-      - lastViewedAt
-      - redeemedAt
-      - redeemedInMediaBuyId
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    ProposalSnapshot:
-      description: Frozen products + proposals captured from the discovery session at compose time
-      type: object
-      properties:
-        products:
-          description: All products that were available in the discovery session
-          type: array
-          items:
-            $ref: '#/components/schemas/Product'
-        proposals:
-          description: All proposals from the discovery session (including the chosen one)
-          type: array
-          items:
-            $ref: '#/components/schemas/Proposal'
-      required:
-      - products
-      - proposals
       additionalProperties: false
     Product:
       description: Product resource for campaign inventory
@@ -1327,6 +818,515 @@ components:
           type: string
         cta_label:
           type: string
+      additionalProperties: false
+    Proposal:
+      description: A recommended media plan with budget allocations across products (ADCP v3)
+      type: object
+      properties:
+        proposalId:
+          description: Unique identifier — used to refine or execute the proposal
+          type: string
+        name:
+          description: Human-readable name for this media plan proposal
+          type: string
+        description:
+          description: Strategic explanation of what the proposal achieves
+          type: string
+        briefAlignment:
+          description: Explanation of how this proposal aligns with the brief
+          type: string
+        salesAgentId:
+          description: Sales agent that generated this proposal
+          type: string
+        salesAgentName:
+          description: Human-readable sales agent name
+          type: string
+        storefrontId:
+          description: Storefront the proposal was surfaced through. The storefront is the buyer-facing seller identity; the underlying sales agent is internal routing detail.
+          type: string
+        storefrontName:
+          description: Human-readable storefront name. Use this as the seller label on proposal cards.
+          type: string
+        supportedRoutingTypes:
+          deprecated: true
+          description: Deprecated v2 compatibility field. It is not a storefront type or proposal capability and must not affect eligibility or execution.
+          type: array
+          items:
+            type: string
+            enum:
+            - DECISIONED
+            - ROUTED
+        allocations:
+          description: Budget distribution across products — percentages sum to 100
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductAllocation'
+        expiresAt:
+          description: When the proposal expires (ISO 8601)
+          type: string
+        totalBudgetGuidance:
+          description: Budget guidance for this proposal
+          type: object
+          properties:
+            min:
+              type: number
+            recommended:
+              type: number
+            max:
+              type: number
+            currency:
+              type: string
+          additionalProperties: false
+      required:
+      - proposalId
+      - name
+      - allocations
+      additionalProperties: false
+    ProductFormatOption:
+      description: AdCP 3.1 format declaration for a product
+      type: object
+      properties:
+        format_kind:
+          description: AdCP format kind discriminator (e.g. video_hosted, image)
+          example: video_hosted
+          type: string
+        format_option_id:
+          description: Stable identifier buyers use to select this format via format_option_refs in create_media_buy
+          type: string
+        display_name:
+          description: Human-readable name for this format option
+          type: string
+        params:
+          description: Canonical params for this format option
+          allOf:
+          - $ref: '#/components/schemas/ProductFormatOptionParams'
+      additionalProperties: {}
+    CreateStorefrontProposalBody:
+      description: Request body for creating a storefront proposal
+      type: object
+      properties:
+        operatorId:
+          description: 'Buyer identity for the proposal. Prefer { "domain": "brand.example" }. Legacy string values are accepted as domain strings, except customer:<id> which is decoded as { customerId }.'
+          example:
+            domain: acme.com
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 255
+          - $ref: '#/components/schemas/StorefrontProposalOperatorReference'
+        label:
+          description: Seller's internal label for the proposal
+          example: Acme Q3 RFP — CTV
+          type: string
+          minLength: 1
+          maxLength: 255
+        notes:
+          description: Free-form notes about the offline RFP
+          type: string
+          maxLength: 4000
+        expiresAt:
+          description: When the proposal code expires (ISO 8601). Server enforces this is no later than the underlying proposal.expiresAt.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        discoveryId:
+          description: Discovery session id from a recent discover-products call. The server reads the cached snapshot for this session and persists it as the frozen offer. The session must have been scoped to this seller and restricted to its storefront sales agents.
+          example: disc_a1b2c3
+          type: string
+          minLength: 1
+          maxLength: 255
+        proposalId:
+          description: Which proposal from the discovery snapshot to save with the proposal code.
+          example: proposal_abc123
+          type: string
+          minLength: 1
+          maxLength: 255
+      required:
+      - operatorId
+      - label
+      - expiresAt
+      - discoveryId
+      - proposalId
+    ProductFormatOptionParams:
+      description: Canonical format params. For hosted video, carries accepted containers/codecs.
+      type: object
+      properties:
+        containers:
+          description: Accepted delivery containers for hosted video. A buyer should only send a creative whose container is listed here.
+          example:
+          - mp4
+          type: array
+          items:
+            type: string
+            enum:
+            - mp4
+            - webm
+            - mov
+        video_codecs:
+          description: Accepted video codecs for hosted video.
+          example:
+          - h264
+          type: array
+          items:
+            type: string
+            enum:
+            - h264
+            - h265
+            - vp8
+            - vp9
+            - av1
+            - prores
+        audio_codecs:
+          description: Accepted audio codecs for hosted video.
+          example:
+          - aac
+          type: array
+          items:
+            type: string
+            enum:
+            - aac
+            - mp3
+            - opus
+            - pcm
+      additionalProperties: {}
+    ProposalSnapshot:
+      description: Frozen products + proposals captured from the discovery session at compose time
+      type: object
+      properties:
+        products:
+          description: All products that were available in the discovery session
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        proposals:
+          description: All proposals from the discovery session (including the chosen one)
+          type: array
+          items:
+            $ref: '#/components/schemas/Proposal'
+      required:
+      - products
+      - proposals
+      additionalProperties: false
+    UpdateStorefrontProposalBody:
+      description: Request body for editing a storefront proposal
+      type: object
+      properties:
+        label:
+          description: Updated label
+          type: string
+          minLength: 1
+          maxLength: 255
+        notes:
+          description: Updated notes
+          type: string
+          maxLength: 4000
+        expiresAt:
+          description: Updated expiry (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    StorefrontProposalOperatorReference:
+      description: Resolvable buyer identity for a storefront proposal. Prefer { domain } for brand-backed buyers; use { customerId } only as an unbranded fallback.
+      anyOf:
+      - type: object
+        properties:
+          domain:
+            description: Buyer brand domain. The buyer must resolve to this brand domain when redeeming the proposal code.
+            example: acme.com
+            type: string
+            minLength: 1
+            maxLength: 255
+        required:
+        - domain
+      - type: object
+        properties:
+          customerId:
+            description: Buyer customer id fallback used only when the buyer does not have an advertiser brand domain.
+            example: 123
+            type: integer
+            maximum: 9007199254740991
+            minimum: 1
+        required:
+        - customerId
+    StorefrontProposalOperatorReferenceOutput:
+      description: Resolvable buyer identity for a storefront proposal. Prefer { domain } for brand-backed buyers; use { customerId } only as an unbranded fallback.
+      anyOf:
+      - type: object
+        properties:
+          domain:
+            description: Buyer brand domain. The buyer must resolve to this brand domain when redeeming the proposal code.
+            example: acme.com
+            type: string
+            minLength: 1
+            maxLength: 255
+        required:
+        - domain
+        additionalProperties: false
+      - type: object
+        properties:
+          customerId:
+            description: Buyer customer id fallback used only when the buyer does not have an advertiser brand domain.
+            example: 123
+            type: integer
+            maximum: 9007199254740991
+            minimum: 1
+        required:
+        - customerId
+        additionalProperties: false
+    StorefrontProposal:
+      description: A persisted storefront proposal
+      type: object
+      properties:
+        id:
+          description: Proposal row id
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        proposalCode:
+          description: Short shareable handle. Sellers give this to buyers; buyers pass it to discover_products.
+          example: PRP-XK4A29
+          type: string
+        operatorId:
+          description: Encoded buyer identity retained for backwards compatibility. Use operatorRef for the structured form.
+          type: string
+        operatorRef:
+          description: Structured buyer identity for redemption auth.
+          allOf:
+          - $ref: '#/components/schemas/StorefrontProposalOperatorReferenceOutput'
+        label:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        status:
+          description: 'Proposal lifecycle status. ''active'': available to redeem. ''redeemed'': buyer has applied it to a media buy. ''expired'': past TTL. ''revoked'': seller withdrew.'
+          type: string
+          enum:
+          - active
+          - redeemed
+          - expired
+          - revoked
+        expiresAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        proposalId:
+          description: The protocol-level proposalId from the saved discovery snapshot
+          type: string
+        discoverySessionId:
+          description: Discovery session id this proposal was captured from (for traceability)
+          type: string
+        snapshot:
+          description: The frozen products + proposals returned to the buyer on redemption
+          allOf:
+          - $ref: '#/components/schemas/ProposalSnapshot'
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          type: string
+        firstViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedInMediaBuyId:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - proposalCode
+      - operatorId
+      - operatorRef
+      - label
+      - notes
+      - status
+      - expiresAt
+      - proposalId
+      - discoverySessionId
+      - snapshot
+      - createdAt
+      - createdBy
+      - firstViewedAt
+      - lastViewedAt
+      - redeemedAt
+      - redeemedInMediaBuyId
+      additionalProperties: false
+    ProductAllocation:
+      description: Budget allocation for a product within a proposal
+      type: object
+      properties:
+        productId:
+          description: Product ID — references a product in the sibling products array
+          type: string
+        allocationPercentage:
+          description: Percentage of total budget allocated to this product
+          type: number
+          minimum: 0
+          maximum: 100
+        pricingOptionId:
+          description: Recommended pricing option ID from the product pricing_options
+          type: string
+        rationale:
+          description: Why this product and allocation are recommended
+          type: string
+        sequence:
+          description: Ordering hint for multi-line-item plans (1-based)
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        tags:
+          description: Categorical tags (e.g., "desktop", "mobile")
+          type: array
+          items:
+            type: string
+      required:
+      - productId
+      - allocationPercentage
+      additionalProperties: false
+    StorefrontProposalSummary:
+      description: Compact proposal summary for list views
+      type: object
+      properties:
+        id:
+          description: Proposal row id
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        proposalCode:
+          description: Short shareable handle. Sellers give this to buyers; buyers pass it to discover_products.
+          example: PRP-XK4A29
+          type: string
+        operatorId:
+          description: Encoded buyer identity retained for backwards compatibility. Use operatorRef for the structured form.
+          type: string
+        operatorRef:
+          description: Structured buyer identity for redemption auth.
+          allOf:
+          - $ref: '#/components/schemas/StorefrontProposalOperatorReferenceOutput'
+        label:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        status:
+          description: 'Proposal lifecycle status. ''active'': available to redeem. ''redeemed'': buyer has applied it to a media buy. ''expired'': past TTL. ''revoked'': seller withdrew.'
+          type: string
+          enum:
+          - active
+          - redeemed
+          - expired
+          - revoked
+        expiresAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        proposalId:
+          description: The protocol-level proposalId from the saved discovery snapshot
+          type: string
+        discoverySessionId:
+          description: Discovery session id this proposal was captured from (for traceability)
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          type: string
+        firstViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lastViewedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        redeemedInMediaBuyId:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - proposalCode
+      - operatorId
+      - operatorRef
+      - label
+      - notes
+      - status
+      - expiresAt
+      - proposalId
+      - discoverySessionId
+      - createdAt
+      - createdBy
+      - firstViewedAt
+      - lastViewedAt
+      - redeemedAt
+      - redeemedInMediaBuyId
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
       additionalProperties: false
     ProductCardDetailedData:
       description: Detailed inline product card data for buyer UIs

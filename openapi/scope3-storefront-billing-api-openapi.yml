@@ -633,34 +633,98 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    BillingFee:
-      description: An additional billing fee entry
+    PayoutPayee:
+      description: 'A payout payee — the bank account for one legal payout entity in one payout currency (masked: the account number is reduced to its last 4 characters).'
       type: object
       properties:
-        name:
-          description: Fee label
+        beneficiaryName:
+          description: Payout beneficiary legal name
+          type: string
+        addressLine1:
+          description: Beneficiary street address, line 1
+          type: string
+        addressLine2:
+          description: Beneficiary street address, line 2
+          type:
+          - string
+          - 'null'
+        city:
+          description: Beneficiary city
+          type: string
+        region:
+          description: Beneficiary state/province/region
+          type:
+          - string
+          - 'null'
+        postalCode:
+          description: Beneficiary postal/ZIP code
+          type: string
+        countryCode:
+          description: Beneficiary country (ISO 3166-1 alpha-2)
+          type: string
+        accountNumberLast4:
+          description: Last 4 characters of the account number or IBAN. The full value is never returned by the API.
+          type: string
+        bankIdentifierType:
+          description: 'Which bank identifier system `bankIdentifierValue` uses: FEDWIRE_ABA (US Fedwire/ABA routing number, 9 digits), CHIPS_ABA (CHIPS ABA number, 9 digits), SWIFT_BIC (SWIFT/BIC code, 8 or 11 characters), or BANK_CODE (a local/domestic bank code for banks without a SWIFT-BIC).'
+          type: string
+          enum:
+          - FEDWIRE_ABA
+          - CHIPS_ABA
+          - SWIFT_BIC
+          - BANK_CODE
+        bankIdentifierValue:
+          description: The bank identifier (routing number, CHIPS ABA, SWIFT-BIC, or local bank code)
+          type: string
+        completedAt:
+          description: When payout details were last completed (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        id:
+          description: Payee ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        entityName:
+          description: 'Label for the legal payout entity this bank account belongs to (e.g. "Acme Media India Pvt Ltd"). Together with the payout currency it identifies the payee: one bank account per entity per currency.'
           type: string
           minLength: 1
           maxLength: 255
-        description:
-          description: Fee description
+        currency:
+          description: Payout currency for this payee (ISO 4217 code). One bank account per entity per currency.
           type: string
-          maxLength: 500
-        feePercent:
-          description: Fee percentage (0–100)
-          type: number
-          minimum: 0
-          maximum: 100
+        isPrimary:
+          description: Whether this is the customer's PRIMARY payout entity — the one returned as `payoutDetails` on GET /billing. At most one payee per customer is primary.
+          type: boolean
+        createdAt:
+          description: Creation timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: Last update timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - name
-      - feePercent
-    SetPayoutPayeeResponse:
-      type: object
-      properties:
-        payee:
-          $ref: '#/components/schemas/PayoutPayee'
-      required:
-      - payee
+      - beneficiaryName
+      - addressLine1
+      - addressLine2
+      - city
+      - region
+      - postalCode
+      - countryCode
+      - accountNumberLast4
+      - bankIdentifierType
+      - bankIdentifierValue
+      - completedAt
+      - id
+      - entityName
+      - currency
+      - isPrimary
+      - createdAt
+      - updatedAt
       additionalProperties: false
     IuRateCardActivityScheduleResponse:
       anyOf:
@@ -870,27 +934,29 @@ components:
           - billable
           - includedBackfillMonths
           additionalProperties: false
-    SetPayoutDetailsResponse:
+    ApiError:
+      description: Structured error object
       type: object
       properties:
-        billing:
-          $ref: '#/components/schemas/StorefrontBillingResponse'
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
       required:
-      - billing
+      - code
+      - message
       additionalProperties: false
-    PayoutActivityRow:
-      description: 'One row of payout activity for a seller org, newest first. `kind: "setup"` rows come from the payout-details audit trail (available now); `kind: "ledger"` rows come from payout runs (land once producers exist).'
-      oneOf:
-      - $ref: '#/components/schemas/PayoutActivitySetupRow'
-      - $ref: '#/components/schemas/PayoutActivityLedgerRow'
-      type: object
-      discriminator:
-        propertyName: kind
-        mapping:
-          setup: '#/components/schemas/PayoutActivitySetupRow'
-          ledger: '#/components/schemas/PayoutActivityLedgerRow'
-    PayoutPayee:
-      description: 'A payout payee — the bank account for one legal payout entity in one payout currency (masked: the account number is reduced to its last 4 characters).'
+    PayoutDetails:
+      description: 'Payout bank details on file (masked): the account number is reduced to its last 4 characters.'
       type: object
       properties:
         beneficiaryName:
@@ -937,32 +1003,6 @@ components:
           type: string
           format: date-time
           pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        id:
-          description: Payee ID
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        entityName:
-          description: 'Label for the legal payout entity this bank account belongs to (e.g. "Acme Media India Pvt Ltd"). Together with the payout currency it identifies the payee: one bank account per entity per currency.'
-          type: string
-          minLength: 1
-          maxLength: 255
-        currency:
-          description: Payout currency for this payee (ISO 4217 code). One bank account per entity per currency.
-          type: string
-        isPrimary:
-          description: Whether this is the customer's PRIMARY payout entity — the one returned as `payoutDetails` on GET /billing. At most one payee per customer is primary.
-          type: boolean
-        createdAt:
-          description: Creation timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: Last update timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
       - beneficiaryName
       - addressLine1
@@ -975,103 +1015,6 @@ components:
       - bankIdentifierType
       - bankIdentifierValue
       - completedAt
-      - id
-      - entityName
-      - currency
-      - isPrimary
-      - createdAt
-      - updatedAt
-      additionalProperties: false
-    UpdateStorefrontBillingResponse:
-      type: object
-      properties:
-        billing:
-          $ref: '#/components/schemas/StorefrontBillingResponse'
-      required:
-      - billing
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
-      additionalProperties: false
-    ListPayoutPayeesResponse:
-      description: Payout payees on file (masked), one per legal entity per payout currency. The default payee on the billing config is listed separately on GET /billing.
-      type: object
-      properties:
-        payees:
-          type: array
-          items:
-            $ref: '#/components/schemas/PayoutPayee'
-      required:
-      - payees
-      additionalProperties: false
-    PayoutActivitySetupRow:
-      description: 'One setup/audit row in payout activity: payout bank details were added, updated, or cleared. Projected from the payout-details audit trail — never carries payout values.'
-      type: object
-      properties:
-        kind:
-          type: string
-          enum:
-          - setup
-        reason:
-          description: 'What happened to the payout details: "updated" (details added or edited), "cleared" (details or a payout entity removed), or "changed" (an unrecognized change kind — reserved fallback). Machine-readable so UIs can localize; the sibling `description` field is the English rendering.'
-          type: string
-          enum:
-          - updated
-          - cleared
-          - changed
-        description:
-          description: Human-readable English description of the setup event (e.g. "Payout details updated" or "Payout details cleared"), derived from `reason`. Never includes payout values — no account numbers, no bank identifiers. UIs should localize from `reason` rather than render this string.
-          type: string
-        actorEmail:
-          description: Email of the user who made the change, when known (null for service-token or system-initiated changes)
-          type:
-          - string
-          - 'null'
-        occurredAt:
-          description: When the change was made (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - kind
-      - reason
-      - description
-      - actorEmail
-      - occurredAt
       additionalProperties: false
     GetStorefrontRateCardOfferResponse:
       type: object
@@ -3642,189 +3585,6 @@ components:
       required:
       - data
       additionalProperties: false
-    PayoutDetails:
-      description: 'Payout bank details on file (masked): the account number is reduced to its last 4 characters.'
-      type: object
-      properties:
-        beneficiaryName:
-          description: Payout beneficiary legal name
-          type: string
-        addressLine1:
-          description: Beneficiary street address, line 1
-          type: string
-        addressLine2:
-          description: Beneficiary street address, line 2
-          type:
-          - string
-          - 'null'
-        city:
-          description: Beneficiary city
-          type: string
-        region:
-          description: Beneficiary state/province/region
-          type:
-          - string
-          - 'null'
-        postalCode:
-          description: Beneficiary postal/ZIP code
-          type: string
-        countryCode:
-          description: Beneficiary country (ISO 3166-1 alpha-2)
-          type: string
-        accountNumberLast4:
-          description: Last 4 characters of the account number or IBAN. The full value is never returned by the API.
-          type: string
-        bankIdentifierType:
-          description: 'Which bank identifier system `bankIdentifierValue` uses: FEDWIRE_ABA (US Fedwire/ABA routing number, 9 digits), CHIPS_ABA (CHIPS ABA number, 9 digits), SWIFT_BIC (SWIFT/BIC code, 8 or 11 characters), or BANK_CODE (a local/domestic bank code for banks without a SWIFT-BIC).'
-          type: string
-          enum:
-          - FEDWIRE_ABA
-          - CHIPS_ABA
-          - SWIFT_BIC
-          - BANK_CODE
-        bankIdentifierValue:
-          description: The bank identifier (routing number, CHIPS ABA, SWIFT-BIC, or local bank code)
-          type: string
-        completedAt:
-          description: When payout details were last completed (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - beneficiaryName
-      - addressLine1
-      - addressLine2
-      - city
-      - region
-      - postalCode
-      - countryCode
-      - accountNumberLast4
-      - bankIdentifierType
-      - bankIdentifierValue
-      - completedAt
-      additionalProperties: false
-    ChildBillingStatus:
-      description: Billing status for a child customer
-      type: object
-      properties:
-        customerId:
-          description: Child customer ID
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        name:
-          description: Child customer name
-          type: string
-        company:
-          description: Child company name
-          type:
-          - string
-          - 'null'
-        inherited:
-          description: Whether billing is inherited from parent (true) or has its own payout details (false)
-          type: boolean
-        onboardingStatus:
-          description: Payout setup status of the child account, or "none" if inherited
-          type: string
-          enum:
-          - pending
-          - complete
-          - restricted
-          - none
-      required:
-      - customerId
-      - name
-      - company
-      - inherited
-      - onboardingStatus
-      additionalProperties: false
-    PayoutActivityLedgerRow:
-      description: One payout-run row for a seller org. No producer exists yet — lands once payout run artifacts / the PUBLISHER_PAYOUT ledger entry type exist to project.
-      type: object
-      properties:
-        kind:
-          type: string
-          enum:
-          - ledger
-        status:
-          description: Status of one payout ledger activity row
-          type: string
-          enum:
-          - pending
-          - paid
-          - failed
-        periodLabel:
-          description: Human-readable payout period label (e.g. "June 2026" or "2026-06-01–2026-06-30")
-          type: string
-        entityName:
-          description: Legal payout entity this row belongs to (matches `PayoutPayee.entityName` for multi-entity sellers, or the seller org name for the single default payee)
-          type: string
-        currency:
-          description: ISO 4217 currency code
-          example: USD
-          type: string
-          minLength: 3
-          maxLength: 3
-          pattern: ^[A-Z]{3}$
-        amountMinor:
-          description: Payout amount in minor units (e.g. cents for USD)
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        expectedAt:
-          description: Expected payout date (ISO 8601), when known and not yet paid
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        paidAt:
-          description: When the payout was actually paid out (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        statementRef:
-          description: Reference to the payout statement/remittance advice, when available
-          type: string
-      required:
-      - kind
-      - status
-      - periodLabel
-      - entityName
-      - currency
-      - amountMinor
-      additionalProperties: false
-    BillingFeeOutput:
-      description: An additional billing fee entry
-      type: object
-      properties:
-        name:
-          description: Fee label
-          type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          description: Fee description
-          type: string
-          maxLength: 500
-        feePercent:
-          description: Fee percentage (0–100)
-          type: number
-          minimum: 0
-          maximum: 100
-      required:
-      - name
-      - feePercent
-      additionalProperties: false
-    BillingAccountsResponse:
-      description: Billing status for managed accounts of a parent customer
-      type: object
-      properties:
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChildBillingStatus'
-      required:
-      - accounts
-      additionalProperties: false
     AcceptStorefrontRateCardOfferResponse:
       type: object
       properties:
@@ -5276,6 +5036,28 @@ components:
       required:
       - data
       additionalProperties: false
+    PayoutActivityResponse:
+      description: Payout activity for the caller’s org, newest first. `setup` rows (payout-details changes) appear as soon as they happen; `ledger` rows appear once a payout run has produced at least one artifact.
+      type: object
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayoutActivityRow'
+      required:
+      - rows
+      additionalProperties: false
+    PayoutActivityRow:
+      description: 'One row of payout activity for a seller org, newest first. `kind: "setup"` rows come from the payout-details audit trail (available now); `kind: "ledger"` rows come from payout runs (land once producers exist).'
+      oneOf:
+      - $ref: '#/components/schemas/PayoutActivitySetupRow'
+      - $ref: '#/components/schemas/PayoutActivityLedgerRow'
+      type: object
+      discriminator:
+        propertyName: kind
+        mapping:
+          setup: '#/components/schemas/PayoutActivitySetupRow'
+          ledger: '#/components/schemas/PayoutActivityLedgerRow'
     StorefrontBillingResponse:
       description: Storefront billing configuration. Storefront billing setup is optional only for official Scope3 sales-adapter storefronts on existing downstream platform settlement agreements. Third-party sales agents and finished-product/pass-through sources are normal Interchange-cleared storefront sources and still require payout bank details. Seller-cleared settlement is not yet configurable for normal storefronts.
       type: object
@@ -5343,6 +5125,41 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
+    ChildBillingStatus:
+      description: Billing status for a child customer
+      type: object
+      properties:
+        customerId:
+          description: Child customer ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        name:
+          description: Child customer name
+          type: string
+        company:
+          description: Child company name
+          type:
+          - string
+          - 'null'
+        inherited:
+          description: Whether billing is inherited from parent (true) or has its own payout details (false)
+          type: boolean
+        onboardingStatus:
+          description: Payout setup status of the child account, or "none" if inherited
+          type: string
+          enum:
+          - pending
+          - complete
+          - restricted
+          - none
+      required:
+      - customerId
+      - name
+      - company
+      - inherited
+      - onboardingStatus
+      additionalProperties: false
     GetBillingResponse:
       type: object
       properties:
@@ -5352,16 +5169,199 @@ components:
       required:
       - billing
       additionalProperties: false
-    PayoutActivityResponse:
-      description: Payout activity for the caller’s org, newest first. `setup` rows (payout-details changes) appear as soon as they happen; `ledger` rows appear once a payout run has produced at least one artifact.
+    SetPayoutPayeeResponse:
       type: object
       properties:
-        rows:
+        payee:
+          $ref: '#/components/schemas/PayoutPayee'
+      required:
+      - payee
+      additionalProperties: false
+    BillingFeeOutput:
+      description: An additional billing fee entry
+      type: object
+      properties:
+        name:
+          description: Fee label
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Fee description
+          type: string
+          maxLength: 500
+        feePercent:
+          description: Fee percentage (0–100)
+          type: number
+          minimum: 0
+          maximum: 100
+      required:
+      - name
+      - feePercent
+      additionalProperties: false
+    UpdateStorefrontBillingResponse:
+      type: object
+      properties:
+        billing:
+          $ref: '#/components/schemas/StorefrontBillingResponse'
+      required:
+      - billing
+      additionalProperties: false
+    ListPayoutPayeesResponse:
+      description: Payout payees on file (masked), one per legal entity per payout currency. The default payee on the billing config is listed separately on GET /billing.
+      type: object
+      properties:
+        payees:
           type: array
           items:
-            $ref: '#/components/schemas/PayoutActivityRow'
+            $ref: '#/components/schemas/PayoutPayee'
       required:
-      - rows
+      - payees
+      additionalProperties: false
+    PayoutActivityLedgerRow:
+      description: One payout-run row for a seller org. No producer exists yet — lands once payout run artifacts / the PUBLISHER_PAYOUT ledger entry type exist to project.
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - ledger
+        status:
+          description: Status of one payout ledger activity row
+          type: string
+          enum:
+          - pending
+          - paid
+          - failed
+        periodLabel:
+          description: Human-readable payout period label (e.g. "June 2026" or "2026-06-01–2026-06-30")
+          type: string
+        entityName:
+          description: Legal payout entity this row belongs to (matches `PayoutPayee.entityName` for multi-entity sellers, or the seller org name for the single default payee)
+          type: string
+        currency:
+          description: ISO 4217 currency code
+          example: USD
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+        amountMinor:
+          description: Payout amount in minor units (e.g. cents for USD)
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        expectedAt:
+          description: Expected payout date (ISO 8601), when known and not yet paid
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        paidAt:
+          description: When the payout was actually paid out (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        statementRef:
+          description: Reference to the payout statement/remittance advice, when available
+          type: string
+      required:
+      - kind
+      - status
+      - periodLabel
+      - entityName
+      - currency
+      - amountMinor
+      additionalProperties: false
+    PayoutActivitySetupRow:
+      description: 'One setup/audit row in payout activity: payout bank details were added, updated, or cleared. Projected from the payout-details audit trail — never carries payout values.'
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - setup
+        reason:
+          description: 'What happened to the payout details: "updated" (details added or edited), "cleared" (details or a payout entity removed), or "changed" (an unrecognized change kind — reserved fallback). Machine-readable so UIs can localize; the sibling `description` field is the English rendering.'
+          type: string
+          enum:
+          - updated
+          - cleared
+          - changed
+        description:
+          description: Human-readable English description of the setup event (e.g. "Payout details updated" or "Payout details cleared"), derived from `reason`. Never includes payout values — no account numbers, no bank identifiers. UIs should localize from `reason` rather than render this string.
+          type: string
+        actorEmail:
+          description: Email of the user who made the change, when known (null for service-token or system-initiated changes)
+          type:
+          - string
+          - 'null'
+        occurredAt:
+          description: When the change was made (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - kind
+      - reason
+      - description
+      - actorEmail
+      - occurredAt
+      additionalProperties: false
+    BillingFee:
+      description: An additional billing fee entry
+      type: object
+      properties:
+        name:
+          description: Fee label
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Fee description
+          type: string
+          maxLength: 500
+        feePercent:
+          description: Fee percentage (0–100)
+          type: number
+          minimum: 0
+          maximum: 100
+      required:
+      - name
+      - feePercent
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    SetPayoutDetailsResponse:
+      type: object
+      properties:
+        billing:
+          $ref: '#/components/schemas/StorefrontBillingResponse'
+      required:
+      - billing
+      additionalProperties: false
+    BillingAccountsResponse:
+      description: Billing status for managed accounts of a parent customer
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChildBillingStatus'
+      required:
+      - accounts
       additionalProperties: false
   securitySchemes:
     bearerAuth:

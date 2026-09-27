@@ -97,15 +97,27 @@ components:
       - data
       - error
       additionalProperties: false
-    ResolveBrandBody:
+    ApiError:
+      description: Structured error object
       type: object
       properties:
-        domain:
-          description: Brand domain to resolve (e.g., "nike.com")
+        code:
+          description: Machine-readable error code
           type: string
-          minLength: 1
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
       required:
-      - domain
+      - code
+      - message
+      additionalProperties: false
     ResolveBrandResponse:
       type: object
       properties:
@@ -153,27 +165,15 @@ components:
       - resolved
       - domain
       additionalProperties: false
-    ApiError:
-      description: Structured error object
+    ResolveBrandBody:
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        domain:
+          description: Brand domain to resolve (e.g., "nike.com")
           type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+          minLength: 1
       required:
-      - code
-      - message
-      additionalProperties: false
+      - domain
   securitySchemes:
     bearerAuth:
       type: http

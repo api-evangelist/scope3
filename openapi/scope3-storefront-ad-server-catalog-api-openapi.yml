@@ -1287,22 +1287,123 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    EsaPublisherPropertyListEnvelope:
+    EsaCanonicalProductFormatOption:
+      description: URL-free AdCP 3.1 product format declaration. Canonical formats use format_kind plus params and never agent_url; publisher-backed options pair format_option_id with publisher_domain.
       type: object
       properties:
-        properties:
+        format_option_id:
+          type: string
+        publisher_domain:
+          description: Publisher catalog namespace for format_option_id. Omit for product-local format options.
+          type: string
+          maxLength: 253
+          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$
+        format_kind:
+          anyOf:
+          - type: string
+            enum:
+            - image
+          - type: string
+            enum:
+            - html5
+          - type: string
+            enum:
+            - display_tag
+          - type: string
+            enum:
+            - image_carousel
+          - type: string
+            enum:
+            - video_hosted
+          - type: string
+            enum:
+            - video_vast
+          - type: string
+            enum:
+            - audio_hosted
+          - type: string
+            enum:
+            - audio_daast
+          - type: string
+            enum:
+            - sponsored_placement
+          - type: string
+            enum:
+            - native_in_feed
+          - type: string
+            enum:
+            - responsive_creative
+          - type: string
+            enum:
+            - agent_placement
+          - type: string
+            enum:
+            - custom
+        params:
+          type: object
+          additionalProperties: {}
+      required:
+      - format_kind
+      - params
+      additionalProperties: false
+    EsaSignalResponse:
+      type: object
+      additionalProperties: {}
+    EsaAllowedPublisherSelector:
+      type: object
+      properties:
+        publisherDomain:
+          description: The parent publisher domain from the source's publisher record. For a network whose properties represent individual sites, this is the network domain, not a represented site.
+          type: string
+        selectionType:
+          description: Whether the option covers every property on the domain, specific property ids, or specific property tags.
+          type: string
+          enum:
+          - all
+          - by_id
+          - by_tag
+        propertyIds:
+          type: array
+          items:
+            type: string
+        propertyTags:
+          type: array
+          items:
+            type: string
+        label:
+          description: Human-readable option label.
+          type: string
+      required:
+      - publisherDomain
+      - selectionType
+      - label
+      additionalProperties: false
+    EsaProductListEnvelope:
+      type: object
+      properties:
+        products:
           type: array
           items:
             type: object
             additionalProperties: {}
-        allowedSelectors:
-          description: 'The coverage selectors this source has recorded and will accept on a product. Declare `inventory.publisher_properties` from these rather than deriving a domain from `properties`: `publisher_domain` must match the parent domain in an advertised selector, while a property''s own identifiers may name a represented site instead. Selector availability depends on the source record, not publisher verification.'
-          type: array
-          items:
-            $ref: '#/components/schemas/EsaAllowedPublisherSelector'
       required:
-      - properties
-      - allowedSelectors
+      - products
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
       additionalProperties: false
     VendorPricingOption:
       description: AdCP vendor pricing option. A signal carries zero or more; absence means the signal is free. Forwarded verbatim to the managed ad-server source.
@@ -1406,46 +1507,6 @@ components:
           - description
           additionalProperties: {}
         type: object
-    EsaSignalListEnvelope:
-      type: object
-      properties:
-        signals:
-          type: array
-          items:
-            type: object
-            additionalProperties: {}
-      required:
-      - signals
-      additionalProperties: false
-    EsaAllowedPublisherSelector:
-      type: object
-      properties:
-        publisherDomain:
-          description: The parent publisher domain from the source's publisher record. For a network whose properties represent individual sites, this is the network domain, not a represented site.
-          type: string
-        selectionType:
-          description: Whether the option covers every property on the domain, specific property ids, or specific property tags.
-          type: string
-          enum:
-          - all
-          - by_id
-          - by_tag
-        propertyIds:
-          type: array
-          items:
-            type: string
-        propertyTags:
-          type: array
-          items:
-            type: string
-        label:
-          description: Human-readable option label.
-          type: string
-      required:
-      - publisherDomain
-      - selectionType
-      - label
-      additionalProperties: false
     EsaProductUpdateBody:
       description: Full salesagent WholesaleProductRequest update body for an ad-server source product. The upstream endpoint requires a complete replacement body; unknown/extra fields are forwarded as-is.
       type: object
@@ -1468,20 +1529,6 @@ components:
           type: object
           additionalProperties: {}
       additionalProperties: {}
-    EsaSignalResponse:
-      type: object
-      additionalProperties: {}
-    EsaProductListEnvelope:
-      type: object
-      properties:
-        products:
-          type: array
-          items:
-            type: object
-            additionalProperties: {}
-      required:
-      - products
-      additionalProperties: false
     EsaProductPatchBody:
       description: Partial change body for an ad-server-source product. Only the fields present are applied; an omitted field — or one sent as null — keeps its stored value, and `inventory` merges one level deep. Unknown/extra fields are forwarded as-is.
       type: object
@@ -1523,64 +1570,33 @@ components:
           - 'null'
           additionalProperties: {}
       additionalProperties: {}
-    EsaCanonicalProductFormatOption:
-      description: URL-free AdCP 3.1 product format declaration. Canonical formats use format_kind plus params and never agent_url; publisher-backed options pair format_option_id with publisher_domain.
+    EsaSignalListEnvelope:
       type: object
       properties:
-        format_option_id:
-          type: string
-        publisher_domain:
-          description: Publisher catalog namespace for format_option_id. Omit for product-local format options.
-          type: string
-          maxLength: 253
-          pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$
-        format_kind:
-          anyOf:
-          - type: string
-            enum:
-            - image
-          - type: string
-            enum:
-            - html5
-          - type: string
-            enum:
-            - display_tag
-          - type: string
-            enum:
-            - image_carousel
-          - type: string
-            enum:
-            - video_hosted
-          - type: string
-            enum:
-            - video_vast
-          - type: string
-            enum:
-            - audio_hosted
-          - type: string
-            enum:
-            - audio_daast
-          - type: string
-            enum:
-            - sponsored_placement
-          - type: string
-            enum:
-            - native_in_feed
-          - type: string
-            enum:
-            - responsive_creative
-          - type: string
-            enum:
-            - agent_placement
-          - type: string
-            enum:
-            - custom
-        params:
-          type: object
-          additionalProperties: {}
+        signals:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
       required:
-      - format_kind
-      - params
+      - signals
+      additionalProperties: false
+    EsaPublisherPropertyListEnvelope:
+      type: object
+      properties:
+        properties:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        allowedSelectors:
+          description: 'The coverage selectors this source has recorded and will accept on a product. Declare `inventory.publisher_properties` from these rather than deriving a domain from `properties`: `publisher_domain` must match the parent domain in an advertised selector, while a property''s own identifiers may name a represented site instead. Selector availability depends on the source record, not publisher verification.'
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaAllowedPublisherSelector'
+      required:
+      - properties
+      - allowedSelectors
       additionalProperties: false
     ApiError:
       description: Structured error object
@@ -1602,22 +1618,6 @@ components:
       required:
       - code
       - message
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
       additionalProperties: false
   securitySchemes:
     bearerAuth:

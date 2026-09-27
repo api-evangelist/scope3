@@ -266,16 +266,60 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    OptimizationSuggestionStatus:
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    OptimizationSuggestionListItem:
       type: object
       properties:
         suggestionId:
           type: string
+        campaignId:
+          type: string
+        mediaBuyId:
+          type: string
+        optimizationMetric:
+          type:
+          - string
+          - 'null'
         status:
+          type: string
+        productAdjustmentCount:
+          type: number
+        bidAdjustmentCount:
+          type: number
+        createdAt:
+          type: string
+        statusUpdatedAt:
           type: string
       required:
       - suggestionId
+      - campaignId
+      - mediaBuyId
+      - optimizationMetric
       - status
+      - productAdjustmentCount
+      - bidAdjustmentCount
+      - createdAt
+      - statusUpdatedAt
       additionalProperties: false
     OptimizationSuggestionDetail:
       type: object
@@ -373,60 +417,21 @@ components:
       - createdAt
       - statusUpdatedAt
       additionalProperties: {}
-    OptimizationSuggestionListItem:
+    OptimizationSuggestionList:
       type: object
       properties:
-        suggestionId:
-          type: string
-        campaignId:
-          type: string
-        mediaBuyId:
-          type: string
-        optimizationMetric:
-          type:
-          - string
-          - 'null'
-        status:
-          type: string
-        productAdjustmentCount:
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptimizationSuggestionListItem'
+        totalCount:
           type: number
-        bidAdjustmentCount:
-          type: number
-        createdAt:
-          type: string
-        statusUpdatedAt:
-          type: string
+        hasMore:
+          type: boolean
       required:
-      - suggestionId
-      - campaignId
-      - mediaBuyId
-      - optimizationMetric
-      - status
-      - productAdjustmentCount
-      - bidAdjustmentCount
-      - createdAt
-      - statusUpdatedAt
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
+      - suggestions
+      - totalCount
+      - hasMore
       additionalProperties: false
     ErrorResponse:
       description: Standard error response
@@ -444,21 +449,16 @@ components:
       - data
       - error
       additionalProperties: false
-    OptimizationSuggestionList:
+    OptimizationSuggestionStatus:
       type: object
       properties:
-        suggestions:
-          type: array
-          items:
-            $ref: '#/components/schemas/OptimizationSuggestionListItem'
-        totalCount:
-          type: number
-        hasMore:
-          type: boolean
+        suggestionId:
+          type: string
+        status:
+          type: string
       required:
-      - suggestions
-      - totalCount
-      - hasMore
+      - suggestionId
+      - status
       additionalProperties: false
   securitySchemes:
     bearerAuth:

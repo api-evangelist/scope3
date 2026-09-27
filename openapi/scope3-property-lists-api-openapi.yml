@@ -647,6 +647,320 @@ components:
       - propertyLists
       - total
       additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    PropertyListCascadeSummary:
+      description: Summary of the retroactive push of this updated property list to active media buys.
+      type: object
+      properties:
+        totalMediaBuys:
+          description: Active media buys found whose advertisers reference this list. Each received an update_media_buy call with the refreshed list reference.
+          example: 4
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        updatedCount:
+          description: Active media buys that were successfully notified of the updated list
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        failedCount:
+          description: Active media buys where the update_media_buy call failed. See server logs for details.
+          example: 1
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - totalMediaBuys
+      - updatedCount
+      - failedCount
+      additionalProperties: false
+    AttachCascadeSummary:
+      type: object
+      properties:
+        totalMediaBuys:
+          description: Active media buys found whose advertisers reference this list. Each received an update_media_buy call with the refreshed list reference.
+          example: 4
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        updatedCount:
+          description: Active media buys that were successfully notified of the updated list
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        failedCount:
+          description: Active media buys where the update_media_buy call failed. See server logs for details.
+          example: 1
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        skippedCount:
+          description: Media buys skipped during retroactive attach (already had the list or ineligible status)
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - totalMediaBuys
+      - updatedCount
+      - failedCount
+      - skippedCount
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    CheckPropertyListBody:
+      description: Request body for checking domains and bundles
+      type: object
+      properties:
+        domains:
+          description: 'Domain values to check (convenience shorthand for `identifiers` with `type: "domain"`).'
+          maxItems: 100000
+          type: array
+          items:
+            type: string
+            minLength: 1
+        identifiers:
+          description: Typed identifiers to check (domains and mobile app bundle IDs). Provide `domains`, `identifiers`, or both; combined total must be 1..100000. Bundle identifiers are not currently checked against the AAO registry and are returned in the `assess` bucket pending upstream support.
+          maxItems: 100000
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+    CampaignPropertyListsResponse:
+      description: Property lists referenced by a campaign, derived from targeting_overlay.property_list on the campaign media-buy packages.
+      type: object
+      properties:
+        campaignId:
+          type: string
+        propertyLists:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignPropertyListEntry'
+        summary:
+          type: object
+          properties:
+            totalLists:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            includeCount:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            excludeCount:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+          required:
+          - totalLists
+          - includeCount
+          - excludeCount
+          additionalProperties: false
+      required:
+      - campaignId
+      - propertyLists
+      - summary
+      additionalProperties: false
+    CreatePropertyListInput:
+      description: Request body for creating a property list
+      type: object
+      properties:
+        name:
+          description: Human-readable name for the property list
+          example: Q1 Campaign - UK Premium
+          type: string
+          minLength: 1
+          maxLength: 255
+        purpose:
+          description: Whether properties in this list should be included or excluded
+          example: include
+          type: string
+          enum:
+          - include
+          - exclude
+        domains:
+          description: 'Domain identifiers (convenience shorthand for `identifiers` entries with `type: "domain"`). Provide `domains`, `identifiers`, or both. Large lists are chunked server-side against the AAO registry and local database; the response includes a `resolutionSummary` with the counts.'
+          example:
+          - nytimes.com
+          - cnn.com
+          - bbc.co.uk
+          maxItems: 100000
+          type: array
+          items:
+            type: string
+            minLength: 1
+        identifiers:
+          description: Typed property identifiers (AdCP-aligned) — mix of website domains, mobile app bundles/packages, store IDs, and CTV app IDs. Provide `domains`, `identifiers`, or both; combined total must be between 1 and 100000.
+          example:
+          - type: domain
+            value: nytimes.com
+          - type: ios_bundle
+            value: com.facebook.katana
+          - type: android_package
+            value: com.facebook.katana
+          - type: apple_app_store_id
+            value: '284882215'
+          maxItems: 100000
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+        filters:
+          description: Filter configuration — controls which SmartPropertyLists this list is linked to
+          allOf:
+          - $ref: '#/components/schemas/PropertyListFilters'
+      required:
+      - name
+      - purpose
+    PropertyListIdentifier:
+      description: 'A typed property identifier (AdCP-aligned, sourced from `@adcp/sdk`). Read-side note: Apple App Store bundles share a single backing column, so `apple_tv_bundle` write-time entries normalize to `ios_bundle` on subsequent get/list responses. `bundle_id` (generic fallback) likewise normalizes to the resolved app row''s store-typed form (`ios_bundle` or `android_package`).'
+      type: object
+      properties:
+        type:
+          anyOf:
+          - type: string
+            enum:
+            - domain
+          - type: string
+            enum:
+            - subdomain
+          - type: string
+            enum:
+            - network_id
+          - type: string
+            enum:
+            - ios_bundle
+          - type: string
+            enum:
+            - android_package
+          - type: string
+            enum:
+            - apple_app_store_id
+          - type: string
+            enum:
+            - google_play_id
+          - type: string
+            enum:
+            - roku_store_id
+          - type: string
+            enum:
+            - fire_tv_asin
+          - type: string
+            enum:
+            - samsung_app_id
+          - type: string
+            enum:
+            - apple_tv_bundle
+          - type: string
+            enum:
+            - bundle_id
+          - type: string
+            enum:
+            - venue_id
+          - type: string
+            enum:
+            - screen_id
+          - type: string
+            enum:
+            - openooh_venue_type
+          - type: string
+            enum:
+            - rss_url
+          - type: string
+            enum:
+            - apple_podcast_id
+          - type: string
+            enum:
+            - spotify_collection_id
+          - type: string
+            enum:
+            - podcast_guid
+          - type: string
+            enum:
+            - station_id
+          - type: string
+            enum:
+            - facility_id
+        value:
+          type: string
+      required:
+      - type
+      - value
+      additionalProperties: {}
+    PropertyListResolutionSummary:
+      description: Counts describing how a submitted identifier set resolved against the AAO registry and local catalog.
+      type: object
+      properties:
+        totalRequested:
+          description: Number of unique identifiers the caller submitted (after per-type normalization and dedup)
+          example: 500
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        resolvedCount:
+          description: Identifiers successfully resolved to local Property records
+          example: 432
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        registeredCount:
+          description: Identifiers present in the AAO registry but with no local Property record yet (not yet targetable)
+          example: 12
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        unresolvedCount:
+          description: Identifiers not found anywhere; they will NOT participate in targeting
+          example: 56
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        resolutionRate:
+          description: resolvedCount / totalRequested as a fraction 0–1 (0 when totalRequested is 0)
+          example: 0.864
+          type: number
+          minimum: 0
+          maximum: 1
+      required:
+      - totalRequested
+      - resolvedCount
+      - registeredCount
+      - unresolvedCount
+      - resolutionRate
+      additionalProperties: false
     PropertyListFilters:
       type: object
       properties:
@@ -740,113 +1054,6 @@ components:
                 - include
             required:
             - feature_id
-    PropertyListResponse:
-      description: Response containing a single property list
-      type: object
-      properties:
-        propertyList:
-          $ref: '#/components/schemas/PropertyListOutput'
-      required:
-      - propertyList
-      additionalProperties: false
-    CampaignPropertyListEntry:
-      description: A property list referenced by one or more media-buy packages on a campaign, with the list summary plus the media-buy/package references that pull it in.
-      type: object
-      properties:
-        listId:
-          type: string
-        name:
-          type: string
-        purpose:
-          description: Whether properties in this list should be included or excluded
-          example: include
-          type: string
-          enum:
-          - include
-          - exclude
-        propertyCount:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-        viaMediaBuys:
-          type: array
-          items:
-            type: object
-            properties:
-              mediaBuyId:
-                type: string
-              packageIds:
-                type: array
-                items:
-                  type: string
-            required:
-            - mediaBuyId
-            - packageIds
-            additionalProperties: false
-      required:
-      - listId
-      - name
-      - purpose
-      - propertyCount
-      - createdAt
-      - updatedAt
-      - viaMediaBuys
-      additionalProperties: false
-    PropertyListResolutionSummary:
-      description: Counts describing how a submitted identifier set resolved against the AAO registry and local catalog.
-      type: object
-      properties:
-        totalRequested:
-          description: Number of unique identifiers the caller submitted (after per-type normalization and dedup)
-          example: 500
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        resolvedCount:
-          description: Identifiers successfully resolved to local Property records
-          example: 432
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        registeredCount:
-          description: Identifiers present in the AAO registry but with no local Property record yet (not yet targetable)
-          example: 12
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        unresolvedCount:
-          description: Identifiers not found anywhere; they will NOT participate in targeting
-          example: 56
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        resolutionRate:
-          description: resolvedCount / totalRequested as a fraction 0–1 (0 when totalRequested is 0)
-          example: 0.864
-          type: number
-          minimum: 0
-          maximum: 1
-      required:
-      - totalRequested
-      - resolvedCount
-      - registeredCount
-      - unresolvedCount
-      - resolutionRate
-      additionalProperties: false
-    AttachPropertyListBody:
-      type: object
-      properties:
-        propertyListId:
-          description: The ID of the property list to attach to the campaign
-          example: '1756'
-          type: string
-          minLength: 1
-      required:
-      - propertyListId
     PropertyListSummary:
       description: Compact property-list view returned by list endpoints. Use `get_property_list` for full content.
       type: object
@@ -891,143 +1098,6 @@ components:
       - propertyCount
       - createdAt
       - updatedAt
-      additionalProperties: false
-    CampaignPropertyListsResponse:
-      description: Property lists referenced by a campaign, derived from targeting_overlay.property_list on the campaign media-buy packages.
-      type: object
-      properties:
-        campaignId:
-          type: string
-        propertyLists:
-          type: array
-          items:
-            $ref: '#/components/schemas/CampaignPropertyListEntry'
-        summary:
-          type: object
-          properties:
-            totalLists:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            includeCount:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            excludeCount:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-          required:
-          - totalLists
-          - includeCount
-          - excludeCount
-          additionalProperties: false
-      required:
-      - campaignId
-      - propertyLists
-      - summary
-      additionalProperties: false
-    UpdatePropertyListInput:
-      description: Request body for updating a property list
-      type: object
-      properties:
-        name:
-          description: Updated name for the property list
-          type: string
-          minLength: 1
-          maxLength: 255
-        domains:
-          description: 'Updated domain list (convenience shorthand for `identifiers` with `type: "domain"`). If provided together with `identifiers`, both are merged. Replaces the existing identifier set entirely. Large lists are chunked server-side; the response includes a `resolutionSummary` with the counts.'
-          maxItems: 100000
-          type: array
-          items:
-            type: string
-            minLength: 1
-        identifiers:
-          description: Updated typed identifiers (domains + bundles). Replaces the existing identifier set entirely when either `domains` or `identifiers` is provided.
-          maxItems: 100000
-          type: array
-          items:
-            $ref: '#/components/schemas/PropertyListIdentifier'
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    AttachCascadeSummary:
-      type: object
-      properties:
-        totalMediaBuys:
-          description: Active media buys found whose advertisers reference this list. Each received an update_media_buy call with the refreshed list reference.
-          example: 4
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        updatedCount:
-          description: Active media buys that were successfully notified of the updated list
-          example: 3
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        failedCount:
-          description: Active media buys where the update_media_buy call failed. See server logs for details.
-          example: 1
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        skippedCount:
-          description: Media buys skipped during retroactive attach (already had the list or ineligible status)
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - totalMediaBuys
-      - updatedCount
-      - failedCount
-      - skippedCount
-      additionalProperties: false
-    PropertyListCascadeSummary:
-      description: Summary of the retroactive push of this updated property list to active media buys.
-      type: object
-      properties:
-        totalMediaBuys:
-          description: Active media buys found whose advertisers reference this list. Each received an update_media_buy call with the refreshed list reference.
-          example: 4
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        updatedCount:
-          description: Active media buys that were successfully notified of the updated list
-          example: 3
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        failedCount:
-          description: Active media buys where the update_media_buy call failed. See server logs for details.
-          example: 1
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - totalMediaBuys
-      - updatedCount
-      - failedCount
-      additionalProperties: false
-    EmptyResponse:
-      description: No content
-      type: object
-      properties: {}
       additionalProperties: false
     PropertyListOutput:
       description: Property list resource representation
@@ -1133,81 +1203,108 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    PropertyListIdentifier:
-      description: 'A typed property identifier (AdCP-aligned, sourced from `@adcp/sdk`). Read-side note: Apple App Store bundles share a single backing column, so `apple_tv_bundle` write-time entries normalize to `ios_bundle` on subsequent get/list responses. `bundle_id` (generic fallback) likewise normalizes to the resolved app row''s store-typed form (`ios_bundle` or `android_package`).'
+    EmptyResponse:
+      description: No content
+      type: object
+      properties: {}
+      additionalProperties: false
+    AttachPropertyListBody:
       type: object
       properties:
-        type:
-          anyOf:
-          - type: string
-            enum:
-            - domain
-          - type: string
-            enum:
-            - subdomain
-          - type: string
-            enum:
-            - network_id
-          - type: string
-            enum:
-            - ios_bundle
-          - type: string
-            enum:
-            - android_package
-          - type: string
-            enum:
-            - apple_app_store_id
-          - type: string
-            enum:
-            - google_play_id
-          - type: string
-            enum:
-            - roku_store_id
-          - type: string
-            enum:
-            - fire_tv_asin
-          - type: string
-            enum:
-            - samsung_app_id
-          - type: string
-            enum:
-            - apple_tv_bundle
-          - type: string
-            enum:
-            - bundle_id
-          - type: string
-            enum:
-            - venue_id
-          - type: string
-            enum:
-            - screen_id
-          - type: string
-            enum:
-            - openooh_venue_type
-          - type: string
-            enum:
-            - rss_url
-          - type: string
-            enum:
-            - apple_podcast_id
-          - type: string
-            enum:
-            - spotify_collection_id
-          - type: string
-            enum:
-            - podcast_guid
-          - type: string
-            enum:
-            - station_id
-          - type: string
-            enum:
-            - facility_id
-        value:
+        propertyListId:
+          description: The ID of the property list to attach to the campaign
+          example: '1756'
           type: string
+          minLength: 1
       required:
-      - type
-      - value
-      additionalProperties: {}
+      - propertyListId
+    CampaignPropertyListEntry:
+      description: A property list referenced by one or more media-buy packages on a campaign, with the list summary plus the media-buy/package references that pull it in.
+      type: object
+      properties:
+        listId:
+          type: string
+        name:
+          type: string
+        purpose:
+          description: Whether properties in this list should be included or excluded
+          example: include
+          type: string
+          enum:
+          - include
+          - exclude
+        propertyCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        viaMediaBuys:
+          type: array
+          items:
+            type: object
+            properties:
+              mediaBuyId:
+                type: string
+              packageIds:
+                type: array
+                items:
+                  type: string
+            required:
+            - mediaBuyId
+            - packageIds
+            additionalProperties: false
+      required:
+      - listId
+      - name
+      - purpose
+      - propertyCount
+      - createdAt
+      - updatedAt
+      - viaMediaBuys
+      additionalProperties: false
+    UpdatePropertyListInput:
+      description: Request body for updating a property list
+      type: object
+      properties:
+        name:
+          description: Updated name for the property list
+          type: string
+          minLength: 1
+          maxLength: 255
+        domains:
+          description: 'Updated domain list (convenience shorthand for `identifiers` with `type: "domain"`). If provided together with `identifiers`, both are merged. Replaces the existing identifier set entirely. Large lists are chunked server-side; the response includes a `resolutionSummary` with the counts.'
+          maxItems: 100000
+          type: array
+          items:
+            type: string
+            minLength: 1
+        identifiers:
+          description: Updated typed identifiers (domains + bundles). Replaces the existing identifier set entirely when either `domains` or `identifiers` is provided.
+          maxItems: 100000
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyListIdentifier'
+    AttachPropertyListResponse:
+      type: object
+      properties:
+        campaignId:
+          description: Campaign the list was attached to
+          type: string
+        propertyListId:
+          description: Property list that was attached
+          type: string
+        cascade:
+          description: Counts of active media buys processed during the retroactive attach
+          allOf:
+          - $ref: '#/components/schemas/AttachCascadeSummary'
+      required:
+      - campaignId
+      - propertyListId
+      - cascade
+      additionalProperties: false
     PropertyListFiltersOutput:
       type: object
       properties:
@@ -1303,111 +1400,14 @@ components:
             - feature_id
             additionalProperties: false
       additionalProperties: false
-    CreatePropertyListInput:
-      description: Request body for creating a property list
+    PropertyListResponse:
+      description: Response containing a single property list
       type: object
       properties:
-        name:
-          description: Human-readable name for the property list
-          example: Q1 Campaign - UK Premium
-          type: string
-          minLength: 1
-          maxLength: 255
-        purpose:
-          description: Whether properties in this list should be included or excluded
-          example: include
-          type: string
-          enum:
-          - include
-          - exclude
-        domains:
-          description: 'Domain identifiers (convenience shorthand for `identifiers` entries with `type: "domain"`). Provide `domains`, `identifiers`, or both. Large lists are chunked server-side against the AAO registry and local database; the response includes a `resolutionSummary` with the counts.'
-          example:
-          - nytimes.com
-          - cnn.com
-          - bbc.co.uk
-          maxItems: 100000
-          type: array
-          items:
-            type: string
-            minLength: 1
-        identifiers:
-          description: Typed property identifiers (AdCP-aligned) — mix of website domains, mobile app bundles/packages, store IDs, and CTV app IDs. Provide `domains`, `identifiers`, or both; combined total must be between 1 and 100000.
-          example:
-          - type: domain
-            value: nytimes.com
-          - type: ios_bundle
-            value: com.facebook.katana
-          - type: android_package
-            value: com.facebook.katana
-          - type: apple_app_store_id
-            value: '284882215'
-          maxItems: 100000
-          type: array
-          items:
-            $ref: '#/components/schemas/PropertyListIdentifier'
-        filters:
-          description: Filter configuration — controls which SmartPropertyLists this list is linked to
-          allOf:
-          - $ref: '#/components/schemas/PropertyListFilters'
+        propertyList:
+          $ref: '#/components/schemas/PropertyListOutput'
       required:
-      - name
-      - purpose
-    AttachPropertyListResponse:
-      type: object
-      properties:
-        campaignId:
-          description: Campaign the list was attached to
-          type: string
-        propertyListId:
-          description: Property list that was attached
-          type: string
-        cascade:
-          description: Counts of active media buys processed during the retroactive attach
-          allOf:
-          - $ref: '#/components/schemas/AttachCascadeSummary'
-      required:
-      - campaignId
-      - propertyListId
-      - cascade
-      additionalProperties: false
-    CheckPropertyListBody:
-      description: Request body for checking domains and bundles
-      type: object
-      properties:
-        domains:
-          description: 'Domain values to check (convenience shorthand for `identifiers` with `type: "domain"`).'
-          maxItems: 100000
-          type: array
-          items:
-            type: string
-            minLength: 1
-        identifiers:
-          description: Typed identifiers to check (domains and mobile app bundle IDs). Provide `domains`, `identifiers`, or both; combined total must be 1..100000. Bundle identifiers are not currently checked against the AAO registry and are returned in the `assess` bucket pending upstream support.
-          maxItems: 100000
-          type: array
-          items:
-            $ref: '#/components/schemas/PropertyListIdentifier'
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
+      - propertyList
       additionalProperties: false
   securitySchemes:
     bearerAuth:

@@ -230,17 +230,109 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    RemoveSupplyRequestResponse:
+    PublicSupplyRequestStatus:
       type: object
       properties:
-        removed:
-          type: boolean
-        request:
-          allOf:
-          - $ref: '#/components/schemas/SupplyRequestItem'
+        key:
+          type: string
+          enum:
+          - tracked
+          - available
+        label:
+          type: string
+        description:
+          type: string
+        asOf:
+          type:
+          - string
+          - 'null'
       required:
-      - removed
+      - key
+      - label
+      - description
+      additionalProperties: false
+    RequestSupplyResponse:
+      type: object
+      properties:
+        created:
+          type: boolean
+        updated:
+          type: boolean
+        registryStatus:
+          type: string
+          enum:
+          - found
+          - missing
+          - unavailable
+        request:
+          $ref: '#/components/schemas/SupplyRequestItem'
+      required:
+      - created
+      - updated
+      - registryStatus
       - request
+      additionalProperties: false
+    SupplyRequestSuggestionsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupplyRequestSuggestionItem'
+      required:
+      - items
+      additionalProperties: false
+    SupplyRequestItem:
+      type: object
+      properties:
+        domain:
+          type: string
+        channel:
+          type: string
+        trackingSource:
+          type: string
+          enum:
+          - explicit
+          - shared_channel
+        removable:
+          type: boolean
+        market:
+          type:
+          - string
+          - 'null'
+        desiredSupply:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+        publicStatus:
+          $ref: '#/components/schemas/PublicSupplyRequestStatus'
+        customerNeed:
+          type:
+          - object
+          - 'null'
+          properties:
+            createdAt:
+              type:
+              - string
+              - 'null'
+            updatedAt:
+              type:
+              - string
+              - 'null'
+          required:
+          - createdAt
+          - updatedAt
+          additionalProperties: false
+      required:
+      - domain
+      - channel
+      - trackingSource
+      - removable
+      - market
+      - desiredSupply
+      - publicStatus
+      - customerNeed
       additionalProperties: false
     SupplyRequestListResponse:
       type: object
@@ -312,99 +404,33 @@ components:
       - kind
       - source
       additionalProperties: false
-    RequestSupplyResponse:
+    ErrorResponse:
+      description: Standard error response
       type: object
       properties:
-        created:
-          type: boolean
-        updated:
-          type: boolean
-        registryStatus:
-          type: string
+        data:
+          type:
+          - string
+          - 'null'
           enum:
-          - found
-          - missing
-          - unavailable
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    RemoveSupplyRequestResponse:
+      type: object
+      properties:
+        removed:
+          type: boolean
         request:
-          $ref: '#/components/schemas/SupplyRequestItem'
+          allOf:
+          - $ref: '#/components/schemas/SupplyRequestItem'
       required:
-      - created
-      - updated
-      - registryStatus
+      - removed
       - request
-      additionalProperties: false
-    PublicSupplyRequestStatus:
-      type: object
-      properties:
-        key:
-          type: string
-          enum:
-          - tracked
-          - available
-        label:
-          type: string
-        description:
-          type: string
-        asOf:
-          type:
-          - string
-          - 'null'
-      required:
-      - key
-      - label
-      - description
-      additionalProperties: false
-    SupplyRequestItem:
-      type: object
-      properties:
-        domain:
-          type: string
-        channel:
-          type: string
-        trackingSource:
-          type: string
-          enum:
-          - explicit
-          - shared_channel
-        removable:
-          type: boolean
-        market:
-          type:
-          - string
-          - 'null'
-        desiredSupply:
-          type:
-          - string
-          - 'null'
-          maxLength: 1000
-        publicStatus:
-          $ref: '#/components/schemas/PublicSupplyRequestStatus'
-        customerNeed:
-          type:
-          - object
-          - 'null'
-          properties:
-            createdAt:
-              type:
-              - string
-              - 'null'
-            updatedAt:
-              type:
-              - string
-              - 'null'
-          required:
-          - createdAt
-          - updatedAt
-          additionalProperties: false
-      required:
-      - domain
-      - channel
-      - trackingSource
-      - removable
-      - market
-      - desiredSupply
-      - publicStatus
-      - customerNeed
       additionalProperties: false
     ApiError:
       description: Structured error object
@@ -426,32 +452,6 @@ components:
       required:
       - code
       - message
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    SupplyRequestSuggestionsResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/SupplyRequestSuggestionItem'
-      required:
-      - items
       additionalProperties: false
   securitySchemes:
     bearerAuth:

@@ -76,289 +76,27 @@ paths:
       - Impact
 components:
   schemas:
-    DebugInfo:
-      type: object
-      additionalProperties: false
-      properties:
-        model:
-          $ref: '#/components/schemas/Model'
-        hardware_node:
-          $ref: '#/components/schemas/Node'
-        grid_mix:
-          $ref: '#/components/schemas/GridMix'
-        steps:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/PredictionStep'
-    ImpactMetrics:
+    Error:
       type: object
       additionalProperties: false
       required:
-      - usage_energy_wh
-      - usage_emissions_gco2e
-      - usage_water_ml
-      - embodied_emissions_gco2e
-      - embodied_water_ml
+      - message
       properties:
-        usage_energy_wh:
-          type: number
-          example: 0.13
-          format: float
-          x-go-type: float64
-        usage_emissions_gco2e:
-          type: number
-          example: 0.81
-          format: float
-          x-go-type: float64
-        usage_water_ml:
-          type: number
-          example: 1.32
-          format: float
-          x-go-type: float64
-        embodied_emissions_gco2e:
-          type: number
-          example: 0.81
-          format: float
-          x-go-type: float64
-        embodied_water_ml:
-          type: number
-          example: 1.32
-          format: float
-          x-go-type: float64
-    Node:
-      allOf:
-      - $ref: '#/components/schemas/NodeCreateRequest'
-      - type: object
-        required:
-        - created_at
-        - updated_at
-        properties:
-          customer_id:
-            type: integer
-            x-go-type: int64
-            description: ID of the customer who owns this node (visible to admins only)
-          created_at:
-            type: string
-            format: date-time
-          updated_at:
-            type: string
-            format: date-time
-          created_by:
-            type: string
-            description: ID of the user who created the node (admin or owner only)
-    GridMix:
-      type: object
-      additionalProperties: false
-      required:
-      - country
-      - gco2e_per_kwh
-      properties:
-        country:
-          $ref: '#/components/schemas/CountryCode'
-        region:
-          $ref: '#/components/schemas/RegionCode'
-        gco2e_per_kwh:
-          type: number
-          example: 475
-          format: float
-          x-go-type: float64
-          minimum: 0
-          maximum: 2000
-    Model:
-      title: Model
-      type: object
-      required:
-      - id
-      - created_at
-      - updated_at
-      - created_by
-      - customer_id
-      - aliases
-      additionalProperties: false
-      properties:
-        id:
+        code:
           type: string
-          example: gpt-4-turbo
-        aliases:
-          type: array
-          maxItems: 100
-          items:
-            type: string
-          description: List of aliases for this model; must be globally-unique with id
-          example:
-          - claude-latest
-          - claude-3-sonnet-current
-        name:
+        message:
           type: string
-          example: GPT-4 Turbo
-        family:
-          type: string
-          example: gpt
-        hugging_face_path:
-          type: string
-          example: EleutherAI/gpt-neo-2.7B
-        benchmark_model_id:
-          type: string
-          example: GPTJ-6B
-        total_params_billions:
-          type: number
-          example: 175
-          format: float
-          x-go-type: float64
-        number_of_experts:
-          type: integer
-          x-go-type: int64
-          example: 7
-        params_per_expert_billions:
-          type: number
-          example: 8
-          format: float
-          x-go-type: float64
-        tensor_parallelism:
-          type: integer
-          example: 1
-        datatype:
-          $ref: '#/components/schemas/DataType'
-          example: fp8
-        task:
-          $ref: '#/components/schemas/Task'
-          example: text-generation
-        training_usage_energy_kwh:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_usage_emissions_kgco2e:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_usage_water_l:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_embodied_emissions_kgco2e:
-          type: number
-          example: 11013.1
-          format: float
-          x-go-type: float64
-        training_embodied_water_l:
-          type: number
-          example: 11013.1
-          format: float
-          x-go-type: float64
-        estimated_use_life_days:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        estimated_requests_per_day:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        fine_tuned_from_model_id:
-          type: string
-          example: llama_31_8b
-        customer_id:
-          type: integer
-          x-go-type: int64
-          description: ID of the customer who owns this node (visible to admins only)
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-          description: ID of the user who created the node (admin or owner only)
-    RegionCode:
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+    Image:
       type: string
-      pattern: ^[A-Z]{2}$
-      minLength: 2
-      maxLength: 2
-      description: Two-letter region code as defined by ISO 3166-1 alpha-2
-      example: NY
-    ImpactRequest:
-      title: Impact Request
-      type: object
-      additionalProperties: false
-      required:
-      - rows
-      properties:
-        rows:
-          type: array
-          maxItems: 1000
-          items:
-            $ref: '#/components/schemas/ImpactRow'
-    Task:
-      type: string
-      enum:
-      - text-generation
-      - chat
-      - text-embedding
-      - text-classification
-      - sentiment-analysis
-      - named-entity-recognition
-      - question-answering
-      - summarization
-      - translation
-      - image-classification
-      - object-detection
-      - image-segmentation
-      - image-generation
-      - image-to-text
-      - text-to-image
-      - style-transfer
-      - face-detection
-      - facial-recognition
-      - speech-to-text
-      - text-to-speech
-      - speaker-identification
-      - audio-classification
-      - music-generation
-      - multimodal-embedding
-      - multimodal-generation
-      - visual-question-answering
-      - recommendation-system
-      - reinforcement-learning
-      - anomaly-detection
-      - time-series-forecasting
-      - clustering
-      description: 'Common types of AI/ML models and their primary functions:
-
-        - Text-based models for natural language processing
-
-        - Vision models for image analysis and generation
-
-        - Audio models for speech and sound processing
-
-        - Multimodal models that combine different types of inputs/outputs
-
-        - Specialized models for specific use cases
-
-        '
-    ModeledRow:
-      type: object
-      additionalProperties: false
-      required:
-      - total_impact
-      properties:
-        inference_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        training_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        fine_tuning_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        total_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        debug:
-          $ref: '#/components/schemas/DebugInfo'
-        error:
-          $ref: '#/components/schemas/Error'
+      example: 1024x1024
+      pattern: ^(\d{1,4})x(\d{1,4})$
     ImpactRow:
       type: object
       additionalProperties: false
@@ -530,57 +268,6 @@ components:
           x-go-type: int64
           description: the resolution of the video in number of lines (for instance, 1080 for 1080p)
           example: 1080
-    CountryCode:
-      type: string
-      pattern: ^[A-Z]{2}$
-      minLength: 2
-      maxLength: 2
-      description: Two-letter country code as defined by ISO 3166-1 alpha-2
-      example: US
-    DataType:
-      type: string
-      enum:
-      - fp8
-      - fp8-e4m3
-      - fp8-e5m2
-      - fp16
-      - tf32
-      - fp32
-      - fp64
-      - bfloat8
-      - bfloat16
-      - bf16
-      - int4
-      - int8
-      - int16
-      - int32
-      - int64
-      - uint4
-      - uint8
-      - uint16
-      - uint32
-      - uint64
-    Image:
-      type: string
-      example: 1024x1024
-      pattern: ^(\d{1,4})x(\d{1,4})$
-    PredictionStep:
-      type: object
-      additionalProperties: false
-      required:
-      - description
-      - duration_ms
-      - inferences
-      properties:
-        description:
-          type: string
-        duration_ms:
-          type: number
-          format: float
-          x-go-type: float64
-        inferences:
-          type: integer
-          x-go-type: int64
     ImpactResponse:
       title: Impact Response
       type: object
@@ -612,23 +299,321 @@ components:
         has_errors:
           type: boolean
           example: false
-    Error:
+    ModeledRow:
       type: object
       additionalProperties: false
       required:
-      - message
+      - total_impact
       properties:
-        code:
+        inference_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        training_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        fine_tuning_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        total_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        debug:
+          $ref: '#/components/schemas/DebugInfo'
+        error:
+          $ref: '#/components/schemas/Error'
+    CountryCode:
+      type: string
+      pattern: ^[A-Z]{2}$
+      minLength: 2
+      maxLength: 2
+      description: Two-letter country code as defined by ISO 3166-1 alpha-2
+      example: US
+    RegionCode:
+      type: string
+      pattern: ^[A-Z]{2}$
+      minLength: 2
+      maxLength: 2
+      description: Two-letter region code as defined by ISO 3166-1 alpha-2
+      example: NY
+    Node:
+      allOf:
+      - $ref: '#/components/schemas/NodeCreateRequest'
+      - type: object
+        required:
+        - created_at
+        - updated_at
+        properties:
+          customer_id:
+            type: integer
+            x-go-type: int64
+            description: ID of the customer who owns this node (visible to admins only)
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+          created_by:
+            type: string
+            description: ID of the user who created the node (admin or owner only)
+    PredictionStep:
+      type: object
+      additionalProperties: false
+      required:
+      - description
+      - duration_ms
+      - inferences
+      properties:
+        description:
           type: string
-        message:
+        duration_ms:
+          type: number
+          format: float
+          x-go-type: float64
+        inferences:
+          type: integer
+          x-go-type: int64
+    Model:
+      title: Model
+      type: object
+      required:
+      - id
+      - created_at
+      - updated_at
+      - created_by
+      - customer_id
+      - aliases
+      additionalProperties: false
+      properties:
+        id:
           type: string
-        details:
-          type: object
-          properties:
-            reason:
-              type: string
-            field:
-              type: string
+          example: gpt-4-turbo
+        aliases:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+          description: List of aliases for this model; must be globally-unique with id
+          example:
+          - claude-latest
+          - claude-3-sonnet-current
+        name:
+          type: string
+          example: GPT-4 Turbo
+        family:
+          type: string
+          example: gpt
+        hugging_face_path:
+          type: string
+          example: EleutherAI/gpt-neo-2.7B
+        benchmark_model_id:
+          type: string
+          example: GPTJ-6B
+        total_params_billions:
+          type: number
+          example: 175
+          format: float
+          x-go-type: float64
+        number_of_experts:
+          type: integer
+          x-go-type: int64
+          example: 7
+        params_per_expert_billions:
+          type: number
+          example: 8
+          format: float
+          x-go-type: float64
+        tensor_parallelism:
+          type: integer
+          example: 1
+        datatype:
+          $ref: '#/components/schemas/DataType'
+          example: fp8
+        task:
+          $ref: '#/components/schemas/Task'
+          example: text-generation
+        training_usage_energy_kwh:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_emissions_kgco2e:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_water_l:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_embodied_emissions_kgco2e:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        training_embodied_water_l:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        estimated_use_life_days:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        estimated_requests_per_day:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        fine_tuned_from_model_id:
+          type: string
+          example: llama_31_8b
+        customer_id:
+          type: integer
+          x-go-type: int64
+          description: ID of the customer who owns this node (visible to admins only)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          description: ID of the user who created the node (admin or owner only)
+    GridMix:
+      type: object
+      additionalProperties: false
+      required:
+      - country
+      - gco2e_per_kwh
+      properties:
+        country:
+          $ref: '#/components/schemas/CountryCode'
+        region:
+          $ref: '#/components/schemas/RegionCode'
+        gco2e_per_kwh:
+          type: number
+          example: 475
+          format: float
+          x-go-type: float64
+          minimum: 0
+          maximum: 2000
+    ImpactMetrics:
+      type: object
+      additionalProperties: false
+      required:
+      - usage_energy_wh
+      - usage_emissions_gco2e
+      - usage_water_ml
+      - embodied_emissions_gco2e
+      - embodied_water_ml
+      properties:
+        usage_energy_wh:
+          type: number
+          example: 0.13
+          format: float
+          x-go-type: float64
+        usage_emissions_gco2e:
+          type: number
+          example: 0.81
+          format: float
+          x-go-type: float64
+        usage_water_ml:
+          type: number
+          example: 1.32
+          format: float
+          x-go-type: float64
+        embodied_emissions_gco2e:
+          type: number
+          example: 0.81
+          format: float
+          x-go-type: float64
+        embodied_water_ml:
+          type: number
+          example: 1.32
+          format: float
+          x-go-type: float64
+    Task:
+      type: string
+      enum:
+      - text-generation
+      - chat
+      - text-embedding
+      - text-classification
+      - sentiment-analysis
+      - named-entity-recognition
+      - question-answering
+      - summarization
+      - translation
+      - image-classification
+      - object-detection
+      - image-segmentation
+      - image-generation
+      - image-to-text
+      - text-to-image
+      - style-transfer
+      - face-detection
+      - facial-recognition
+      - speech-to-text
+      - text-to-speech
+      - speaker-identification
+      - audio-classification
+      - music-generation
+      - multimodal-embedding
+      - multimodal-generation
+      - visual-question-answering
+      - recommendation-system
+      - reinforcement-learning
+      - anomaly-detection
+      - time-series-forecasting
+      - clustering
+      description: 'Common types of AI/ML models and their primary functions:
+
+        - Text-based models for natural language processing
+
+        - Vision models for image analysis and generation
+
+        - Audio models for speech and sound processing
+
+        - Multimodal models that combine different types of inputs/outputs
+
+        - Specialized models for specific use cases
+
+        '
+    DataType:
+      type: string
+      enum:
+      - fp8
+      - fp8-e4m3
+      - fp8-e5m2
+      - fp16
+      - tf32
+      - fp32
+      - fp64
+      - bfloat8
+      - bfloat16
+      - bf16
+      - int4
+      - int8
+      - int16
+      - int32
+      - int64
+      - uint4
+      - uint8
+      - uint16
+      - uint32
+      - uint64
+    ImpactRequest:
+      title: Impact Request
+      type: object
+      additionalProperties: false
+      required:
+      - rows
+      properties:
+        rows:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/ImpactRow'
     NodeCreateRequest:
       type: object
       required:
@@ -715,6 +700,21 @@ components:
           maximum: 30
           format: float
           x-go-type: float64
+    DebugInfo:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          $ref: '#/components/schemas/Model'
+        hardware_node:
+          $ref: '#/components/schemas/Node'
+        grid_mix:
+          $ref: '#/components/schemas/GridMix'
+        steps:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/PredictionStep'
   securitySchemes:
     bearerAuth:
       type: http

@@ -206,6 +206,17 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    SyndicateResponse:
+      description: Response after toggling syndication for one or more ADCP agents
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyndicationStatusOutput'
+      required:
+      - data
+      additionalProperties: false
     SyndicationStatusListResponse:
       description: Paginated list of syndication status records
       type: object
@@ -224,26 +235,21 @@ components:
       - items
       - total
       additionalProperties: false
-    ApiError:
-      description: Structured error object
+    ErrorResponse:
+      description: Standard error response
       type: object
       properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
       required:
-      - code
-      - message
+      - data
+      - error
       additionalProperties: false
     SyndicationStatusOutput:
       description: Syndication status record
@@ -345,32 +351,26 @@ components:
       - updatedAt
       - completedAt
       additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
+    ApiError:
+      description: Structured error object
       type: object
       properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
       required:
-      - data
-      - error
-      additionalProperties: false
-    SyndicateResponse:
-      description: Response after toggling syndication for one or more ADCP agents
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SyndicationStatusOutput'
-      required:
-      - data
+      - code
+      - message
       additionalProperties: false
   securitySchemes:
     bearerAuth:

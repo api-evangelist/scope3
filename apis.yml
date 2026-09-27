@@ -58,12 +58,13 @@ tags:
 - AdTech
 - Measurements
 - Artificial Intelligence
-- Agentic
+- AI Agents
 - AdCP
 - MCP
 - Programmatic
 - Media Buying
 - Publishing
+- A2A
 tags_raw:
 - Company
 - Enterprise
@@ -79,6 +80,7 @@ tags_raw:
 - Programmatic
 - Media Buying
 - Publishing
+- A2A
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -723,3 +725,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 16
   pass: local-v1
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://docs.interchange.io/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "0.3"
+  control: 404

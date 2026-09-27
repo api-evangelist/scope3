@@ -72,19 +72,34 @@ paths:
       - Segment
 components:
   schemas:
-    DistributionMethod:
-      type: string
-      enum:
-      - BUCKET_PUSH
-      - API_PULL
-      - INTEGRATION
-      description: The segment distribution method
-    UpdateFrequency:
-      type: string
-      enum:
-      - DAILY
-      - MONTHLY
-      description: The segment update frequency
+    Paging:
+      type: object
+      required:
+      - totalRecords
+      properties:
+        next:
+          type: string
+          description: The url to query for the next page of data
+        previous:
+          type: string
+          description: The url to query for the next page of data
+        totalRecords:
+          type: integer
+          description: The total number of records
+    PlacementList:
+      type: object
+      required:
+      - name
+      - countries
+      properties:
+        name:
+          type: string
+          description: The placement list name
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries included in the segment
     SegmentData:
       type: object
       required:
@@ -128,6 +143,12 @@ components:
           items:
             type: string
           description: The GPIDs excluded for the given property
+    UpdateFrequency:
+      type: string
+      enum:
+      - DAILY
+      - MONTHLY
+      description: The segment update frequency
     SegmentDataResponse:
       type: object
       required:
@@ -141,56 +162,13 @@ components:
           description: The segment data
         paging:
           $ref: '#/components/schemas/Paging'
-    SegmentList:
-      type: object
-      required:
-      - segments
-      - paging
-      properties:
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/Segment'
-        paging:
-          $ref: '#/components/schemas/Paging'
-    SegmentPartner:
-      type: object
-      required:
-      - name
-      - segmentId
-      properties:
-        name:
-          type: string
-          description: The client partner's name
-        segmentId:
-          type: string
-          description: The client partner's segment id
-        seatId:
-          type:
-          - string
-          - 'null'
-          description: The client partner's seat id
-    SegmentDataType:
+    DistributionMethod:
       type: string
       enum:
-      - INCLUDED_PROPERTY
-      - EXCLUDED_PROPERTY
-      - EXCLUDED_PROPERTY_PLACEMENTS
-      description: The segment data type
-    PlacementList:
-      type: object
-      required:
-      - name
-      - countries
-      properties:
-        name:
-          type: string
-          description: The placement list name
-        countries:
-          type: array
-          items:
-            type: string
-          description: The countries included in the segment
+      - BUCKET_PUSH
+      - API_PULL
+      - INTEGRATION
+      description: The segment distribution method
     Segment:
       type: object
       required:
@@ -253,20 +231,42 @@ components:
           format: date-time
           description: Deactivated date and time
           example: '2021-01-30T08:30:00Z'
-    Paging:
+    SegmentList:
       type: object
       required:
-      - totalRecords
+      - segments
+      - paging
       properties:
-        next:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SegmentDataType:
+      type: string
+      enum:
+      - INCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY_PLACEMENTS
+      description: The segment data type
+    SegmentPartner:
+      type: object
+      required:
+      - name
+      - segmentId
+      properties:
+        name:
           type: string
-          description: The url to query for the next page of data
-        previous:
+          description: The client partner's name
+        segmentId:
           type: string
-          description: The url to query for the next page of data
-        totalRecords:
-          type: integer
-          description: The total number of records
+          description: The client partner's segment id
+        seatId:
+          type:
+          - string
+          - 'null'
+          description: The client partner's seat id
     PropertyList:
       type: object
       required:

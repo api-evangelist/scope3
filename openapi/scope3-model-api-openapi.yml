@@ -336,6 +336,23 @@ paths:
       - Model
 components:
   schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
     ModelResponse:
       title: Model Response
       type: object
@@ -348,29 +365,46 @@ components:
           maxItems: 100
           items:
             $ref: '#/components/schemas/Model'
-    DataType:
+    Family:
       type: string
       enum:
-      - fp8
-      - fp8-e4m3
-      - fp8-e5m2
-      - fp16
-      - tf32
-      - fp32
-      - fp64
-      - bfloat8
-      - bfloat16
-      - bf16
-      - int4
-      - int8
-      - int16
-      - int32
-      - int64
-      - uint4
-      - uint8
-      - uint16
-      - uint32
-      - uint64
+      - claude
+      - gpt
+      - dall-e
+      - whisper
+      - gemini
+      - palm
+      - bert
+      - t5
+      - llama
+      - opt
+      - galactica
+      - phi
+      - stable-diffusion
+      - stable-lm
+      - mistral
+      - mixtral
+      - command
+      - embed
+      - falcon
+      - mpt
+      - pythia
+      - dolly
+      - bloom
+      - roberta
+      - gpt-neo
+      - gpt-j
+      description: 'Core AI model families from various organizations:
+
+        - Commercial models from major AI companies
+
+        - Open source model families
+
+        - Research/academic model families
+
+        - Models may appear in multiple categories if they have both commercial and open source variants
+
+        '
     Model:
       title: Model
       type: object
@@ -481,53 +515,6 @@ components:
         created_by:
           type: string
           description: ID of the user who created the node (admin or owner only)
-    Task:
-      type: string
-      enum:
-      - text-generation
-      - chat
-      - text-embedding
-      - text-classification
-      - sentiment-analysis
-      - named-entity-recognition
-      - question-answering
-      - summarization
-      - translation
-      - image-classification
-      - object-detection
-      - image-segmentation
-      - image-generation
-      - image-to-text
-      - text-to-image
-      - style-transfer
-      - face-detection
-      - facial-recognition
-      - speech-to-text
-      - text-to-speech
-      - speaker-identification
-      - audio-classification
-      - music-generation
-      - multimodal-embedding
-      - multimodal-generation
-      - visual-question-answering
-      - recommendation-system
-      - reinforcement-learning
-      - anomaly-detection
-      - time-series-forecasting
-      - clustering
-      description: 'Common types of AI/ML models and their primary functions:
-
-        - Text-based models for natural language processing
-
-        - Vision models for image analysis and generation
-
-        - Audio models for speech and sound processing
-
-        - Multimodal models that combine different types of inputs/outputs
-
-        - Specialized models for specific use cases
-
-        '
     ModelCreateRequest:
       type: object
       required:
@@ -676,61 +663,74 @@ components:
           example: 11013.1
           format: float
           x-go-type: float64
-    Error:
-      type: object
-      additionalProperties: false
-      required:
-      - message
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        details:
-          type: object
-          properties:
-            reason:
-              type: string
-            field:
-              type: string
-    Family:
+    DataType:
       type: string
       enum:
-      - claude
-      - gpt
-      - dall-e
-      - whisper
-      - gemini
-      - palm
-      - bert
-      - t5
-      - llama
-      - opt
-      - galactica
-      - phi
-      - stable-diffusion
-      - stable-lm
-      - mistral
-      - mixtral
-      - command
-      - embed
-      - falcon
-      - mpt
-      - pythia
-      - dolly
-      - bloom
-      - roberta
-      - gpt-neo
-      - gpt-j
-      description: 'Core AI model families from various organizations:
+      - fp8
+      - fp8-e4m3
+      - fp8-e5m2
+      - fp16
+      - tf32
+      - fp32
+      - fp64
+      - bfloat8
+      - bfloat16
+      - bf16
+      - int4
+      - int8
+      - int16
+      - int32
+      - int64
+      - uint4
+      - uint8
+      - uint16
+      - uint32
+      - uint64
+    Task:
+      type: string
+      enum:
+      - text-generation
+      - chat
+      - text-embedding
+      - text-classification
+      - sentiment-analysis
+      - named-entity-recognition
+      - question-answering
+      - summarization
+      - translation
+      - image-classification
+      - object-detection
+      - image-segmentation
+      - image-generation
+      - image-to-text
+      - text-to-image
+      - style-transfer
+      - face-detection
+      - facial-recognition
+      - speech-to-text
+      - text-to-speech
+      - speaker-identification
+      - audio-classification
+      - music-generation
+      - multimodal-embedding
+      - multimodal-generation
+      - visual-question-answering
+      - recommendation-system
+      - reinforcement-learning
+      - anomaly-detection
+      - time-series-forecasting
+      - clustering
+      description: 'Common types of AI/ML models and their primary functions:
 
-        - Commercial models from major AI companies
+        - Text-based models for natural language processing
 
-        - Open source model families
+        - Vision models for image analysis and generation
 
-        - Research/academic model families
+        - Audio models for speech and sound processing
 
-        - Models may appear in multiple categories if they have both commercial and open source variants
+        - Multimodal models that combine different types of inputs/outputs
+
+        - Specialized models for specific use cases
 
         '
   securitySchemes:

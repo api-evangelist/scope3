@@ -43,24 +43,6 @@ paths:
       - Benchmarks
 components:
   schemas:
-    BenchmarksResponse:
-      type: object
-      required:
-      - benchmarks
-      properties:
-        requestId:
-          $ref: '#/components/schemas/RequestId'
-        benchmarks:
-          type: array
-          items:
-            $ref: '#/components/schemas/BenchmarkInformation'
-    CountryInput:
-      type: string
-      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
-      example: US
-    RequestId:
-      type: string
-      description: Auto generated request identifier
     ChannelWithBenchmarks:
       type: string
       enum:
@@ -70,6 +52,9 @@ components:
       - social
       - ctv-bvod
       example: web
+    RequestId:
+      type: string
+      description: Auto generated request identifier
     BenchmarkInformation:
       type: object
       required:
@@ -90,6 +75,21 @@ components:
           format: double
           example: 1.02
           description: Ad tech emissions in grams of CO₂e.
+    CountryInput:
+      type: string
+      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
+      example: US
+    BenchmarksResponse:
+      type: object
+      required:
+      - benchmarks
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        benchmarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenchmarkInformation'
     BenchmarksRequest:
       type: object
       required:
