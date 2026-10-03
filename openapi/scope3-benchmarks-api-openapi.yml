@@ -52,9 +52,6 @@ components:
       - social
       - ctv-bvod
       example: web
-    RequestId:
-      type: string
-      description: Auto generated request identifier
     BenchmarkInformation:
       type: object
       required:
@@ -104,6 +101,9 @@ components:
           type: string
           description: 'Year-month which specifies which month''s benchmarks to use. (Supported Formats: YYYY-MM, YYYYMM, or YYYY/MM)'
           example: 2023-04
+    RequestId:
+      type: string
+      description: Auto generated request identifier
   securitySchemes:
     bearerAuth:
       type: http

@@ -75,6 +75,38 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    StorefrontProductsResponse:
+      description: List of storefront products aggregated across all ad server sources
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontProductSummary'
+      required:
+      - data
+      additionalProperties: false
     ErrorResponse:
       description: Standard error response
       type: object
@@ -90,17 +122,6 @@ components:
       required:
       - data
       - error
-      additionalProperties: false
-    StorefrontProductsResponse:
-      description: List of storefront products aggregated across all ad server sources
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/StorefrontProductSummary'
-      required:
-      - data
       additionalProperties: false
     StorefrontProductSummary:
       description: A product from an ad server source associated with this storefront
@@ -137,27 +158,6 @@ components:
       - status
       - creativeFormatIds
       - adUnitNames
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
       additionalProperties: false
   securitySchemes:
     bearerAuth:

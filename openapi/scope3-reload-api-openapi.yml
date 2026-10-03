@@ -38,6 +38,17 @@ paths:
       x-summary-source: derived
 components:
   schemas:
+    StatusResponse:
+      title: Status Response
+      type: object
+      additionalProperties: false
+      required:
+      - ready
+      properties:
+        ready:
+          type: boolean
+        reason:
+          type: string
     Error:
       type: object
       additionalProperties: false
@@ -55,17 +66,6 @@ components:
               type: string
             field:
               type: string
-    StatusResponse:
-      title: Status Response
-      type: object
-      additionalProperties: false
-      required:
-      - ready
-      properties:
-        ready:
-          type: boolean
-        reason:
-          type: string
   securitySchemes:
     bearerAuth:
       type: http

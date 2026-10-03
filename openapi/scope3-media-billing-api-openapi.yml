@@ -551,6 +551,94 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    DeleteMediaBillingAttachmentResponse:
+      type: object
+      properties: {}
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ListMediaBillingAttachmentsResponse:
+      description: Media billing attachments configured for the org.
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaBillingAttachment'
+      required:
+      - attachments
+      additionalProperties: false
+    CreateMediaBillingEntityResponse:
+      type: object
+      properties:
+        entity:
+          $ref: '#/components/schemas/MediaBillingEntity'
+      required:
+      - entity
+      additionalProperties: false
+    CreateMediaBillingAttachmentResponse:
+      type: object
+      properties:
+        attachment:
+          $ref: '#/components/schemas/MediaBillingAttachment'
+      required:
+      - attachment
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    ResolveMediaBillingEntityResponse:
+      description: 'Answers "who gets this invoice" for an advertiser or account: the resolved media billing entity and which level of the hierarchy it came from.'
+      type: object
+      properties:
+        entity:
+          description: The resolved media billing entity, or null when the org has no media billing entity at all (not even a primary backstop).
+          allOf:
+          - $ref: '#/components/schemas/MediaBillingEntity'
+        resolvedVia:
+          description: '"advertiser" (the advertiser has its own attachment), "account" (its owning account does), "org" (the org primary/backstop), or "none" (the org has no entity yet).'
+          type: string
+          enum:
+          - advertiser
+          - account
+          - org
+          - none
+      required:
+      - entity
+      - resolvedVia
+      additionalProperties: false
     CreateMediaBillingEntityBody:
       description: Create a media billing entity — a legal entity Scope3 invoices for media spend.
       type: object
@@ -617,6 +705,10 @@ components:
       - addressLine1
       - city
       - postalCode
+    DeleteMediaBillingEntityResponse:
+      type: object
+      properties: {}
+      additionalProperties: false
     MediaBillingEntity:
       description: A media billing entity — a legal entity Scope3 invoices for media spend.
       type: object
@@ -709,26 +801,6 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    CreateMediaBillingEntityResponse:
-      type: object
-      properties:
-        entity:
-          $ref: '#/components/schemas/MediaBillingEntity'
-      required:
-      - entity
-      additionalProperties: false
-    CreateMediaBillingAttachmentResponse:
-      type: object
-      properties:
-        attachment:
-          $ref: '#/components/schemas/MediaBillingAttachment'
-      required:
-      - attachment
-      additionalProperties: false
-    DeleteMediaBillingEntityResponse:
-      type: object
-      properties: {}
-      additionalProperties: false
     UpdateMediaBillingEntityResponse:
       type: object
       properties:
@@ -736,52 +808,6 @@ components:
           $ref: '#/components/schemas/MediaBillingEntity'
       required:
       - entity
-      additionalProperties: false
-    ListMediaBillingEntitiesResponse:
-      description: Media billing entities configured for the org.
-      type: object
-      properties:
-        entities:
-          type: array
-          items:
-            $ref: '#/components/schemas/MediaBillingEntity'
-      required:
-      - entities
-      additionalProperties: false
-    ListMediaBillingAttachmentsResponse:
-      description: Media billing attachments configured for the org.
-      type: object
-      properties:
-        attachments:
-          type: array
-          items:
-            $ref: '#/components/schemas/MediaBillingAttachment'
-      required:
-      - attachments
-      additionalProperties: false
-    DeleteMediaBillingAttachmentResponse:
-      type: object
-      properties: {}
-      additionalProperties: false
-    ResolveMediaBillingEntityResponse:
-      description: 'Answers "who gets this invoice" for an advertiser or account: the resolved media billing entity and which level of the hierarchy it came from.'
-      type: object
-      properties:
-        entity:
-          description: The resolved media billing entity, or null when the org has no media billing entity at all (not even a primary backstop).
-          allOf:
-          - $ref: '#/components/schemas/MediaBillingEntity'
-        resolvedVia:
-          description: '"advertiser" (the advertiser has its own attachment), "account" (its owning account does), "org" (the org primary/backstop), or "none" (the org has no entity yet).'
-          type: string
-          enum:
-          - advertiser
-          - account
-          - org
-          - none
-      required:
-      - entity
-      - resolvedVia
       additionalProperties: false
     MediaBillingAttachment:
       description: Routes one advertiser or account (child customer) to a media billing entity.
@@ -827,42 +853,16 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
+    ListMediaBillingEntitiesResponse:
+      description: Media billing entities configured for the org.
       type: object
       properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaBillingEntity'
       required:
-      - data
-      - error
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
+      - entities
       additionalProperties: false
   securitySchemes:
     bearerAuth:

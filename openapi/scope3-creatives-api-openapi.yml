@@ -4806,190 +4806,29 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    CreativeCollectionMemberSummary:
-      description: A collection member with an optional creative summary when the member references a saved creative.
+    ConnectBuyerModelCredentialBody:
       type: object
       properties:
-        member_type:
-          description: Type of item in a creative collection. Creative members are saved campaign creatives; asset members are raw/source/brand/generated assets.
+        providerType:
           type: string
           enum:
-          - creative
-          - asset
-        member_id:
+          - audiostack
+          - elevenlabs
+          - fal
+          - gemini
+          - openai
+          - veo
+        apiKey:
           type: string
+          minLength: 1
         label:
-          type:
-          - string
-          - 'null'
-        metadata:
-          type: object
-          additionalProperties: {}
-        creative:
-          allOf:
-          - $ref: '#/components/schemas/CreativeManifestSummary'
-        created_at:
           type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updated_at:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          minLength: 1
+          maxLength: 120
       required:
-      - member_type
-      - member_id
-      - created_at
-      - updated_at
-      additionalProperties: false
-    CreativeAssetControl:
-      description: Renderer/evaluator guidance for supplied creative assets that must retain visual fidelity through generation and refinement.
-      type: object
-      properties:
-        locked_asset:
-          description: When true, creative generation and rendering should preserve this supplied asset rather than redraw or reinterpret it.
-          type: boolean
-        asset_role:
-          description: Role of the supplied asset, such as product, package, logo, brand, reference, or scene.
-          type: string
-          enum:
-          - product
-          - package
-          - logo
-          - brand
-          - reference
-          - scene
-          - other
-        can_transform:
-          description: Whether the asset may be transformed. Set false for exact product imagery, packaging, logos, book covers, or regulated artwork.
-          type: boolean
-        preservation_notes:
-          description: Human-readable instructions for preserving asset fidelity, e.g. "Preserve cover typography and portrait exactly."
-          type: string
-          minLength: 1
-          maxLength: 1000
-        source_asset_id:
-          description: Raw/source creative-session asset ID used to derive this linked asset, when the asset is a rendition or locked composite.
-          type: string
-          minLength: 1
-          maxLength: 255
-        rendition_asset_id:
-          description: Creative-session rendition asset ID used in the final creative manifest.
-          type: string
-          minLength: 1
-          maxLength: 255
-      additionalProperties: false
-    CardInput:
-      description: Per-card input for carousel creatives. Provide filename for multipart file uploads or url for pre-hosted assets.
-      type: object
-      properties:
-        filename:
-          description: Filename of an uploaded file for this card's media. Must match the file's originalname in the multipart upload.
-          type: string
-          minLength: 1
-        url:
-          description: URL of a hosted image or video for this card's media. Use instead of filename for pre-hosted assets.
-          type: string
-          format: uri
-        headline:
-          description: Card headline text
-          type: string
-          maxLength: 255
-        description:
-          description: Card body copy
-          type: string
-          maxLength: 2000
-        cta:
-          description: Call-to-action label (e.g. "Shop Now")
-          type: string
-          maxLength: 50
-        landing_page_url:
-          description: Destination URL when the card is clicked
-          type: string
-          format: uri
-        platform_extensions:
-          description: Platform-specific card attributes
-          type: array
-          items:
-            type: object
-            additionalProperties: {}
-    CreativeTemplateResponse:
-      description: Creative format template with asset requirements
-      type: object
-      properties:
-        template_id:
-          description: Template identifier
-          type: string
-        name:
-          description: Template name
-          type: string
-        description:
-          description: What this template is for
-          type: string
-        category:
-          description: Template category
-          type: string
-        assets_required:
-          description: Assets required/optional for this template
-          type: array
-          items:
-            $ref: '#/components/schemas/TemplateAssetRequirement'
-        expects_html_wrapper:
-          description: Whether an HTML tag is the primary asset
-          type: boolean
-        supports_tag_input:
-          description: Whether user can paste a tag instead of uploading files
-          type: boolean
-        supported_macros:
-          description: ADCP macros supported by this format
-          type: array
-          items:
-            type: string
-        renders:
-          description: ADCP render specifications
-          type: array
-          items:
-            type: object
-            properties:
-              role:
-                type: string
-              width:
-                type: number
-              height:
-                type: number
-              min_width:
-                type: number
-              max_width:
-                type: number
-              min_height:
-                type: number
-              max_height:
-                type: number
-              aspect_ratio:
-                type: string
-              responsive:
-                type: object
-                properties:
-                  width:
-                    type: boolean
-                  height:
-                    type: boolean
-                required:
-                - width
-                - height
-                additionalProperties: false
-            required:
-            - role
-            additionalProperties: false
-      required:
-      - template_id
-      - name
-      - description
-      - category
-      - assets_required
-      - expects_html_wrapper
-      - supports_tag_input
-      additionalProperties: false
+      - providerType
+      - apiKey
+      - label
     CreativeCollectionMemberInput:
       description: A saved creative or source/generated asset to add to a collection.
       type: object
@@ -5015,418 +4854,6 @@ components:
       required:
       - member_type
       - member_id
-    AdvertiserModelCredential:
-      type: object
-      properties:
-        id:
-          type: string
-        customerId:
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        advertiserIds:
-          type: array
-          items:
-            type: string
-        isDefault:
-          type: boolean
-        providerType:
-          type: string
-        providerDisplayName:
-          type: string
-        label:
-          type: string
-        status:
-          type: string
-          enum:
-          - ACTIVE
-          - REVOKED
-          - ERROR
-        maskedKey:
-          type:
-          - string
-          - 'null'
-        connectedBy:
-          type:
-          - string
-          - 'null'
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-        assignment:
-          type: string
-          enum:
-          - advertiser
-          - default
-        effective:
-          type: boolean
-      required:
-      - id
-      - customerId
-      - advertiserIds
-      - isDefault
-      - providerType
-      - providerDisplayName
-      - label
-      - status
-      - maskedKey
-      - connectedBy
-      - createdAt
-      - updatedAt
-      - assignment
-      - effective
-      additionalProperties: false
-    AttachCreativeCollectionBody:
-      description: Attach collection metadata to the campaign workspace. This does not launch or sync creatives by itself.
-      type: object
-      properties:
-        role:
-          default: creative_library
-          description: 'How a campaign uses the collection: working creative library, source assets, approved launch set, or testing set.'
-          type: string
-          enum:
-          - creative_library
-          - source_assets
-          - approved_set
-          - test_set
-        sync_policy:
-          default: manual
-          description: Whether campaign attachment changes are manual or automatically include new collection members.
-          type: string
-          enum:
-          - manual
-          - auto_include_new_members
-        metadata:
-          default: {}
-          type: object
-          additionalProperties: {}
-    TextAssetSlotInput:
-      description: Text asset assigned to an AdCP format slot. The slot asset_id is the key in the creative manifest assets map.
-      type: object
-      properties:
-        asset_id:
-          description: AdCP format slot asset_id (e.g. "headline", "description")
-          type: string
-          minLength: 1
-          maxLength: 255
-        content:
-          description: Text content for this slot
-          type: string
-          minLength: 1
-          maxLength: 5000
-      required:
-      - asset_id
-      - content
-    CreativeRole:
-      description: 'Advertiser creative-library role: evergreen (serve-ready, reusable across campaigns) or reference (a generation input, not served). Absent for flight-specific creatives.'
-      type: string
-      enum:
-      - evergreen
-      - reference
-    AssignCreativeToCampaignBody:
-      description: Assign an advertiser-library creative to a campaign
-      type: object
-      properties:
-        campaignId:
-          description: Campaign ID to assign the creative to
-          type: string
-          minLength: 1
-      required:
-      - campaignId
-    CreateCreativeManifestMetadata:
-      description: JSON metadata for creating a creative manifest
-      type: object
-      properties:
-        name:
-          description: Manifest name (auto-generated if omitted)
-          type: string
-          minLength: 1
-          maxLength: 255
-        message:
-          description: Creative brief / direction text
-          type: string
-          minLength: 1
-          maxLength: 5000
-        url_asset:
-          description: Add a single URL asset (per AdCP url-asset spec). For multi-slot formats (e.g. native), use `url_assets` instead.
-          type: object
-          properties:
-            url:
-              description: URL to add as asset (must be http/https)
-              type: string
-              format: uri
-            url_type:
-              description: URL type classification
-              type: string
-              enum:
-              - clickthrough
-              - tracker_pixel
-              - tracker_script
-              - vast
-          required:
-          - url
-          - url_type
-        url_assets:
-          description: URL assets assigned to specific AdCP format slots (e.g. native landing_page, click trackers). Each entry pairs a slot `asset_id` with a URL.
-          maxItems: 50
-          type: array
-          items:
-            $ref: '#/components/schemas/UrlAssetSlotInput'
-        text_assets:
-          description: Text assets assigned to specific AdCP format slots (e.g. native headline, long_headline, description, business_name, disclosure). Each entry pairs a slot `asset_id` with content.
-          maxItems: 50
-          type: array
-          items:
-            $ref: '#/components/schemas/TextAssetSlotInput'
-        webhook_asset:
-          description: Add a webhook asset for DCO (dynamic content).
-          type: object
-          properties:
-            url:
-              description: URL to add as asset (must be http/https)
-              type: string
-              format: uri
-            method:
-              type: string
-              enum:
-              - GET
-              - POST
-            timeout_ms:
-              type: integer
-              minimum: 10
-              maximum: 5000
-            response_type:
-              type: string
-              enum:
-              - html
-              - json
-              - xml
-              - javascript
-            security:
-              type: object
-              properties:
-                method:
-                  type: string
-                  enum:
-                  - hmac_sha256
-                  - api_key
-                  - none
-                hmac_header:
-                  type: string
-                api_key_header:
-                  type: string
-              required:
-              - method
-          required:
-          - url
-          - response_type
-          - security
-        format_id:
-          description: Legacy-v1 ADCP named-format ref for this creative (auto-resolved from template if omitted). Use format_kind for AdCP 3.1 canonical formats.
-          type: object
-          properties:
-            agent_url:
-              type: string
-            id:
-              type: string
-              pattern: ^[a-zA-Z0-9_-]+$
-            width:
-              type: number
-              minimum: 1
-            height:
-              type: number
-              minimum: 1
-            duration_ms:
-              type: number
-              minimum: 1
-          required:
-          - agent_url
-          - id
-          additionalProperties: {}
-        format_kind:
-          description: AdCP 3.1 canonical format kind (e.g. image_carousel, video_hosted). Alternative to format_id for canonical formats.
-          anyOf:
-          - type: string
-            enum:
-            - image
-          - type: string
-            enum:
-            - html5
-          - type: string
-            enum:
-            - display_tag
-          - type: string
-            enum:
-            - image_carousel
-          - type: string
-            enum:
-            - video_hosted
-          - type: string
-            enum:
-            - video_vast
-          - type: string
-            enum:
-            - audio_hosted
-          - type: string
-            enum:
-            - audio_daast
-          - type: string
-            enum:
-            - sponsored_placement
-          - type: string
-            enum:
-            - native_in_feed
-          - type: string
-            enum:
-            - responsive_creative
-          - type: string
-            enum:
-            - agent_placement
-          - type: string
-            enum:
-            - custom
-        format_option_ref:
-          description: Pins this manifest to a specific format_options[] entry on a product, identified by format_option_id. Use scope:"publisher" with publisher_domain for catalog-backed options, scope:"product" for product-inline options.
-          oneOf:
-          - type: object
-            properties:
-              scope:
-                type: string
-                enum:
-                - publisher
-              publisher_domain:
-                type: string
-              format_option_id:
-                type: string
-            required:
-            - scope
-            - publisher_domain
-            - format_option_id
-            additionalProperties: false
-          - type: object
-            properties:
-              scope:
-                type: string
-                enum:
-                - product
-              format_option_id:
-                type: string
-            required:
-            - scope
-            - format_option_id
-            additionalProperties: false
-          type: object
-        industry_identifiers:
-          description: Industry identifiers (Ad-ID, ISCI, Clearcast clock number, IDcrea) per AdCP spec.
-          type: array
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-                enum:
-                - ad_id
-                - isci
-                - clearcast_clock
-                - idcrea
-              value:
-                type: string
-            required:
-            - type
-            - value
-        template_id:
-          description: Creative template ID — legacy-v1 ADCP named-format id (e.g., "display_image", "display_html", "video_standard") or vendor tag (e.g., "vendor_dcm_tag")
-          type: string
-        assets:
-          description: 'Multipart REST metadata only: each filename must match a file uploaded in the same multipart request. Murph chat attachments are not multipart files; represent them as linked_assets[].data_url using the murph-attachment://N placeholder instead. If omitted, multipart files are auto-classified.'
-          type: array
-          items:
-            type: object
-            properties:
-              filename:
-                description: Must match an uploaded file's originalname
-                type: string
-                minLength: 1
-              asset_type:
-                description: Asset type (auto-detected from MIME if omitted)
-                type: string
-                enum:
-                - IMAGE
-                - VIDEO
-                - AUDIO
-                - HTML
-                - JAVASCRIPT
-                - CSS
-                - TEXT
-                - URL
-                - VAST
-                - FONT
-                - LOGO
-                - DOCUMENT
-              label:
-                description: Label/key for this asset in the manifest (auto-generated if omitted)
-                type: string
-              slot_asset_id:
-                description: AdCP format slot asset_id for this file (used by multi-slot formats like native).
-                type: string
-                minLength: 1
-                maxLength: 255
-              locked_asset:
-                description: When true, creative generation and rendering should preserve this supplied asset rather than redraw or reinterpret it.
-                type: boolean
-              asset_role:
-                description: Role of the supplied asset, such as product, package, logo, brand, reference, or scene.
-                type: string
-                enum:
-                - product
-                - package
-                - logo
-                - brand
-                - reference
-                - scene
-                - other
-              can_transform:
-                description: Whether the asset may be transformed. Set false for exact product imagery, packaging, logos, book covers, or regulated artwork.
-                type: boolean
-              preservation_notes:
-                description: Human-readable instructions for preserving asset fidelity, e.g. "Preserve cover typography and portrait exactly."
-                type: string
-                minLength: 1
-                maxLength: 1000
-              source_asset_id:
-                description: Raw/source creative-session asset ID used to derive this linked asset, when the asset is a rendition or locked composite.
-                type: string
-                minLength: 1
-                maxLength: 255
-              rendition_asset_id:
-                description: Creative-session rendition asset ID used in the final creative manifest.
-                type: string
-                minLength: 1
-                maxLength: 255
-            required:
-            - filename
-        linked_assets:
-          description: URL-backed or inline media assets from a chat attachment, DAM, catalog, product page, or creative generator. For every Murph chat attachment, use linked_assets[].data_url = murph-attachment://N; never put its filename in assets[] because buyer_api_call does not send multipart file bytes.
-          maxItems: 50
-          type: array
-          items:
-            $ref: '#/components/schemas/LinkedCreativeAssetInput'
-        brandAgentId:
-          description: Advertiser ID (parameter name kept for wire compatibility). Required when creating an advertiser-level master without a campaign. Ignored when the manifest is created under a campaign (resolved from campaign context).
-          type: string
-        frequencyCaps:
-          description: Buyer-defined frequency caps for this creative. When provided, sets the full list.
-          type: array
-          items:
-            $ref: '#/components/schemas/FrequencyCapConfigInput'
-        cards:
-          description: Carousel cards (image_carousel format). Min 2, max 10. Each card needs filename (for an uploaded file) or url (for a pre-hosted asset), plus optional headline, description, cta, landing_page_url.
-          minItems: 2
-          maxItems: 10
-          type: array
-          items:
-            $ref: '#/components/schemas/CardInput'
     BulkUpdateCreativeSelection:
       description: Selectors for a campaign-scoped bulk creative update
       type: object
@@ -5495,20 +4922,89 @@ components:
           - FONT
           - LOGO
           - DOCUMENT
-    LinkedCreativeAssetInput:
-      description: A linked or inline generated creative asset that can be saved into the manifest asset store without multipart file upload.
+    CreativeManifestSummary:
+      description: Compact creative-manifest view returned by list endpoints. Use `get_creative` for the full resource.
       type: object
       properties:
-        url:
-          description: Publicly reachable URL for a hosted creative asset from a DAM, catalog, product page, or creative generator.
+        creative_id:
+          description: Creative manifest ID
+          type: string
+        campaign_id:
+          description: Campaign ID (omitted for advertiser-level masters)
+          type: string
+        name:
+          description: Manifest name
+          type: string
+        format_id:
+          description: ADCP format identifier
+          type: object
+          properties:
+            id:
+              type: string
+            agent_url:
+              type: string
+            width:
+              type: number
+            height:
+              type: number
+            duration_ms:
+              type: number
+          required:
+          - id
+          - agent_url
+          additionalProperties: {}
+        format_kind:
+          description: AdCP 3.1 canonical format kind (e.g. image_carousel, video_hosted)
+          type: string
+        template_id:
+          description: Creative template used for this manifest
+          type: string
+        brand_domain:
+          description: Brand domain (auto-resolved)
+          type: string
+        preview_url:
+          description: URL to preview the processed creative (processed HTML hosted in GCS)
           type: string
           format: uri
-        data_url:
-          description: Inline generated creative asset as a base64 data URL. Use when a local/dev creative adapter returns inline assets because no asset store is configured.
+        requires_upgrade:
+          description: True when this creative has no format_kind and must be upgraded before it can be assigned to new media buys. Call POST .../upgrade to set format_kind and clear this flag.
+          type: boolean
+        reuse_count:
+          description: Number of campaigns this creative is actively attached to. A reuse signal for the advertiser library (returned on the advertiser-scoped list); omitted on single-manifest reads.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        creative_role:
+          description: Advertiser-library role (evergreen or reference). Absent for flight-specific creatives that live on their campaign.
+          allOf:
+          - $ref: '#/components/schemas/CreativeRole'
+        creative_source:
+          description: Provenance of the creative (uploaded/generated/connected). Today always "uploaded".
+          allOf:
+          - $ref: '#/components/schemas/CreativeSource'
+        platform_links:
+          description: Provider/sales-agent creative identifiers captured from sync_creatives for round-trip comparison.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeManifestPlatformLink'
+        created_at:
+          description: Created timestamp
           type: string
-          pattern: ^data:(image|video|audio|text\/html|application\/xml|text\/plain)[^;]*;base64,[A-Za-z0-9+/=]+$
-        asset_type:
-          description: Creative asset type represented by the linked URL (IMAGE, VIDEO, AUDIO, HTML, VAST, etc.).
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updated_at:
+          description: Updated timestamp
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        asset_count:
+          description: Number of uploaded assets in this manifest. Replaces the embedded `assets[]` array on summary rows.
+          example: 3
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        primary_asset_type:
+          description: The dominant media asset type (VIDEO > AUDIO > IMAGE/HTML) — lets clients classify a creative by medium even when format_kind is absent (e.g. a bare upload). Omitted when the manifest has no media asset.
           type: string
           enum:
           - IMAGE
@@ -5523,102 +5019,97 @@ components:
           - FONT
           - LOGO
           - DOCUMENT
-        label:
-          description: Human-readable label for this linked asset.
-          type: string
-          minLength: 1
-          maxLength: 255
-        slot_asset_id:
-          description: Optional AdCP format slot asset_id for this linked asset (for example, "image", "video", or "audio").
-          type: string
-          minLength: 1
-          maxLength: 255
-        content_type:
-          description: Optional MIME type. If omitted, the server infers a sensible default from asset_type and URL extension.
-          type: string
-          minLength: 1
-          maxLength: 255
-        duration_ms:
-          description: Duration in milliseconds for time-based assets (VIDEO, AUDIO, VAST). Persisted so the media-buy compatibility gate can verify the creative fits a slot's required duration before syncing it to a source.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        declared_sizes:
-          description: Buyer-declared display sizes (width×height in pixels) for an HTML ad tag whose markup doesn't declare one — supplied out-of-band via a CSV/manifest. Persisted so the tag can still auto-map to placements when assigned to a campaign in a later turn. Ignored for non-HTML assets (images/video carry probed dimensions).
-          maxItems: 30
+        sync_status:
+          description: Compact sync status across sales agents. Use `get_creative` for the full sync metadata (including `last_synced_at`).
+          type: object
+          properties:
+            synced:
+              description: True when the manifest is synced with at least one agent
+              type: boolean
+            agent_count:
+              description: Number of sales agents the manifest is synced with
+              type: integer
+              minimum: -9007199254740991
+              maximum: 9007199254740991
+          required:
+          - synced
+          - agent_count
+          additionalProperties: false
+        target_format_ids:
+          description: Additional format IDs this creative covers beyond its primary format_id.
           type: array
           items:
             type: object
             properties:
+              id:
+                type: string
+              agent_url:
+                type: string
               width:
-                type: integer
-                maximum: 9007199254740991
-                minimum: 1
+                type: number
               height:
-                type: integer
-                maximum: 9007199254740991
-                minimum: 1
+                type: number
+              duration_ms:
+                type: number
             required:
-            - width
-            - height
-        make_primary:
-          description: When true, make this URL-backed asset the primary renderable creative source. Only one linked asset may be primary.
-          type: boolean
-        locked_asset:
-          description: When true, creative generation and rendering should preserve this supplied asset rather than redraw or reinterpret it.
-          type: boolean
-        asset_role:
-          description: Role of the supplied asset, such as product, package, logo, brand, reference, or scene.
-          type: string
-          enum:
-          - product
-          - package
-          - logo
-          - brand
-          - reference
-          - scene
-          - other
-        can_transform:
-          description: Whether the asset may be transformed. Set false for exact product imagery, packaging, logos, book covers, or regulated artwork.
-          type: boolean
-        preservation_notes:
-          description: Human-readable instructions for preserving asset fidelity, e.g. "Preserve cover typography and portrait exactly."
-          type: string
-          minLength: 1
-          maxLength: 1000
-        source_asset_id:
-          description: Raw/source creative-session asset ID used to derive this linked asset, when the asset is a rendition or locked composite.
-          type: string
-          minLength: 1
-          maxLength: 255
-        rendition_asset_id:
-          description: Creative-session rendition asset ID used in the final creative manifest.
-          type: string
-          minLength: 1
-          maxLength: 255
+            - id
+            - agent_url
+            additionalProperties: {}
+        placements:
+          description: Resolved placements this creative maps to (primary + target formats), named against the campaign's required placements. Populated by the campaign creative-manifest list.
+          type: array
+          items:
+            type: object
+            properties:
+              placement_id:
+                type: string
+              placement_name:
+                type: string
+            required:
+            - placement_id
+            - placement_name
+            additionalProperties: false
       required:
-      - asset_type
-    ApiError:
-      description: Structured error object
+      - creative_id
+      - name
+      - created_at
+      - updated_at
+      - asset_count
+      additionalProperties: false
+    CreativeSource:
+      description: 'Origin of the creative: uploaded (bring-your-own), generated (by a creative agent), or connected (from a 3p platform).'
+      type: string
+      enum:
+      - uploaded
+      - generated
+      - connected
+    CreativeManifestSyncStatus:
+      description: Sync status across sales agents for a creative manifest.
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        synced:
+          description: True when the manifest is synced with at least one agent
+          type: boolean
+        agent_count:
+          description: Number of sales agents the manifest is synced with
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        last_synced_at:
+          description: Timestamp of the most recent successful sync
           type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - code
-      - message
+      - synced
+      - agent_count
       additionalProperties: false
+    CreativeRole:
+      description: 'Advertiser creative-library role: evergreen (serve-ready, reusable across campaigns) or reference (a generation input, not served). Absent for flight-specific creatives.'
+      type: string
+      enum:
+      - evergreen
+      - reference
     CardUpdate:
       description: Per-card input for updating carousel creatives.
       type: object
@@ -5653,264 +5144,72 @@ components:
           items:
             type: object
             additionalProperties: {}
-    CreateCreativeCollectionBody:
-      description: Create a campaign creative workspace for saved creatives and raw/generated assets.
+    CreativeCollectionMutationResponse:
+      description: Mutation response for collection management.
       type: object
       properties:
-        name:
-          type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          type: string
-          minLength: 1
-          maxLength: 2000
-        metadata:
-          type: object
-          additionalProperties: {}
-        members:
-          maxItems: 500
-          type: array
-          items:
-            $ref: '#/components/schemas/CreativeCollectionMemberInput'
-        attach_to_campaign:
-          description: Attach the collection to this campaign after creation. Defaults to true for campaign workspaces.
-          default: true
-          type: boolean
-        role:
-          default: creative_library
-          description: 'How a campaign uses the collection: working creative library, source assets, approved launch set, or testing set.'
-          type: string
-          enum:
-          - creative_library
-          - source_assets
-          - approved_set
-          - test_set
-        sync_policy:
-          default: manual
-          description: Whether campaign attachment changes are manual or automatically include new collection members.
-          type: string
-          enum:
-          - manual
-          - auto_include_new_members
+        collection:
+          $ref: '#/components/schemas/CreativeCollectionSummary'
+        added_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        removed_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        attached:
+          allOf:
+          - $ref: '#/components/schemas/CampaignCreativeCollectionAttachment'
+        assigned_count:
+          description: Number of creative_manifest_campaign rows created by this operation.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        legacy_members_excluded:
+          description: Creative members skipped because their manifest lacks format_kind (upgrade required).
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        ownership_excluded:
+          description: Creative members skipped because their manifest belongs to a different advertiser than the campaign.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
       required:
-      - name
-    BuyerModelCredential:
+      - collection
+      additionalProperties: false
+    UrlAssetSlotInput:
+      description: URL asset assigned to an AdCP format slot. The slot asset_id is the key in the creative manifest assets map.
       type: object
       properties:
-        id:
+        asset_id:
+          description: AdCP format slot asset_id (e.g. "landing_page", "click_url")
           type: string
-        customerId:
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        advertiserIds:
-          type: array
-          items:
-            type: string
-        isDefault:
-          type: boolean
-        providerType:
+          minLength: 1
+          maxLength: 255
+        url:
+          description: URL to add as asset (must be http/https)
           type: string
-        providerDisplayName:
-          type: string
-        label:
-          type: string
-        status:
+          format: uri
+        url_type:
+          description: URL type classification. Optional — the server derives the canonical url_type from `asset_id` (e.g. "landing_page" → clickthrough, "impression_tracker" → tracker_pixel). Any client-provided value is treated as a hint, not authoritative.
           type: string
           enum:
-          - ACTIVE
-          - REVOKED
-          - ERROR
-        maskedKey:
-          type:
-          - string
-          - 'null'
-        connectedBy:
-          type:
-          - string
-          - 'null'
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
+          - clickthrough
+          - tracker_pixel
+          - tracker_script
+          - vast
       required:
-      - id
-      - customerId
-      - advertiserIds
-      - isDefault
-      - providerType
-      - providerDisplayName
-      - label
-      - status
-      - maskedKey
-      - connectedBy
-      - createdAt
-      - updatedAt
-      additionalProperties: false
-    BulkUpdateCreativesResponse:
-      description: Bulk creative update preview or execution result suitable for confirmation UI.
-      type: object
-      properties:
-        dry_run:
-          type: boolean
-        matched_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        total_matches:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        returned_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        truncated:
-          type: boolean
-        updated_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        selection:
-          $ref: '#/components/schemas/BulkUpdateCreativeSelectionOutput'
-        exclude_creative_ids:
-          type: array
-          items:
-            type: string
-        limit:
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        updates:
-          type: object
-          properties:
-            click_url:
-              description: URL to add as asset (must be http/https)
-              type: string
-              format: uri
-            format_id:
-              type: object
-              properties:
-                id:
-                  type: string
-                agent_url:
-                  type: string
-                width:
-                  type: number
-                height:
-                  type: number
-                duration_ms:
-                  type: number
-              required:
-              - id
-              - agent_url
-              additionalProperties: {}
-            target_format_ids:
-              type: array
-              items:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  agent_url:
-                    type: string
-                  width:
-                    type: number
-                  height:
-                    type: number
-                  duration_ms:
-                    type: number
-                required:
-                - id
-                - agent_url
-                additionalProperties: {}
-          additionalProperties: false
-        creatives:
-          type: array
-          items:
-            $ref: '#/components/schemas/BulkUpdateCreativeResultItem'
-      required:
-      - dry_run
-      - matched_count
-      - total_matches
-      - returned_count
-      - truncated
-      - updated_count
-      - selection
-      - limit
-      - updates
-      - creatives
-      additionalProperties: false
-    BulkUpdateCreativeSelectionOutput:
-      description: Selectors for a campaign-scoped bulk creative update
-      type: object
-      properties:
-        collection_id:
-          description: Creative collection ID to use as the matched set. Only creative members in the collection are included.
-          type: string
-          minLength: 1
-          maxLength: 255
-        creative_ids:
-          description: Exact creative IDs to include
-          minItems: 1
-          maxItems: 200
-          type: array
-          items:
-            type: string
-            minLength: 1
-        name_contains:
-          description: Case-insensitive partial creative name match
-          type: string
-          minLength: 1
-          maxLength: 200
-        created_after:
-          description: Include creatives created at or after this ISO timestamp
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        created_before:
-          description: Include creatives created at or before this ISO timestamp
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updated_after:
-          description: Include creatives updated at or after this ISO timestamp
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updated_before:
-          description: Include creatives updated at or before this ISO timestamp
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        template_id:
-          description: Match creatives using this template ID
-          type: string
-          minLength: 1
-          maxLength: 255
-        format_kind:
-          description: Match creatives using this canonical format kind
-          type: string
-          minLength: 1
-          maxLength: 255
-        asset_type:
-          description: Match creatives containing at least one active asset type
-          type: string
-          enum:
-          - IMAGE
-          - VIDEO
-          - AUDIO
-          - HTML
-          - JAVASCRIPT
-          - CSS
-          - TEXT
-          - URL
-          - VAST
-          - FONT
-          - LOGO
-          - DOCUMENT
-      additionalProperties: false
+      - asset_id
+      - url
+    FrequencyCapTargetLevel:
+      description: Level of the entity the frequency cap applies to
+      type: string
+      enum:
+      - ADVERTISER
+      - CAMPAIGN
+      - CREATIVE
     CampaignCreativeCollectionAttachment:
       description: Campaign attachment metadata for a creative collection.
       type: object
@@ -5952,601 +5251,152 @@ components:
       - created_at
       - updated_at
       additionalProperties: false
-    ManifestAssetResponse:
-      description: Asset within a creative manifest
+    CreativeCollectionSummary:
+      description: A creative collection owned by an advertiser, campaign, or customer workspace.
       type: object
       properties:
-        asset_id:
-          description: Asset ID
+        collection_id:
           type: string
-        name:
-          description: Display name
-          type: string
-        original_filename:
-          description: Original uploaded filename
-          type: string
-        asset_type:
-          description: Asset type
-          type: string
-          enum:
-          - IMAGE
-          - VIDEO
-          - AUDIO
-          - HTML
-          - JAVASCRIPT
-          - CSS
-          - TEXT
-          - URL
-          - VAST
-          - FONT
-          - LOGO
-          - DOCUMENT
-        content_type:
-          description: MIME type
-          type: string
-        file_size:
-          description: File size in bytes
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        public_url:
-          description: Public URL
-          type: string
-          format: uri
-        asset_source:
-          description: Whether this asset was uploaded by the user or generated by the system
-          type: string
-          enum:
-          - CREATIVE_SOURCE
-          - USER_UPLOADED
-          - SYSTEM_PROCESSED
-        slot_asset_id:
-          description: AdCP format slot asset_id assigned to this asset, when applicable. The slot asset_id is the key under which the asset appears in the AdCP creative manifest.
-          type: string
-        asset_control:
-          description: Optional fidelity controls for supplied assets that should be preserved by creative generators, renderers, and evaluators.
-          allOf:
-          - $ref: '#/components/schemas/CreativeAssetControl'
-        width:
-          description: Actual width in pixels (image and video assets only)
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        height:
-          description: Actual height in pixels (image and video assets only)
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        declared_sizes:
-          description: Buyer-declared display sizes for an HTML ad tag, supplied out-of-band via a CSV/manifest at upload. Declared, not probed — distinct from width/height, which hold measured dimensions.
-          type: array
-          items:
-            type: object
-            properties:
-              width:
-                type: integer
-                maximum: 9007199254740991
-                minimum: 1
-              height:
-                type: integer
-                maximum: 9007199254740991
-                minimum: 1
-            required:
-            - width
-            - height
-            additionalProperties: false
-        duration_ms:
-          description: Detected duration in milliseconds, probed at upload (video and audio assets)
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        codec:
-          description: Detected codec, normalized at upload, e.g. "h264", "aac", "mp3" (video and audio assets)
-          type: string
-        bitrate_kbps:
-          description: Detected average overall bitrate in kilobits per second (video and audio assets)
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        frame_rate:
-          description: Detected frames per second, e.g. 30 or 29.97 (video assets)
-          type: number
-          exclusiveMinimum: 0
-        sample_rate:
-          description: Detected audio sampling rate in hertz, e.g. 44100 (audio assets)
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        container:
-          description: Detected container/format family, e.g. "mp4", "mp3", "wav" (video and audio assets)
-          type: string
-        warnings:
-          description: Dimensional inconsistencies detected at upload time. Present only when a problem was found.
-          type: array
-          items:
-            $ref: '#/components/schemas/AssetDimensionWarning'
-        created_at:
-          description: Upload timestamp
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - asset_id
-      - name
-      - original_filename
-      - asset_type
-      - content_type
-      - file_size
-      - public_url
-      - asset_source
-      - created_at
-      additionalProperties: false
-    RemoveCreativeCollectionMembersBody:
-      description: Remove saved creatives or assets from a collection.
-      type: object
-      properties:
-        members:
-          minItems: 1
-          maxItems: 500
-          type: array
-          items:
-            type: object
-            properties:
-              member_type:
-                description: Type of item in a creative collection. Creative members are saved campaign creatives; asset members are raw/source/brand/generated assets.
-                type: string
-                enum:
-                - creative
-                - asset
-              member_id:
-                type: string
-                minLength: 1
-                maxLength: 255
-            required:
-            - member_type
-            - member_id
-      required:
-      - members
-    CreativeDashboardUrlResponse:
-      type: object
-      properties:
-        url:
-          description: Fully-resolved Interchange creative dashboard URL.
-          type: string
-      required:
-      - url
-      additionalProperties: false
-    CreativeManifestResponse:
-      description: Creative manifest with inline assets
-      type: object
-      properties:
-        creative_id:
-          description: Creative manifest ID
-          type: string
-        name:
-          description: Manifest name
-          type: string
-        message:
-          description: Creative brief text
-          type: string
-        brand_domain:
-          description: Brand domain (auto-resolved)
-          type: string
-        template_id:
-          description: Creative template used for this manifest
-          type: string
-        format_id:
-          description: ADCP format identifier
-          type: object
-          properties:
-            id:
-              type: string
-            agent_url:
-              type: string
-            width:
-              type: number
-            height:
-              type: number
-            duration_ms:
-              type: number
-          required:
-          - id
-          - agent_url
-          additionalProperties: {}
-        format_kind:
-          description: AdCP 3.1 canonical format kind (e.g. image_carousel, video_hosted)
-          type: string
-        format_option_ref:
-          description: AdCP 3.1 scope-discriminated format option reference.
-          oneOf:
-          - type: object
-            properties:
-              scope:
-                type: string
-                enum:
-                - publisher
-              publisher_domain:
-                type: string
-              format_option_id:
-                type: string
-            required:
-            - scope
-            - publisher_domain
-            - format_option_id
-            additionalProperties: false
-          - type: object
-            properties:
-              scope:
-                type: string
-                enum:
-                - product
-              format_option_id:
-                type: string
-            required:
-            - scope
-            - format_option_id
-            additionalProperties: false
-          type: object
-        requires_upgrade:
-          description: True when this creative has no format_kind and must be upgraded before it can be assigned to new media buys. Call POST .../upgrade to set format_kind and clear this flag.
-          type: boolean
-        industry_identifiers:
-          description: Industry identifiers (Ad-ID, ISCI, Clearcast clock, IDcrea)
-          type: array
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-                enum:
-                - ad_id
-                - isci
-                - clearcast_clock
-                - idcrea
-              value:
-                type: string
-            required:
-            - type
-            - value
-            additionalProperties: false
-        target_format_ids:
-          description: Target format IDs (from campaign products)
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              agent_url:
-                type: string
-              width:
-                type: number
-              height:
-                type: number
-              duration_ms:
-                type: number
-            required:
-            - id
-            - agent_url
-            additionalProperties: {}
-        reuse_count:
-          description: Number of campaigns this creative is actively attached to. A reuse signal for the advertiser library (returned on the advertiser-scoped list); omitted on single-manifest reads.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        creative_role:
-          description: Advertiser-library role (evergreen or reference). Absent for flight-specific creatives that live on their campaign.
-          allOf:
-          - $ref: '#/components/schemas/CreativeRole'
-        creative_source:
-          description: Provenance of the creative (uploaded/generated/connected). Today always "uploaded".
-          allOf:
-          - $ref: '#/components/schemas/CreativeSource'
-        preview_url:
-          description: URL to preview the processed creative (processed HTML hosted in GCS)
-          type: string
-          format: uri
-        assets:
-          description: Uploaded assets in this manifest
-          type: array
-          items:
-            $ref: '#/components/schemas/ManifestAssetResponse'
-        carousel_cards:
-          description: Carousel card definitions for image_carousel creatives.
-          type: array
-          items:
-            type: object
-            properties:
-              card_index:
-                type: integer
-                minimum: 0
-                maximum: 9007199254740991
-              media_asset_id:
-                type: string
-              headline:
-                type: string
-              description:
-                type: string
-              cta:
-                type: string
-              landing_page_url:
-                type: string
-              platform_extensions:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: {}
-            required:
-            - card_index
-            - media_asset_id
-            additionalProperties: false
-        html_processing:
-          description: Result of HTML processing (CDN URL rewriting + macro insertion)
-          type: object
-          properties:
-            processed_html:
-              description: Full processed HTML (only included in create response, not GET)
-              type: string
-            processed_html_url:
-              description: URL to processed HTML in GCS (for preview)
-              type: string
-              format: uri
-            rewritten_refs:
-              description: Asset references rewritten to CDN URLs
-              type: array
-              items:
-                type: object
-                properties:
-                  original:
-                    type: string
-                  cdn_url:
-                    type: string
-                required:
-                - original
-                - cdn_url
-                additionalProperties: false
-            unresolved_refs:
-              description: Local references found in HTML that did not match any uploaded asset
-              type: array
-              items:
-                type: string
-            inserted_macros:
-              description: ADCP macros that were inserted
-              type: array
-              items:
-                type: string
-          required:
-          - rewritten_refs
-          - unresolved_refs
-          - inserted_macros
-          additionalProperties: false
-        auto_detected_template:
-          description: Auto-detected template info (populated when template_id was not explicitly provided)
-          type: object
-          properties:
-            template_id:
-              type: string
-            template_name:
-              type: string
-            method:
-              type: string
-              enum:
-              - tag_hints
-              - html_analysis
-              - file_analysis
-              - none
-          required:
-          - template_id
-          - template_name
-          - method
-          additionalProperties: false
-        creative_manifest:
-          description: Full ADCP creative manifest (built for sync)
-        sync_status:
-          description: Sync status across sales agents
-          allOf:
-          - $ref: '#/components/schemas/CreativeManifestSyncStatus'
-        platform_links:
-          description: Provider/sales-agent creative identifiers captured from sync_creatives for round-trip comparison.
-          type: array
-          items:
-            $ref: '#/components/schemas/CreativeManifestPlatformLink'
-        tracking:
-          description: Auto-generated Scope3 tracking URLs for impression and click measurement
-          type: object
-          properties:
-            impression_tracker_url:
-              description: Scope3 impression tracker pixel URL with macro placeholders
-              type: string
-            click_tracker_url:
-              description: Scope3 click tracker URL wrapping the original clickthrough with macro placeholders
-              type: string
-            supported_macros:
-              description: ADCP macros supported by this creative format (filled at ad serving time)
-              type: array
-              items:
-                type: string
-          required:
-          - supported_macros
-          additionalProperties: false
         campaign_id:
-          description: Campaign ID (omitted for advertiser-level masters)
           type: string
         advertiser_id:
-          description: Advertiser ID this manifest belongs to
+          description: Advertiser that owns this collection. Present when owner_scope is advertiser.
           type: string
-        frequencyCaps:
-          description: Buyer-defined frequency caps configured for this creative
-          type: array
-          items:
-            $ref: '#/components/schemas/FrequencyCapConfig'
-        already_exists:
-          description: True when create returned a pre-existing manifest with the same (campaign_id, name) instead of inserting a new one. Only set on create responses.
-          type: boolean
-        ignored_files:
-          description: Number of files in the create request that were ignored because the request hit the (campaign_id, name) dedupe path and returned a pre-existing manifest. Use the update endpoint to add or replace assets on the existing manifest. Only set when already_exists is true.
+        owner_scope:
+          description: 'Derived scope: advertiser when advertiser_id is set, campaign when campaign_id is set, otherwise customer.'
+          type: string
+          enum:
+          - advertiser
+          - campaign
+          - customer
+        name:
+          type: string
+        description:
+          type:
+          - string
+          - 'null'
+        metadata:
+          type: object
+          additionalProperties: {}
+        member_count:
           type: integer
           minimum: 0
           maximum: 9007199254740991
-        warnings:
-          description: Format compatibility warnings emitted when an explicit format_id does not match any format accepted by the campaign products. Only set on update responses when a mismatch is detected. The creative was saved; reassign it or update the product configuration before executing.
+        creative_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        asset_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        attached_campaign_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        members:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/CreativeCollectionMemberSummary'
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignCreativeCollectionAttachment'
         created_at:
-          description: Created timestamp
           type: string
           format: date-time
           pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
         updated_at:
-          description: Updated timestamp
           type: string
           format: date-time
           pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - creative_id
+      - collection_id
       - name
-      - assets
+      - member_count
+      - creative_count
+      - asset_count
+      - attached_campaign_count
       - created_at
       - updated_at
       additionalProperties: false
-    ConnectBuyerModelCredentialBody:
+    SaveCreativesToLibraryResponse:
+      description: Result of promoting creatives into the advertiser library.
       type: object
       properties:
-        providerType:
-          type: string
-          enum:
-          - audiostack
-          - elevenlabs
-          - fal
-          - gemini
-          - openai
-          - veo
-        apiKey:
-          type: string
-          minLength: 1
-        label:
-          type: string
-          minLength: 1
-          maxLength: 120
+        role:
+          $ref: '#/components/schemas/CreativeRole'
+        updated:
+          description: Creative manifest IDs whose role was set.
+          type: array
+          items:
+            type: string
+        manifests:
+          description: The advertiser library after the save (promoted creatives only), so the result can render the shelf.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeManifestSummary'
+        total:
+          description: Total promoted creatives in the advertiser library.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
       required:
-      - providerType
-      - apiKey
-      - label
-    AdvertiserModelCredentialList:
-      type: array
-      items:
-        $ref: '#/components/schemas/AdvertiserModelCredential'
-    ProductFormatOptionParams:
-      description: Canonical format params. For hosted video, carries accepted containers/codecs.
-      type: object
-      properties:
-        containers:
-          description: Accepted delivery containers for hosted video. A buyer should only send a creative whose container is listed here.
-          example:
-          - mp4
-          type: array
-          items:
-            type: string
-            enum:
-            - mp4
-            - webm
-            - mov
-        video_codecs:
-          description: Accepted video codecs for hosted video.
-          example:
-          - h264
-          type: array
-          items:
-            type: string
-            enum:
-            - h264
-            - h265
-            - vp8
-            - vp9
-            - av1
-            - prores
-        audio_codecs:
-          description: Accepted audio codecs for hosted video.
-          example:
-          - aac
-          type: array
-          items:
-            type: string
-            enum:
-            - aac
-            - mp3
-            - opus
-            - pcm
-      additionalProperties: {}
-    AssetDimensionWarning:
-      description: Dimensional inconsistency detected on an uploaded asset
-      type: object
-      properties:
-        code:
-          description: FILENAME_DIMENSION_MISMATCH = actual pixel dimensions differ from what the filename claims; UNLIKELY_PRIMARY_CREATIVE = asset is unusually small to be the primary creative
-          type: string
-          enum:
-          - FILENAME_DIMENSION_MISMATCH
-          - UNLIKELY_PRIMARY_CREATIVE
-        message:
-          description: Human-readable description
-          type: string
-      required:
-      - code
-      - message
+      - role
+      - updated
+      - manifests
+      - total
       additionalProperties: false
-    CreativePreviewResponse:
+    CardInput:
+      description: Per-card input for carousel creatives. Provide filename for multipart file uploads or url for pre-hosted assets.
       type: object
       properties:
-        response_type:
+        filename:
+          description: Filename of an uploaded file for this card's media. Must match the file's originalname in the multipart upload.
           type: string
-        previews:
+          minLength: 1
+        url:
+          description: URL of a hosted image or video for this card's media. Use instead of filename for pre-hosted assets.
+          type: string
+          format: uri
+        headline:
+          description: Card headline text
+          type: string
+          maxLength: 255
+        description:
+          description: Card body copy
+          type: string
+          maxLength: 2000
+        cta:
+          description: Call-to-action label (e.g. "Shop Now")
+          type: string
+          maxLength: 50
+        landing_page_url:
+          description: Destination URL when the card is clicked
+          type: string
+          format: uri
+        platform_extensions:
+          description: Platform-specific card attributes
           type: array
           items:
             type: object
-            properties:
-              preview_id:
-                type: string
-            required:
-            - preview_id
             additionalProperties: {}
-        interactive_url:
-          type: string
-        expires_at:
-          type: string
-      required:
-      - response_type
-      - previews
-      additionalProperties: {}
-    FrequencyCapConfigInput:
-      description: Frequency cap entry supplied inside a parent advertiser/campaign/creative request body. On PUT, the full array replaces all existing caps for that target.
+    ListCreativeCollectionsResponse:
+      description: Creative collection list response.
       type: object
       properties:
-        max_impressions:
-          description: Maximum number of impressions allowed within the window
-          example: 3
-          type: integer
-          maximum: 9007199254740991
-          minimum: 1
-        window:
-          $ref: '#/components/schemas/FrequencyCapWindow'
-      required:
-      - max_impressions
-      - window
-      additionalProperties: {}
-    AddCreativeCollectionMembersBody:
-      description: Add saved creatives or assets to a collection.
-      type: object
-      properties:
-        members:
-          minItems: 1
-          maxItems: 500
+        collections:
           type: array
           items:
-            $ref: '#/components/schemas/CreativeCollectionMemberInput'
+            $ref: '#/components/schemas/CreativeCollectionSummary'
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
       required:
-      - members
+      - collections
+      - total
+      additionalProperties: false
     TemplateAssetRequirement:
       description: Asset slot within a creative template. Re-exported from `@adcp/sdk` as `FormatAssetSlot` — a discriminated union over `item_type` (`individual` or `repeatable_group`) per the AdCP spec.
       anyOf:
@@ -9849,8 +8699,603 @@ components:
         - max_count
         - assets
         additionalProperties: {}
-    UpdateCreativeCollectionBody:
-      description: Update creative collection metadata.
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    BulkUpdateCreativesResponse:
+      description: Bulk creative update preview or execution result suitable for confirmation UI.
+      type: object
+      properties:
+        dry_run:
+          type: boolean
+        matched_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        total_matches:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        returned_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        truncated:
+          type: boolean
+        updated_count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        selection:
+          $ref: '#/components/schemas/BulkUpdateCreativeSelectionOutput'
+        exclude_creative_ids:
+          type: array
+          items:
+            type: string
+        limit:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        updates:
+          type: object
+          properties:
+            click_url:
+              description: URL to add as asset (must be http/https)
+              type: string
+              format: uri
+            format_id:
+              type: object
+              properties:
+                id:
+                  type: string
+                agent_url:
+                  type: string
+                width:
+                  type: number
+                height:
+                  type: number
+                duration_ms:
+                  type: number
+              required:
+              - id
+              - agent_url
+              additionalProperties: {}
+            target_format_ids:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  agent_url:
+                    type: string
+                  width:
+                    type: number
+                  height:
+                    type: number
+                  duration_ms:
+                    type: number
+                required:
+                - id
+                - agent_url
+                additionalProperties: {}
+          additionalProperties: false
+        creatives:
+          type: array
+          items:
+            $ref: '#/components/schemas/BulkUpdateCreativeResultItem'
+      required:
+      - dry_run
+      - matched_count
+      - total_matches
+      - returned_count
+      - truncated
+      - updated_count
+      - selection
+      - limit
+      - updates
+      - creatives
+      additionalProperties: false
+    AddCreativeCollectionMembersBody:
+      description: Add saved creatives or assets to a collection.
+      type: object
+      properties:
+        members:
+          minItems: 1
+          maxItems: 500
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeCollectionMemberInput'
+      required:
+      - members
+    ProductFormatOptionParams:
+      description: Canonical format params. For hosted video, carries accepted containers/codecs.
+      type: object
+      properties:
+        containers:
+          description: Accepted delivery containers for hosted video. A buyer should only send a creative whose container is listed here.
+          example:
+          - mp4
+          type: array
+          items:
+            type: string
+            enum:
+            - mp4
+            - webm
+            - mov
+        video_codecs:
+          description: Accepted video codecs for hosted video.
+          example:
+          - h264
+          type: array
+          items:
+            type: string
+            enum:
+            - h264
+            - h265
+            - vp8
+            - vp9
+            - av1
+            - prores
+        audio_codecs:
+          description: Accepted audio codecs for hosted video.
+          example:
+          - aac
+          type: array
+          items:
+            type: string
+            enum:
+            - aac
+            - mp3
+            - opus
+            - pcm
+      additionalProperties: {}
+    CreativeManifestPlatformLink:
+      description: Readback linkage between a campaign creative and the sales agent/provider creative created during sync.
+      type: object
+      properties:
+        agent_id:
+          description: Stable ADCP sales-agent identifier used for the sync.
+          type: string
+        agent_name:
+          description: Human-readable sales-agent or platform adapter name.
+          type: string
+        platform_id:
+          description: Provider-assigned creative identifier returned by sync_creatives, when available.
+          type: string
+        status:
+          description: Latest sync status reported for this agent.
+          type: string
+        approval_status:
+          description: Latest provider or seller approval status, when available.
+          type: string
+        synced_at:
+          description: Timestamp of the latest completed sync.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - agent_id
+      - agent_name
+      - status
+      additionalProperties: false
+    AdvertiserModelCredential:
+      type: object
+      properties:
+        id:
+          type: string
+        customerId:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        advertiserIds:
+          type: array
+          items:
+            type: string
+        isDefault:
+          type: boolean
+        providerType:
+          type: string
+        providerDisplayName:
+          type: string
+        label:
+          type: string
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - REVOKED
+          - ERROR
+        maskedKey:
+          type:
+          - string
+          - 'null'
+        connectedBy:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        assignment:
+          type: string
+          enum:
+          - advertiser
+          - default
+        effective:
+          type: boolean
+      required:
+      - id
+      - customerId
+      - advertiserIds
+      - isDefault
+      - providerType
+      - providerDisplayName
+      - label
+      - status
+      - maskedKey
+      - connectedBy
+      - createdAt
+      - updatedAt
+      - assignment
+      - effective
+      additionalProperties: false
+    BulkUpdateCreativesBody:
+      description: Bulk update saved campaign creatives. Use dry_run first to confirm the matched set.
+      type: object
+      properties:
+        selection:
+          $ref: '#/components/schemas/BulkUpdateCreativeSelection'
+        update:
+          type: object
+          properties:
+            click_url:
+              description: Set the canonical click-through URL for every selected creative.
+              type: string
+              format: uri
+            format_id:
+              description: Set the primary format for every selected creative. Use to retype creatives to a sales agent's required format id (e.g. display_300x250_nongenerative).
+              type: object
+              properties:
+                agent_url:
+                  type: string
+                id:
+                  type: string
+                  pattern: ^[a-zA-Z0-9_-]+$
+                width:
+                  type: number
+                  minimum: 1
+                height:
+                  type: number
+                  minimum: 1
+                duration_ms:
+                  type: number
+                  minimum: 1
+              required:
+              - agent_url
+              - id
+              additionalProperties: {}
+            target_format_ids:
+              description: Set the additional format ids every selected creative covers. Replaces the existing list on each creative.
+              type: array
+              items:
+                type: object
+                properties:
+                  agent_url:
+                    type: string
+                  id:
+                    type: string
+                    pattern: ^[a-zA-Z0-9_-]+$
+                  width:
+                    type: number
+                    minimum: 1
+                  height:
+                    type: number
+                    minimum: 1
+                  duration_ms:
+                    type: number
+                    minimum: 1
+                required:
+                - agent_url
+                - id
+                additionalProperties: {}
+        dry_run:
+          description: When true, return the matched creative set without applying changes. Defaults to true for human confirmation.
+          default: true
+          type: boolean
+        exclude_creative_ids:
+          description: Creative IDs to remove from the matched set before applying the update
+          maxItems: 200
+          type: array
+          items:
+            type: string
+            minLength: 1
+        limit:
+          description: Maximum number of creatives to match/update
+          default: 200
+          type: integer
+          minimum: 1
+          maximum: 500
+        confirm_partial_batch:
+          description: When false, applying a bulk update is rejected if more creatives match than the requested limit. Set true only when the buyer explicitly confirms a partial batch.
+          default: false
+          type: boolean
+      required:
+      - selection
+      - update
+    CreativeDashboardUrlResponse:
+      type: object
+      properties:
+        url:
+          description: Fully-resolved Interchange creative dashboard URL.
+          type: string
+      required:
+      - url
+      additionalProperties: false
+    ManifestAssetResponse:
+      description: Asset within a creative manifest
+      type: object
+      properties:
+        asset_id:
+          description: Asset ID
+          type: string
+        name:
+          description: Display name
+          type: string
+        original_filename:
+          description: Original uploaded filename
+          type: string
+        asset_type:
+          description: Asset type
+          type: string
+          enum:
+          - IMAGE
+          - VIDEO
+          - AUDIO
+          - HTML
+          - JAVASCRIPT
+          - CSS
+          - TEXT
+          - URL
+          - VAST
+          - FONT
+          - LOGO
+          - DOCUMENT
+        content_type:
+          description: MIME type
+          type: string
+        file_size:
+          description: File size in bytes
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        public_url:
+          description: Public URL
+          type: string
+          format: uri
+        asset_source:
+          description: Whether this asset was uploaded by the user or generated by the system
+          type: string
+          enum:
+          - CREATIVE_SOURCE
+          - USER_UPLOADED
+          - SYSTEM_PROCESSED
+        slot_asset_id:
+          description: AdCP format slot asset_id assigned to this asset, when applicable. The slot asset_id is the key under which the asset appears in the AdCP creative manifest.
+          type: string
+        asset_control:
+          description: Optional fidelity controls for supplied assets that should be preserved by creative generators, renderers, and evaluators.
+          allOf:
+          - $ref: '#/components/schemas/CreativeAssetControl'
+        width:
+          description: Actual width in pixels (image and video assets only)
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        height:
+          description: Actual height in pixels (image and video assets only)
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        declared_sizes:
+          description: Buyer-declared display sizes for an HTML ad tag, supplied out-of-band via a CSV/manifest at upload. Declared, not probed — distinct from width/height, which hold measured dimensions.
+          type: array
+          items:
+            type: object
+            properties:
+              width:
+                type: integer
+                maximum: 9007199254740991
+                minimum: 1
+              height:
+                type: integer
+                maximum: 9007199254740991
+                minimum: 1
+            required:
+            - width
+            - height
+            additionalProperties: false
+        duration_ms:
+          description: Detected duration in milliseconds, probed at upload (video and audio assets)
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        codec:
+          description: Detected codec, normalized at upload, e.g. "h264", "aac", "mp3" (video and audio assets)
+          type: string
+        bitrate_kbps:
+          description: Detected average overall bitrate in kilobits per second (video and audio assets)
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        frame_rate:
+          description: Detected frames per second, e.g. 30 or 29.97 (video assets)
+          type: number
+          exclusiveMinimum: 0
+        sample_rate:
+          description: Detected audio sampling rate in hertz, e.g. 44100 (audio assets)
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        container:
+          description: Detected container/format family, e.g. "mp4", "mp3", "wav" (video and audio assets)
+          type: string
+        warnings:
+          description: Dimensional inconsistencies detected at upload time. Present only when a problem was found.
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetDimensionWarning'
+        created_at:
+          description: Upload timestamp
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - asset_id
+      - name
+      - original_filename
+      - asset_type
+      - content_type
+      - file_size
+      - public_url
+      - asset_source
+      - created_at
+      additionalProperties: false
+    RemoveCreativeCollectionMembersBody:
+      description: Remove saved creatives or assets from a collection.
+      type: object
+      properties:
+        members:
+          minItems: 1
+          maxItems: 500
+          type: array
+          items:
+            type: object
+            properties:
+              member_type:
+                description: Type of item in a creative collection. Creative members are saved campaign creatives; asset members are raw/source/brand/generated assets.
+                type: string
+                enum:
+                - creative
+                - asset
+              member_id:
+                type: string
+                minLength: 1
+                maxLength: 255
+            required:
+            - member_type
+            - member_id
+      required:
+      - members
+    AdvertiserModelCredentialList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AdvertiserModelCredential'
+    BuyerModelCredential:
+      type: object
+      properties:
+        id:
+          type: string
+        customerId:
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        advertiserIds:
+          type: array
+          items:
+            type: string
+        isDefault:
+          type: boolean
+        providerType:
+          type: string
+        providerDisplayName:
+          type: string
+        label:
+          type: string
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - REVOKED
+          - ERROR
+        maskedKey:
+          type:
+          - string
+          - 'null'
+        connectedBy:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - id
+      - customerId
+      - advertiserIds
+      - isDefault
+      - providerType
+      - providerDisplayName
+      - label
+      - status
+      - maskedKey
+      - connectedBy
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    CreativeCollectionMemberSummary:
+      description: A collection member with an optional creative summary when the member references a saved creative.
+      type: object
+      properties:
+        member_type:
+          description: Type of item in a creative collection. Creative members are saved campaign creatives; asset members are raw/source/brand/generated assets.
+          type: string
+          enum:
+          - creative
+          - asset
+        member_id:
+          type: string
+        label:
+          type:
+          - string
+          - 'null'
+        metadata:
+          type: object
+          additionalProperties: {}
+        creative:
+          allOf:
+          - $ref: '#/components/schemas/CreativeManifestSummary'
+        created_at:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updated_at:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - member_type
+      - member_id
+      - created_at
+      - updated_at
+      additionalProperties: false
+    CreateCreativeCollectionBody:
+      description: Create a campaign creative workspace for saved creatives and raw/generated assets.
       type: object
       properties:
         name:
@@ -9858,41 +9303,39 @@ components:
           minLength: 1
           maxLength: 255
         description:
-          type:
-          - string
-          - 'null'
+          type: string
           minLength: 1
           maxLength: 2000
         metadata:
           type: object
           additionalProperties: {}
-    SaveCreativesToLibraryResponse:
-      description: Result of promoting creatives into the advertiser library.
-      type: object
-      properties:
+        members:
+          maxItems: 500
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeCollectionMemberInput'
+        attach_to_campaign:
+          description: Attach the collection to this campaign after creation. Defaults to true for campaign workspaces.
+          default: true
+          type: boolean
         role:
-          $ref: '#/components/schemas/CreativeRole'
-        updated:
-          description: Creative manifest IDs whose role was set.
-          type: array
-          items:
-            type: string
-        manifests:
-          description: The advertiser library after the save (promoted creatives only), so the result can render the shelf.
-          type: array
-          items:
-            $ref: '#/components/schemas/CreativeManifestSummary'
-        total:
-          description: Total promoted creatives in the advertiser library.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
+          default: creative_library
+          description: 'How a campaign uses the collection: working creative library, source assets, approved launch set, or testing set.'
+          type: string
+          enum:
+          - creative_library
+          - source_assets
+          - approved_set
+          - test_set
+        sync_policy:
+          default: manual
+          description: Whether campaign attachment changes are manual or automatically include new collection members.
+          type: string
+          enum:
+          - manual
+          - auto_include_new_members
       required:
-      - role
-      - updated
-      - manifests
-      - total
-      additionalProperties: false
+      - name
     FrequencyCapConfig:
       description: Buyer-side frequency cap configuration
       type: object
@@ -9937,25 +9380,158 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: {}
-    FrequencyCapTargetLevel:
-      description: Level of the entity the frequency cap applies to
-      type: string
-      enum:
-      - ADVERTISER
-      - CAMPAIGN
-      - CREATIVE
-    CreativeManifestSummary:
-      description: Compact creative-manifest view returned by list endpoints. Use `get_creative` for the full resource.
+    AssetDimensionWarning:
+      description: Dimensional inconsistency detected on an uploaded asset
+      type: object
+      properties:
+        code:
+          description: FILENAME_DIMENSION_MISMATCH = actual pixel dimensions differ from what the filename claims; UNLIKELY_PRIMARY_CREATIVE = asset is unusually small to be the primary creative
+          type: string
+          enum:
+          - FILENAME_DIMENSION_MISMATCH
+          - UNLIKELY_PRIMARY_CREATIVE
+        message:
+          description: Human-readable description
+          type: string
+      required:
+      - code
+      - message
+      additionalProperties: false
+    CreativePreviewResponse:
+      type: object
+      properties:
+        response_type:
+          type: string
+        previews:
+          type: array
+          items:
+            type: object
+            properties:
+              preview_id:
+                type: string
+            required:
+            - preview_id
+            additionalProperties: {}
+        interactive_url:
+          type: string
+        expires_at:
+          type: string
+      required:
+      - response_type
+      - previews
+      additionalProperties: {}
+    TextAssetSlotInput:
+      description: Text asset assigned to an AdCP format slot. The slot asset_id is the key in the creative manifest assets map.
+      type: object
+      properties:
+        asset_id:
+          description: AdCP format slot asset_id (e.g. "headline", "description")
+          type: string
+          minLength: 1
+          maxLength: 255
+        content:
+          description: Text content for this slot
+          type: string
+          minLength: 1
+          maxLength: 5000
+      required:
+      - asset_id
+      - content
+    CreativeTemplateResponse:
+      description: Creative format template with asset requirements
+      type: object
+      properties:
+        template_id:
+          description: Template identifier
+          type: string
+        name:
+          description: Template name
+          type: string
+        description:
+          description: What this template is for
+          type: string
+        category:
+          description: Template category
+          type: string
+        assets_required:
+          description: Assets required/optional for this template
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateAssetRequirement'
+        expects_html_wrapper:
+          description: Whether an HTML tag is the primary asset
+          type: boolean
+        supports_tag_input:
+          description: Whether user can paste a tag instead of uploading files
+          type: boolean
+        supported_macros:
+          description: ADCP macros supported by this format
+          type: array
+          items:
+            type: string
+        renders:
+          description: ADCP render specifications
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                type: string
+              width:
+                type: number
+              height:
+                type: number
+              min_width:
+                type: number
+              max_width:
+                type: number
+              min_height:
+                type: number
+              max_height:
+                type: number
+              aspect_ratio:
+                type: string
+              responsive:
+                type: object
+                properties:
+                  width:
+                    type: boolean
+                  height:
+                    type: boolean
+                required:
+                - width
+                - height
+                additionalProperties: false
+            required:
+            - role
+            additionalProperties: false
+      required:
+      - template_id
+      - name
+      - description
+      - category
+      - assets_required
+      - expects_html_wrapper
+      - supports_tag_input
+      additionalProperties: false
+    CreativeManifestResponse:
+      description: Creative manifest with inline assets
       type: object
       properties:
         creative_id:
           description: Creative manifest ID
           type: string
-        campaign_id:
-          description: Campaign ID (omitted for advertiser-level masters)
-          type: string
         name:
           description: Manifest name
+          type: string
+        message:
+          description: Creative brief text
+          type: string
+        brand_domain:
+          description: Brand domain (auto-resolved)
+          type: string
+        template_id:
+          description: Creative template used for this manifest
           type: string
         format_id:
           description: ADCP format identifier
@@ -9978,87 +9554,61 @@ components:
         format_kind:
           description: AdCP 3.1 canonical format kind (e.g. image_carousel, video_hosted)
           type: string
-        template_id:
-          description: Creative template used for this manifest
-          type: string
-        brand_domain:
-          description: Brand domain (auto-resolved)
-          type: string
-        preview_url:
-          description: URL to preview the processed creative (processed HTML hosted in GCS)
-          type: string
-          format: uri
+        format_option_ref:
+          description: AdCP 3.1 scope-discriminated format option reference.
+          oneOf:
+          - type: object
+            properties:
+              scope:
+                type: string
+                enum:
+                - publisher
+              publisher_domain:
+                type: string
+              format_option_id:
+                type: string
+            required:
+            - scope
+            - publisher_domain
+            - format_option_id
+            additionalProperties: false
+          - type: object
+            properties:
+              scope:
+                type: string
+                enum:
+                - product
+              format_option_id:
+                type: string
+            required:
+            - scope
+            - format_option_id
+            additionalProperties: false
+          type: object
         requires_upgrade:
           description: True when this creative has no format_kind and must be upgraded before it can be assigned to new media buys. Call POST .../upgrade to set format_kind and clear this flag.
           type: boolean
-        reuse_count:
-          description: Number of campaigns this creative is actively attached to. A reuse signal for the advertiser library (returned on the advertiser-scoped list); omitted on single-manifest reads.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        creative_role:
-          description: Advertiser-library role (evergreen or reference). Absent for flight-specific creatives that live on their campaign.
-          allOf:
-          - $ref: '#/components/schemas/CreativeRole'
-        creative_source:
-          description: Provenance of the creative (uploaded/generated/connected). Today always "uploaded".
-          allOf:
-          - $ref: '#/components/schemas/CreativeSource'
-        platform_links:
-          description: Provider/sales-agent creative identifiers captured from sync_creatives for round-trip comparison.
+        industry_identifiers:
+          description: Industry identifiers (Ad-ID, ISCI, Clearcast clock, IDcrea)
           type: array
           items:
-            $ref: '#/components/schemas/CreativeManifestPlatformLink'
-        created_at:
-          description: Created timestamp
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updated_at:
-          description: Updated timestamp
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        asset_count:
-          description: Number of uploaded assets in this manifest. Replaces the embedded `assets[]` array on summary rows.
-          example: 3
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        primary_asset_type:
-          description: The dominant media asset type (VIDEO > AUDIO > IMAGE/HTML) — lets clients classify a creative by medium even when format_kind is absent (e.g. a bare upload). Omitted when the manifest has no media asset.
-          type: string
-          enum:
-          - IMAGE
-          - VIDEO
-          - AUDIO
-          - HTML
-          - JAVASCRIPT
-          - CSS
-          - TEXT
-          - URL
-          - VAST
-          - FONT
-          - LOGO
-          - DOCUMENT
-        sync_status:
-          description: Compact sync status across sales agents. Use `get_creative` for the full sync metadata (including `last_synced_at`).
-          type: object
-          properties:
-            synced:
-              description: True when the manifest is synced with at least one agent
-              type: boolean
-            agent_count:
-              description: Number of sales agents the manifest is synced with
-              type: integer
-              minimum: -9007199254740991
-              maximum: 9007199254740991
-          required:
-          - synced
-          - agent_count
-          additionalProperties: false
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - ad_id
+                - isci
+                - clearcast_clock
+                - idcrea
+              value:
+                type: string
+            required:
+            - type
+            - value
+            additionalProperties: false
         target_format_ids:
-          description: Additional format IDs this creative covers beyond its primary format_id.
+          description: Target format IDs (from campaign products)
           type: array
           items:
             type: object
@@ -10077,47 +9627,187 @@ components:
             - id
             - agent_url
             additionalProperties: {}
-        placements:
-          description: Resolved placements this creative maps to (primary + target formats), named against the campaign's required placements. Populated by the campaign creative-manifest list.
+        reuse_count:
+          description: Number of campaigns this creative is actively attached to. A reuse signal for the advertiser library (returned on the advertiser-scoped list); omitted on single-manifest reads.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        creative_role:
+          description: Advertiser-library role (evergreen or reference). Absent for flight-specific creatives that live on their campaign.
+          allOf:
+          - $ref: '#/components/schemas/CreativeRole'
+        creative_source:
+          description: Provenance of the creative (uploaded/generated/connected). Today always "uploaded".
+          allOf:
+          - $ref: '#/components/schemas/CreativeSource'
+        preview_url:
+          description: URL to preview the processed creative (processed HTML hosted in GCS)
+          type: string
+          format: uri
+        assets:
+          description: Uploaded assets in this manifest
+          type: array
+          items:
+            $ref: '#/components/schemas/ManifestAssetResponse'
+        carousel_cards:
+          description: Carousel card definitions for image_carousel creatives.
           type: array
           items:
             type: object
             properties:
-              placement_id:
+              card_index:
+                type: integer
+                minimum: 0
+                maximum: 9007199254740991
+              media_asset_id:
                 type: string
-              placement_name:
+              headline:
                 type: string
+              description:
+                type: string
+              cta:
+                type: string
+              landing_page_url:
+                type: string
+              platform_extensions:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: {}
             required:
-            - placement_id
-            - placement_name
+            - card_index
+            - media_asset_id
             additionalProperties: false
-      required:
-      - creative_id
-      - name
-      - created_at
-      - updated_at
-      - asset_count
-      additionalProperties: false
-    SaveCreativesToLibraryBody:
-      description: Promote advertiser creatives into the library ("the shelf") with a role. Identify the creatives by creative_ids or by collection_id.
-      type: object
-      properties:
-        creative_ids:
-          description: Creative manifest IDs to promote into the advertiser library. Provide this or collection_id.
+        html_processing:
+          description: Result of HTML processing (CDN URL rewriting + macro insertion)
+          type: object
+          properties:
+            processed_html:
+              description: Full processed HTML (only included in create response, not GET)
+              type: string
+            processed_html_url:
+              description: URL to processed HTML in GCS (for preview)
+              type: string
+              format: uri
+            rewritten_refs:
+              description: Asset references rewritten to CDN URLs
+              type: array
+              items:
+                type: object
+                properties:
+                  original:
+                    type: string
+                  cdn_url:
+                    type: string
+                required:
+                - original
+                - cdn_url
+                additionalProperties: false
+            unresolved_refs:
+              description: Local references found in HTML that did not match any uploaded asset
+              type: array
+              items:
+                type: string
+            inserted_macros:
+              description: ADCP macros that were inserted
+              type: array
+              items:
+                type: string
+          required:
+          - rewritten_refs
+          - unresolved_refs
+          - inserted_macros
+          additionalProperties: false
+        auto_detected_template:
+          description: Auto-detected template info (populated when template_id was not explicitly provided)
+          type: object
+          properties:
+            template_id:
+              type: string
+            template_name:
+              type: string
+            method:
+              type: string
+              enum:
+              - tag_hints
+              - html_analysis
+              - file_analysis
+              - none
+          required:
+          - template_id
+          - template_name
+          - method
+          additionalProperties: false
+        creative_manifest:
+          description: Full ADCP creative manifest (built for sync)
+        sync_status:
+          description: Sync status across sales agents
+          allOf:
+          - $ref: '#/components/schemas/CreativeManifestSyncStatus'
+        platform_links:
+          description: Provider/sales-agent creative identifiers captured from sync_creatives for round-trip comparison.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeManifestPlatformLink'
+        tracking:
+          description: Auto-generated Scope3 tracking URLs for impression and click measurement
+          type: object
+          properties:
+            impression_tracker_url:
+              description: Scope3 impression tracker pixel URL with macro placeholders
+              type: string
+            click_tracker_url:
+              description: Scope3 click tracker URL wrapping the original clickthrough with macro placeholders
+              type: string
+            supported_macros:
+              description: ADCP macros supported by this creative format (filled at ad serving time)
+              type: array
+              items:
+                type: string
+          required:
+          - supported_macros
+          additionalProperties: false
+        campaign_id:
+          description: Campaign ID (omitted for advertiser-level masters)
+          type: string
+        advertiser_id:
+          description: Advertiser ID this manifest belongs to
+          type: string
+        frequencyCaps:
+          description: Buyer-defined frequency caps configured for this creative
+          type: array
+          items:
+            $ref: '#/components/schemas/FrequencyCapConfig'
+        already_exists:
+          description: True when create returned a pre-existing manifest with the same (campaign_id, name) instead of inserting a new one. Only set on create responses.
+          type: boolean
+        ignored_files:
+          description: Number of files in the create request that were ignored because the request hit the (campaign_id, name) dedupe path and returned a pre-existing manifest. Use the update endpoint to add or replace assets on the existing manifest. Only set when already_exists is true.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        warnings:
+          description: Format compatibility warnings emitted when an explicit format_id does not match any format accepted by the campaign products. Only set on update responses when a mismatch is detected. The creative was saved; reassign it or update the product configuration before executing.
           type: array
           items:
             type: string
-            minLength: 1
-        collection_id:
-          description: A saved collection (e.g. the one grouped at creative-intent time) whose creative members are all promoted. Provide this or creative_ids — collection_id scales to any number of creatives.
+        created_at:
+          description: Created timestamp
           type: string
-          minLength: 1
-        role:
-          description: 'Library role to assign: evergreen (serve-ready) or reference (generation input).'
-          allOf:
-          - $ref: '#/components/schemas/CreativeRole'
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updated_at:
+          description: Updated timestamp
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - role
+      - creative_id
+      - name
+      - assets
+      - created_at
+      - updated_at
+      additionalProperties: false
     UpdateCreativeManifestMetadata:
       description: JSON metadata for updating a creative manifest
       type: object
@@ -10467,73 +10157,72 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CardUpdate'
-    CreativeManifestListResponse:
-      description: Paginated list of creative manifest summaries
+    SaveCreativesToLibraryBody:
+      description: Promote advertiser creatives into the library ("the shelf") with a role. Identify the creatives by creative_ids or by collection_id.
       type: object
       properties:
-        manifests:
-          description: Manifests projected to the summary shape. Use `get_creative` for full detail.
+        creative_ids:
+          description: Creative manifest IDs to promote into the advertiser library. Provide this or collection_id.
           type: array
           items:
-            $ref: '#/components/schemas/CreativeManifestSummary'
-        total:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - manifests
-      - total
-      additionalProperties: false
-    CreativeCollectionMutationResponse:
-      description: Mutation response for collection management.
-      type: object
-      properties:
-        collection:
-          $ref: '#/components/schemas/CreativeCollectionSummary'
-        added_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        removed_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        attached:
+            type: string
+            minLength: 1
+        collection_id:
+          description: A saved collection (e.g. the one grouped at creative-intent time) whose creative members are all promoted. Provide this or creative_ids — collection_id scales to any number of creatives.
+          type: string
+          minLength: 1
+        role:
+          description: 'Library role to assign: evergreen (serve-ready) or reference (generation input).'
           allOf:
-          - $ref: '#/components/schemas/CampaignCreativeCollectionAttachment'
-        assigned_count:
-          description: Number of creative_manifest_campaign rows created by this operation.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        legacy_members_excluded:
-          description: Creative members skipped because their manifest lacks format_kind (upgrade required).
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        ownership_excluded:
-          description: Creative members skipped because their manifest belongs to a different advertiser than the campaign.
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
+          - $ref: '#/components/schemas/CreativeRole'
       required:
-      - collection
-      additionalProperties: false
-    ListCreativeCollectionsResponse:
-      description: Creative collection list response.
+      - role
+    AssignCreativeToCampaignBody:
+      description: Assign an advertiser-library creative to a campaign
       type: object
       properties:
-        collections:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreativeCollectionSummary'
-        total:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
+        campaignId:
+          description: Campaign ID to assign the creative to
+          type: string
+          minLength: 1
       required:
-      - collections
-      - total
+      - campaignId
+    CreativeAssetControl:
+      description: Renderer/evaluator guidance for supplied creative assets that must retain visual fidelity through generation and refinement.
+      type: object
+      properties:
+        locked_asset:
+          description: When true, creative generation and rendering should preserve this supplied asset rather than redraw or reinterpret it.
+          type: boolean
+        asset_role:
+          description: Role of the supplied asset, such as product, package, logo, brand, reference, or scene.
+          type: string
+          enum:
+          - product
+          - package
+          - logo
+          - brand
+          - reference
+          - scene
+          - other
+        can_transform:
+          description: Whether the asset may be transformed. Set false for exact product imagery, packaging, logos, book covers, or regulated artwork.
+          type: boolean
+        preservation_notes:
+          description: Human-readable instructions for preserving asset fidelity, e.g. "Preserve cover typography and portrait exactly."
+          type: string
+          minLength: 1
+          maxLength: 1000
+        source_asset_id:
+          description: Raw/source creative-session asset ID used to derive this linked asset, when the asset is a rendition or locked composite.
+          type: string
+          minLength: 1
+          maxLength: 255
+        rendition_asset_id:
+          description: Creative-session rendition asset ID used in the final creative manifest.
+          type: string
+          minLength: 1
+          maxLength: 255
       additionalProperties: false
     AvailableTemplatesResponse:
       description: Available creative templates for a campaign
@@ -10650,259 +10339,112 @@ components:
       - campaign_format_options
       - campaign_products
       additionalProperties: false
-    FrequencyCapWindow:
-      description: Rolling time window over which max_impressions applies (AdCP Duration shape).
+    BulkUpdateCreativeSelectionOutput:
+      description: Selectors for a campaign-scoped bulk creative update
       type: object
       properties:
-        interval:
-          type: number
-          minimum: 1
-        unit:
-          anyOf:
-          - type: string
-            enum:
-            - seconds
-          - type: string
-            enum:
-            - minutes
-          - type: string
-            enum:
-            - hours
-          - type: string
-            enum:
-            - days
-          - type: string
-            enum:
-            - campaign
-      required:
-      - interval
-      - unit
-      additionalProperties: {}
-    BulkUpdateCreativesBody:
-      description: Bulk update saved campaign creatives. Use dry_run first to confirm the matched set.
-      type: object
-      properties:
-        selection:
-          $ref: '#/components/schemas/BulkUpdateCreativeSelection'
-        update:
-          type: object
-          properties:
-            click_url:
-              description: Set the canonical click-through URL for every selected creative.
-              type: string
-              format: uri
-            format_id:
-              description: Set the primary format for every selected creative. Use to retype creatives to a sales agent's required format id (e.g. display_300x250_nongenerative).
-              type: object
-              properties:
-                agent_url:
-                  type: string
-                id:
-                  type: string
-                  pattern: ^[a-zA-Z0-9_-]+$
-                width:
-                  type: number
-                  minimum: 1
-                height:
-                  type: number
-                  minimum: 1
-                duration_ms:
-                  type: number
-                  minimum: 1
-              required:
-              - agent_url
-              - id
-              additionalProperties: {}
-            target_format_ids:
-              description: Set the additional format ids every selected creative covers. Replaces the existing list on each creative.
-              type: array
-              items:
-                type: object
-                properties:
-                  agent_url:
-                    type: string
-                  id:
-                    type: string
-                    pattern: ^[a-zA-Z0-9_-]+$
-                  width:
-                    type: number
-                    minimum: 1
-                  height:
-                    type: number
-                    minimum: 1
-                  duration_ms:
-                    type: number
-                    minimum: 1
-                required:
-                - agent_url
-                - id
-                additionalProperties: {}
-        dry_run:
-          description: When true, return the matched creative set without applying changes. Defaults to true for human confirmation.
-          default: true
-          type: boolean
-        exclude_creative_ids:
-          description: Creative IDs to remove from the matched set before applying the update
+        collection_id:
+          description: Creative collection ID to use as the matched set. Only creative members in the collection are included.
+          type: string
+          minLength: 1
+          maxLength: 255
+        creative_ids:
+          description: Exact creative IDs to include
+          minItems: 1
           maxItems: 200
           type: array
           items:
             type: string
             minLength: 1
-        limit:
-          description: Maximum number of creatives to match/update
-          default: 200
-          type: integer
-          minimum: 1
-          maximum: 500
-        confirm_partial_batch:
-          description: When false, applying a bulk update is rejected if more creatives match than the requested limit. Set true only when the buyer explicitly confirms a partial batch.
-          default: false
-          type: boolean
-      required:
-      - selection
-      - update
-    CreativeSource:
-      description: 'Origin of the creative: uploaded (bring-your-own), generated (by a creative agent), or connected (from a 3p platform).'
-      type: string
-      enum:
-      - uploaded
-      - generated
-      - connected
-    CreativeManifestPlatformLink:
-      description: Readback linkage between a campaign creative and the sales agent/provider creative created during sync.
-      type: object
-      properties:
-        agent_id:
-          description: Stable ADCP sales-agent identifier used for the sync.
+        name_contains:
+          description: Case-insensitive partial creative name match
           type: string
-        agent_name:
-          description: Human-readable sales-agent or platform adapter name.
-          type: string
-        platform_id:
-          description: Provider-assigned creative identifier returned by sync_creatives, when available.
-          type: string
-        status:
-          description: Latest sync status reported for this agent.
-          type: string
-        approval_status:
-          description: Latest provider or seller approval status, when available.
-          type: string
-        synced_at:
-          description: Timestamp of the latest completed sync.
+          minLength: 1
+          maxLength: 200
+        created_after:
+          description: Include creatives created at or after this ISO timestamp
           type: string
           format: date-time
           pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - agent_id
-      - agent_name
-      - status
-      additionalProperties: false
-    CreativeManifestSyncStatus:
-      description: Sync status across sales agents for a creative manifest.
-      type: object
-      properties:
-        synced:
-          description: True when the manifest is synced with at least one agent
-          type: boolean
-        agent_count:
-          description: Number of sales agents the manifest is synced with
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        last_synced_at:
-          description: Timestamp of the most recent successful sync
+        created_before:
+          description: Include creatives created at or before this ISO timestamp
           type: string
           format: date-time
           pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - synced
-      - agent_count
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    CreativeCollectionSummary:
-      description: A creative collection owned by an advertiser, campaign, or customer workspace.
-      type: object
-      properties:
-        collection_id:
+        updated_after:
+          description: Include creatives updated at or after this ISO timestamp
           type: string
-        campaign_id:
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updated_before:
+          description: Include creatives updated at or before this ISO timestamp
           type: string
-        advertiser_id:
-          description: Advertiser that owns this collection. Present when owner_scope is advertiser.
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        template_id:
+          description: Match creatives using this template ID
           type: string
-        owner_scope:
-          description: 'Derived scope: advertiser when advertiser_id is set, campaign when campaign_id is set, otherwise customer.'
+          minLength: 1
+          maxLength: 255
+        format_kind:
+          description: Match creatives using this canonical format kind
+          type: string
+          minLength: 1
+          maxLength: 255
+        asset_type:
+          description: Match creatives containing at least one active asset type
           type: string
           enum:
-          - advertiser
-          - campaign
-          - customer
-        name:
+          - IMAGE
+          - VIDEO
+          - AUDIO
+          - HTML
+          - JAVASCRIPT
+          - CSS
+          - TEXT
+          - URL
+          - VAST
+          - FONT
+          - LOGO
+          - DOCUMENT
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
           type: string
-        description:
-          type:
-          - string
-          - 'null'
-        metadata:
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
           type: object
           additionalProperties: {}
-        member_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        creative_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        asset_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        attached_campaign_count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreativeCollectionMemberSummary'
-        attachments:
-          type: array
-          items:
-            $ref: '#/components/schemas/CampaignCreativeCollectionAttachment'
-        created_at:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updated_at:
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - collection_id
-      - name
-      - member_count
-      - creative_count
-      - asset_count
-      - attached_campaign_count
-      - created_at
-      - updated_at
+      - code
+      - message
       additionalProperties: false
+    FrequencyCapConfigInput:
+      description: Frequency cap entry supplied inside a parent advertiser/campaign/creative request body. On PUT, the full array replaces all existing caps for that target.
+      type: object
+      properties:
+        max_impressions:
+          description: Maximum number of impressions allowed within the window
+          example: 3
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+        window:
+          $ref: '#/components/schemas/FrequencyCapWindow'
+      required:
+      - max_impressions
+      - window
+      additionalProperties: {}
     BulkUpdateCreativeResultItem:
       description: A creative selected by a bulk update dry-run or execution result.
       type: object
@@ -11073,30 +10615,488 @@ components:
       - asset_count
       - status
       additionalProperties: false
-    UrlAssetSlotInput:
-      description: URL asset assigned to an AdCP format slot. The slot asset_id is the key in the creative manifest assets map.
+    CreativeManifestListResponse:
+      description: Paginated list of creative manifest summaries
       type: object
       properties:
-        asset_id:
-          description: AdCP format slot asset_id (e.g. "landing_page", "click_url")
+        manifests:
+          description: Manifests projected to the summary shape. Use `get_creative` for full detail.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreativeManifestSummary'
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - manifests
+      - total
+      additionalProperties: false
+    LinkedCreativeAssetInput:
+      description: A linked or inline generated creative asset that can be saved into the manifest asset store without multipart file upload.
+      type: object
+      properties:
+        url:
+          description: Publicly reachable URL for a hosted creative asset from a DAM, catalog, product page, or creative generator.
+          type: string
+          format: uri
+        data_url:
+          description: Inline generated creative asset as a base64 data URL. Use when a local/dev creative adapter returns inline assets because no asset store is configured.
+          type: string
+          pattern: ^data:(image|video|audio|text\/html|application\/xml|text\/plain)[^;]*;base64,[A-Za-z0-9+/=]+$
+        asset_type:
+          description: Creative asset type represented by the linked URL (IMAGE, VIDEO, AUDIO, HTML, VAST, etc.).
+          type: string
+          enum:
+          - IMAGE
+          - VIDEO
+          - AUDIO
+          - HTML
+          - JAVASCRIPT
+          - CSS
+          - TEXT
+          - URL
+          - VAST
+          - FONT
+          - LOGO
+          - DOCUMENT
+        label:
+          description: Human-readable label for this linked asset.
           type: string
           minLength: 1
           maxLength: 255
-        url:
-          description: URL to add as asset (must be http/https)
+        slot_asset_id:
+          description: Optional AdCP format slot asset_id for this linked asset (for example, "image", "video", or "audio").
           type: string
-          format: uri
-        url_type:
-          description: URL type classification. Optional — the server derives the canonical url_type from `asset_id` (e.g. "landing_page" → clickthrough, "impression_tracker" → tracker_pixel). Any client-provided value is treated as a hint, not authoritative.
+          minLength: 1
+          maxLength: 255
+        content_type:
+          description: Optional MIME type. If omitted, the server infers a sensible default from asset_type and URL extension.
+          type: string
+          minLength: 1
+          maxLength: 255
+        duration_ms:
+          description: Duration in milliseconds for time-based assets (VIDEO, AUDIO, VAST). Persisted so the media-buy compatibility gate can verify the creative fits a slot's required duration before syncing it to a source.
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        declared_sizes:
+          description: Buyer-declared display sizes (width×height in pixels) for an HTML ad tag whose markup doesn't declare one — supplied out-of-band via a CSV/manifest. Persisted so the tag can still auto-map to placements when assigned to a campaign in a later turn. Ignored for non-HTML assets (images/video carry probed dimensions).
+          maxItems: 30
+          type: array
+          items:
+            type: object
+            properties:
+              width:
+                type: integer
+                maximum: 9007199254740991
+                minimum: 1
+              height:
+                type: integer
+                maximum: 9007199254740991
+                minimum: 1
+            required:
+            - width
+            - height
+        make_primary:
+          description: When true, make this URL-backed asset the primary renderable creative source. Only one linked asset may be primary.
+          type: boolean
+        locked_asset:
+          description: When true, creative generation and rendering should preserve this supplied asset rather than redraw or reinterpret it.
+          type: boolean
+        asset_role:
+          description: Role of the supplied asset, such as product, package, logo, brand, reference, or scene.
           type: string
           enum:
-          - clickthrough
-          - tracker_pixel
-          - tracker_script
-          - vast
+          - product
+          - package
+          - logo
+          - brand
+          - reference
+          - scene
+          - other
+        can_transform:
+          description: Whether the asset may be transformed. Set false for exact product imagery, packaging, logos, book covers, or regulated artwork.
+          type: boolean
+        preservation_notes:
+          description: Human-readable instructions for preserving asset fidelity, e.g. "Preserve cover typography and portrait exactly."
+          type: string
+          minLength: 1
+          maxLength: 1000
+        source_asset_id:
+          description: Raw/source creative-session asset ID used to derive this linked asset, when the asset is a rendition or locked composite.
+          type: string
+          minLength: 1
+          maxLength: 255
+        rendition_asset_id:
+          description: Creative-session rendition asset ID used in the final creative manifest.
+          type: string
+          minLength: 1
+          maxLength: 255
       required:
-      - asset_id
-      - url
+      - asset_type
+    CreateCreativeManifestMetadata:
+      description: JSON metadata for creating a creative manifest
+      type: object
+      properties:
+        name:
+          description: Manifest name (auto-generated if omitted)
+          type: string
+          minLength: 1
+          maxLength: 255
+        message:
+          description: Creative brief / direction text
+          type: string
+          minLength: 1
+          maxLength: 5000
+        url_asset:
+          description: Add a single URL asset (per AdCP url-asset spec). For multi-slot formats (e.g. native), use `url_assets` instead.
+          type: object
+          properties:
+            url:
+              description: URL to add as asset (must be http/https)
+              type: string
+              format: uri
+            url_type:
+              description: URL type classification
+              type: string
+              enum:
+              - clickthrough
+              - tracker_pixel
+              - tracker_script
+              - vast
+          required:
+          - url
+          - url_type
+        url_assets:
+          description: URL assets assigned to specific AdCP format slots (e.g. native landing_page, click trackers). Each entry pairs a slot `asset_id` with a URL.
+          maxItems: 50
+          type: array
+          items:
+            $ref: '#/components/schemas/UrlAssetSlotInput'
+        text_assets:
+          description: Text assets assigned to specific AdCP format slots (e.g. native headline, long_headline, description, business_name, disclosure). Each entry pairs a slot `asset_id` with content.
+          maxItems: 50
+          type: array
+          items:
+            $ref: '#/components/schemas/TextAssetSlotInput'
+        webhook_asset:
+          description: Add a webhook asset for DCO (dynamic content).
+          type: object
+          properties:
+            url:
+              description: URL to add as asset (must be http/https)
+              type: string
+              format: uri
+            method:
+              type: string
+              enum:
+              - GET
+              - POST
+            timeout_ms:
+              type: integer
+              minimum: 10
+              maximum: 5000
+            response_type:
+              type: string
+              enum:
+              - html
+              - json
+              - xml
+              - javascript
+            security:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum:
+                  - hmac_sha256
+                  - api_key
+                  - none
+                hmac_header:
+                  type: string
+                api_key_header:
+                  type: string
+              required:
+              - method
+          required:
+          - url
+          - response_type
+          - security
+        format_id:
+          description: Legacy-v1 ADCP named-format ref for this creative (auto-resolved from template if omitted). Use format_kind for AdCP 3.1 canonical formats.
+          type: object
+          properties:
+            agent_url:
+              type: string
+            id:
+              type: string
+              pattern: ^[a-zA-Z0-9_-]+$
+            width:
+              type: number
+              minimum: 1
+            height:
+              type: number
+              minimum: 1
+            duration_ms:
+              type: number
+              minimum: 1
+          required:
+          - agent_url
+          - id
+          additionalProperties: {}
+        format_kind:
+          description: AdCP 3.1 canonical format kind (e.g. image_carousel, video_hosted). Alternative to format_id for canonical formats.
+          anyOf:
+          - type: string
+            enum:
+            - image
+          - type: string
+            enum:
+            - html5
+          - type: string
+            enum:
+            - display_tag
+          - type: string
+            enum:
+            - image_carousel
+          - type: string
+            enum:
+            - video_hosted
+          - type: string
+            enum:
+            - video_vast
+          - type: string
+            enum:
+            - audio_hosted
+          - type: string
+            enum:
+            - audio_daast
+          - type: string
+            enum:
+            - sponsored_placement
+          - type: string
+            enum:
+            - native_in_feed
+          - type: string
+            enum:
+            - responsive_creative
+          - type: string
+            enum:
+            - agent_placement
+          - type: string
+            enum:
+            - custom
+        format_option_ref:
+          description: Pins this manifest to a specific format_options[] entry on a product, identified by format_option_id. Use scope:"publisher" with publisher_domain for catalog-backed options, scope:"product" for product-inline options.
+          oneOf:
+          - type: object
+            properties:
+              scope:
+                type: string
+                enum:
+                - publisher
+              publisher_domain:
+                type: string
+              format_option_id:
+                type: string
+            required:
+            - scope
+            - publisher_domain
+            - format_option_id
+            additionalProperties: false
+          - type: object
+            properties:
+              scope:
+                type: string
+                enum:
+                - product
+              format_option_id:
+                type: string
+            required:
+            - scope
+            - format_option_id
+            additionalProperties: false
+          type: object
+        industry_identifiers:
+          description: Industry identifiers (Ad-ID, ISCI, Clearcast clock number, IDcrea) per AdCP spec.
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - ad_id
+                - isci
+                - clearcast_clock
+                - idcrea
+              value:
+                type: string
+            required:
+            - type
+            - value
+        template_id:
+          description: Creative template ID — legacy-v1 ADCP named-format id (e.g., "display_image", "display_html", "video_standard") or vendor tag (e.g., "vendor_dcm_tag")
+          type: string
+        assets:
+          description: 'Multipart REST metadata only: each filename must match a file uploaded in the same multipart request. Murph chat attachments are not multipart files; represent them as linked_assets[].data_url using the murph-attachment://N placeholder instead. If omitted, multipart files are auto-classified.'
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                description: Must match an uploaded file's originalname
+                type: string
+                minLength: 1
+              asset_type:
+                description: Asset type (auto-detected from MIME if omitted)
+                type: string
+                enum:
+                - IMAGE
+                - VIDEO
+                - AUDIO
+                - HTML
+                - JAVASCRIPT
+                - CSS
+                - TEXT
+                - URL
+                - VAST
+                - FONT
+                - LOGO
+                - DOCUMENT
+              label:
+                description: Label/key for this asset in the manifest (auto-generated if omitted)
+                type: string
+              slot_asset_id:
+                description: AdCP format slot asset_id for this file (used by multi-slot formats like native).
+                type: string
+                minLength: 1
+                maxLength: 255
+              locked_asset:
+                description: When true, creative generation and rendering should preserve this supplied asset rather than redraw or reinterpret it.
+                type: boolean
+              asset_role:
+                description: Role of the supplied asset, such as product, package, logo, brand, reference, or scene.
+                type: string
+                enum:
+                - product
+                - package
+                - logo
+                - brand
+                - reference
+                - scene
+                - other
+              can_transform:
+                description: Whether the asset may be transformed. Set false for exact product imagery, packaging, logos, book covers, or regulated artwork.
+                type: boolean
+              preservation_notes:
+                description: Human-readable instructions for preserving asset fidelity, e.g. "Preserve cover typography and portrait exactly."
+                type: string
+                minLength: 1
+                maxLength: 1000
+              source_asset_id:
+                description: Raw/source creative-session asset ID used to derive this linked asset, when the asset is a rendition or locked composite.
+                type: string
+                minLength: 1
+                maxLength: 255
+              rendition_asset_id:
+                description: Creative-session rendition asset ID used in the final creative manifest.
+                type: string
+                minLength: 1
+                maxLength: 255
+            required:
+            - filename
+        linked_assets:
+          description: URL-backed or inline media assets from a chat attachment, DAM, catalog, product page, or creative generator. For every Murph chat attachment, use linked_assets[].data_url = murph-attachment://N; never put its filename in assets[] because buyer_api_call does not send multipart file bytes.
+          maxItems: 50
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedCreativeAssetInput'
+        brandAgentId:
+          description: Advertiser ID (parameter name kept for wire compatibility). Required when creating an advertiser-level master without a campaign. Ignored when the manifest is created under a campaign (resolved from campaign context).
+          type: string
+        frequencyCaps:
+          description: Buyer-defined frequency caps for this creative. When provided, sets the full list.
+          type: array
+          items:
+            $ref: '#/components/schemas/FrequencyCapConfigInput'
+        cards:
+          description: Carousel cards (image_carousel format). Min 2, max 10. Each card needs filename (for an uploaded file) or url (for a pre-hosted asset), plus optional headline, description, cta, landing_page_url.
+          minItems: 2
+          maxItems: 10
+          type: array
+          items:
+            $ref: '#/components/schemas/CardInput'
+    UpdateCreativeCollectionBody:
+      description: Update creative collection metadata.
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 2000
+        metadata:
+          type: object
+          additionalProperties: {}
+    FrequencyCapWindow:
+      description: Rolling time window over which max_impressions applies (AdCP Duration shape).
+      type: object
+      properties:
+        interval:
+          type: number
+          minimum: 1
+        unit:
+          anyOf:
+          - type: string
+            enum:
+            - seconds
+          - type: string
+            enum:
+            - minutes
+          - type: string
+            enum:
+            - hours
+          - type: string
+            enum:
+            - days
+          - type: string
+            enum:
+            - campaign
+      required:
+      - interval
+      - unit
+      additionalProperties: {}
+    AttachCreativeCollectionBody:
+      description: Attach collection metadata to the campaign workspace. This does not launch or sync creatives by itself.
+      type: object
+      properties:
+        role:
+          default: creative_library
+          description: 'How a campaign uses the collection: working creative library, source assets, approved launch set, or testing set.'
+          type: string
+          enum:
+          - creative_library
+          - source_assets
+          - approved_set
+          - test_set
+        sync_policy:
+          default: manual
+          description: Whether campaign attachment changes are manual or automatically include new collection members.
+          type: string
+          enum:
+          - manual
+          - auto_include_new_members
+        metadata:
+          default: {}
+          type: object
+          additionalProperties: {}
   securitySchemes:
     bearerAuth:
       type: http

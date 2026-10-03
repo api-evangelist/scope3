@@ -249,87 +249,19 @@ paths:
       description: Production server
 components:
   schemas:
-    ReportingMetricsTimeseriesResponse:
-      description: 'Time-series reporting response: flat leaf × day rows (same hierarchy fields as the summary view, plus date)'
-      type: object
-      properties:
-        timeseries:
-          description: 'Flat rows: one entry per (advertiser → campaign → media buy → package) × day, sorted by date ascending'
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeseriesEntry'
-        totals:
-          description: Aggregated totals across the entire period. Money metrics are null when the emitted rows span currencies
-          allOf:
-          - $ref: '#/components/schemas/ReportingTotalsMetrics'
-        totalsCurrency:
-          description: ISO-4217 currency the returned-row totals are denominated in; null when there are no rows or emitted rows span multiple currencies
-          type:
-          - string
-          - 'null'
-        periodStart:
-          description: Start of the reporting period (YYYY-MM-DD)
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
-        periodEnd:
-          description: End of the reporting period (YYYY-MM-DD)
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
-      required:
-      - timeseries
-      - totals
-      - totalsCurrency
-      - periodStart
-      - periodEnd
-      additionalProperties: false
-    EventSummaryResponse:
-      description: Response containing hourly-aggregated event counts for an advertiser
-      type: object
-      properties:
-        periodStart:
-          description: Start of the queried period (inclusive, ISO 8601)
-          example: '2026-03-27T14:00:00.000Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        periodEnd:
-          description: End of the queried period (exclusive, ISO 8601)
-          example: '2026-03-27T15:00:00.000Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        entries:
-          description: Aggregated event entries within the queried period
-          type: array
-          items:
-            $ref: '#/components/schemas/EventSummaryEntry'
-        totalEventCount:
-          description: Sum of all event counts across all entries
-          example: 5000
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - periodStart
-      - periodEnd
-      - entries
-      - totalEventCount
-      additionalProperties: false
-    CampaignManagement:
-      description: 'Whether the platform acts on this campaign. "tracked" = a campaign the platform did not set up, mirrored from a connected seller account: the shell is derived from the buys underneath, read-only, and updates automatically as the seller changes things. "managed" = a campaign authored or adopted through the platform (get_products → create_media_buy → update_media_buy) — the platform sends instructions down. In both states the execution system remains the source of truth.'
+    EventSummaryType:
+      description: 'Type of event to filter by: conversion, click, impression, measurement, or mmp'
       type: string
       enum:
-      - tracked
-      - managed
-    TimeseriesEntry:
-      description: One row of metrics for a single (advertiser → campaign → media buy → package) leaf on a single day
+      - conversion
+      - click
+      - impression
+      - measurement
+      - mmp
+    AdvertiserReporting:
+      description: Advertiser-level reporting metrics with campaign breakdown
       type: object
       properties:
-        date:
-          description: Reporting date (YYYY-MM-DD)
-          example: '2025-01-15'
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
         advertiserId:
           description: Advertiser identifier
           type: string
@@ -337,8 +269,26 @@ components:
           description: Advertiser name
           type: string
         currency:
-          description: ISO-4217 currency that actually denominates the row's spend, eCPM, and CPC; normally the advertiser's locked primary currency, or the reported source currency when FX conversion is unavailable
+          description: ISO-4217 currency used for money under this advertiser (the advertiser's locked primary currency); source delivery spend is normalized to it when an applicable FX rate is available
           type: string
+        metrics:
+          $ref: '#/components/schemas/ReportingMetrics'
+        campaigns:
+          description: Campaign-level breakdown
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignReporting'
+      required:
+      - advertiserId
+      - advertiserName
+      - currency
+      - metrics
+      - campaigns
+      additionalProperties: false
+    CampaignReporting:
+      description: Campaign-level reporting metrics with media buy breakdown
+      type: object
+      properties:
         campaignId:
           description: Campaign identifier
           type: string
@@ -346,40 +296,64 @@ components:
           description: Campaign name
           type: string
         management:
-          description: 'Management state of the row''s campaign: "tracked" (mirrored read-only from a connected seller account) or "managed" (authored or adopted through the platform). Rows without a campaign are managed.'
+          description: 'Management state of this campaign: "tracked" (a campaign the platform did not set up, mirrored read-only from a connected seller account) or "managed" (authored or adopted through the platform). Buyer reporting currently includes managed campaigns only — tracked mirror delivery is excluded from this surface — so aggregates never silently mix the two states.'
           allOf:
           - $ref: '#/components/schemas/CampaignManagement'
-        mediaBuyId:
-          description: Media buy identifier
-          type: string
-        mediaBuyName:
-          description: Media buy name
-          type: string
-        mediaBuyStatus:
-          description: Media buy status
-          type: string
-        packageId:
-          description: Package identifier. Empty string when the media buy has no packages.
-          type: string
-        productId:
-          description: Product identifier for this package. Empty string when no package.
-          type: string
-        productName:
-          description: Human-readable product name for this package. Empty string when no package.
-          type: string
         metrics:
           $ref: '#/components/schemas/ReportingMetrics'
+        mediaBuys:
+          description: Media buy-level breakdown
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaBuyReporting'
       required:
-      - date
-      - advertiserId
-      - advertiserName
-      - currency
       - campaignId
       - campaignName
       - management
-      - mediaBuyId
-      - mediaBuyName
-      - mediaBuyStatus
+      - metrics
+      - mediaBuys
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    PackageReporting:
+      description: Package-level reporting metrics
+      type: object
+      properties:
+        packageId:
+          description: Package identifier
+          type: string
+        productId:
+          description: Product identifier for this package
+          type:
+          - string
+          - 'null'
+        productName:
+          description: Human-readable product name for this package
+          type:
+          - string
+          - 'null'
+        metrics:
+          $ref: '#/components/schemas/ReportingMetrics'
+      required:
       - packageId
       - productId
       - productName
@@ -479,6 +453,148 @@ components:
       - cpa
       - roas
       additionalProperties: false
+    CampaignManagement:
+      description: 'Whether the platform acts on this campaign. "tracked" = a campaign the platform did not set up, mirrored from a connected seller account: the shell is derived from the buys underneath, read-only, and updates automatically as the seller changes things. "managed" = a campaign authored or adopted through the platform (get_products → create_media_buy → update_media_buy) — the platform sends instructions down. In both states the execution system remains the source of truth.'
+      type: string
+      enum:
+      - tracked
+      - managed
+    ReportingMetricsExportResponse:
+      description: Response containing a signed URL to download the exported CSV
+      type: object
+      properties:
+        downloadUrl:
+          description: Signed URL to download the CSV file (expires in 7 days)
+          type: string
+          format: uri
+        expiresAt:
+          description: ISO 8601 timestamp when the download URL expires
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        fileName:
+          description: Name of the generated CSV file
+          type: string
+        rowCount:
+          description: Number of data rows in the CSV (excluding header)
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - downloadUrl
+      - expiresAt
+      - fileName
+      - rowCount
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    ReportingConversionInfo:
+      description: How the consolidated (FX-converted) figures were produced
+      type: object
+      properties:
+        displayCurrency:
+          description: ISO-4217 currency the consolidated block is expressed in
+          type: string
+        asOf:
+          description: UTC calendar day whose locked rate-of-the-day was applied (one rate across the whole window)
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        rateSource:
+          description: Where the rates came from (the platform rate-of-day table)
+          type: string
+          enum:
+          - fx_rate_snapshots
+        rateBasis:
+          description: 'Conversion basis: ''as-of'' applies one current rate-of-the-day to the whole window (an estimate; a booked-rate basis is a later phase)'
+          type: string
+          enum:
+          - as-of
+        rates:
+          description: Every rate applied in this conversion
+          type: array
+          items:
+            type: object
+            properties:
+              pair:
+                description: BASEQUOTE pair, e.g. USDZAR = ZAR per USD
+                type: string
+              rate:
+                description: QUOTE units per 1 BASE
+                type: number
+            required:
+            - pair
+            - rate
+            additionalProperties: false
+        unconverted:
+          description: Native currencies that could NOT be converted (no rate available); their spend is excluded from the consolidated money totals rather than guessed
+          type: array
+          items:
+            type: string
+        estimate:
+          description: 'Always true: the consolidated figures are display estimates, never billing or settlement inputs'
+          type: boolean
+          enum:
+          - true
+      required:
+      - displayCurrency
+      - asOf
+      - rateSource
+      - rateBasis
+      - rates
+      - unconverted
+      - estimate
+      additionalProperties: false
+    ReportingMetricsResponse:
+      description: 'Hierarchical reporting response: advertiser → campaign → media buy → package'
+      type: object
+      properties:
+        advertisers:
+          description: Advertiser-level reporting data
+          type: array
+          items:
+            $ref: '#/components/schemas/AdvertiserReporting'
+        totals:
+          description: Aggregated totals across all advertisers, exact and native. Money metrics are present only when every advertiser shares one currency (totalsCurrency); when currencies mix they are null — see the consolidated block for the converted rollup
+          allOf:
+          - $ref: '#/components/schemas/ReportingTotalsMetrics'
+        totalsCurrency:
+          description: ISO-4217 currency the native totals are denominated in; null when the advertisers span multiple currencies (money metrics in totals are then null)
+          type:
+          - string
+          - 'null'
+        consolidated:
+          description: FX-converted cross-advertiser rollup in the display currency (explicit displayCurrency, or the buyer home currency when resolvable). Omitted when no conversion applies (single-currency buyer viewing natively). Display estimate only — never a billing input
+          allOf:
+          - $ref: '#/components/schemas/ConsolidatedReporting'
+        periodStart:
+          description: Start of the reporting period (YYYY-MM-DD)
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        periodEnd:
+          description: End of the reporting period (YYYY-MM-DD)
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+      required:
+      - advertisers
+      - totals
+      - totalsCurrency
+      - periodStart
+      - periodEnd
+      additionalProperties: false
     MediaBuyReporting:
       description: Media buy-level reporting metrics with package breakdown
       type: object
@@ -576,130 +692,15 @@ components:
       - byAdvertiser
       - conversionInfo
       additionalProperties: false
-    ReportingConversionInfo:
-      description: How the consolidated (FX-converted) figures were produced
+    TimeseriesEntry:
+      description: One row of metrics for a single (advertiser → campaign → media buy → package) leaf on a single day
       type: object
       properties:
-        displayCurrency:
-          description: ISO-4217 currency the consolidated block is expressed in
-          type: string
-        asOf:
-          description: UTC calendar day whose locked rate-of-the-day was applied (one rate across the whole window)
+        date:
+          description: Reporting date (YYYY-MM-DD)
+          example: '2025-01-15'
           type: string
           pattern: ^\d{4}-\d{2}-\d{2}$
-        rateSource:
-          description: Where the rates came from (the platform rate-of-day table)
-          type: string
-          enum:
-          - fx_rate_snapshots
-        rateBasis:
-          description: 'Conversion basis: ''as-of'' applies one current rate-of-the-day to the whole window (an estimate; a booked-rate basis is a later phase)'
-          type: string
-          enum:
-          - as-of
-        rates:
-          description: Every rate applied in this conversion
-          type: array
-          items:
-            type: object
-            properties:
-              pair:
-                description: BASEQUOTE pair, e.g. USDZAR = ZAR per USD
-                type: string
-              rate:
-                description: QUOTE units per 1 BASE
-                type: number
-            required:
-            - pair
-            - rate
-            additionalProperties: false
-        unconverted:
-          description: Native currencies that could NOT be converted (no rate available); their spend is excluded from the consolidated money totals rather than guessed
-          type: array
-          items:
-            type: string
-        estimate:
-          description: 'Always true: the consolidated figures are display estimates, never billing or settlement inputs'
-          type: boolean
-          enum:
-          - true
-      required:
-      - displayCurrency
-      - asOf
-      - rateSource
-      - rateBasis
-      - rates
-      - unconverted
-      - estimate
-      additionalProperties: false
-    ReportingMetricsResponse:
-      description: 'Hierarchical reporting response: advertiser → campaign → media buy → package'
-      type: object
-      properties:
-        advertisers:
-          description: Advertiser-level reporting data
-          type: array
-          items:
-            $ref: '#/components/schemas/AdvertiserReporting'
-        totals:
-          description: Aggregated totals across all advertisers, exact and native. Money metrics are present only when every advertiser shares one currency (totalsCurrency); when currencies mix they are null — see the consolidated block for the converted rollup
-          allOf:
-          - $ref: '#/components/schemas/ReportingTotalsMetrics'
-        totalsCurrency:
-          description: ISO-4217 currency the native totals are denominated in; null when the advertisers span multiple currencies (money metrics in totals are then null)
-          type:
-          - string
-          - 'null'
-        consolidated:
-          description: FX-converted cross-advertiser rollup in the display currency (explicit displayCurrency, or the buyer home currency when resolvable). Omitted when no conversion applies (single-currency buyer viewing natively). Display estimate only — never a billing input
-          allOf:
-          - $ref: '#/components/schemas/ConsolidatedReporting'
-        periodStart:
-          description: Start of the reporting period (YYYY-MM-DD)
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
-        periodEnd:
-          description: End of the reporting period (YYYY-MM-DD)
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
-      required:
-      - advertisers
-      - totals
-      - totalsCurrency
-      - periodStart
-      - periodEnd
-      additionalProperties: false
-    ReportingMetricsExportResponse:
-      description: Response containing a signed URL to download the exported CSV
-      type: object
-      properties:
-        downloadUrl:
-          description: Signed URL to download the CSV file (expires in 7 days)
-          type: string
-          format: uri
-        expiresAt:
-          description: ISO 8601 timestamp when the download URL expires
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        fileName:
-          description: Name of the generated CSV file
-          type: string
-        rowCount:
-          description: Number of data rows in the CSV (excluding header)
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - downloadUrl
-      - expiresAt
-      - fileName
-      - rowCount
-      additionalProperties: false
-    AdvertiserReporting:
-      description: Advertiser-level reporting metrics with campaign breakdown
-      type: object
-      properties:
         advertiserId:
           description: Advertiser identifier
           type: string
@@ -707,26 +708,8 @@ components:
           description: Advertiser name
           type: string
         currency:
-          description: ISO-4217 currency used for money under this advertiser (the advertiser's locked primary currency); source delivery spend is normalized to it when an applicable FX rate is available
+          description: ISO-4217 currency that actually denominates the row's spend, eCPM, and CPC; normally the advertiser's locked primary currency, or the reported source currency when FX conversion is unavailable
           type: string
-        metrics:
-          $ref: '#/components/schemas/ReportingMetrics'
-        campaigns:
-          description: Campaign-level breakdown
-          type: array
-          items:
-            $ref: '#/components/schemas/CampaignReporting'
-      required:
-      - advertiserId
-      - advertiserName
-      - currency
-      - metrics
-      - campaigns
-      additionalProperties: false
-    CampaignReporting:
-      description: Campaign-level reporting metrics with media buy breakdown
-      type: object
-      properties:
         campaignId:
           description: Campaign identifier
           type: string
@@ -734,98 +717,45 @@ components:
           description: Campaign name
           type: string
         management:
-          description: 'Management state of this campaign: "tracked" (a campaign the platform did not set up, mirrored read-only from a connected seller account) or "managed" (authored or adopted through the platform). Buyer reporting currently includes managed campaigns only — tracked mirror delivery is excluded from this surface — so aggregates never silently mix the two states.'
+          description: 'Management state of the row''s campaign: "tracked" (mirrored read-only from a connected seller account) or "managed" (authored or adopted through the platform). Rows without a campaign are managed.'
           allOf:
           - $ref: '#/components/schemas/CampaignManagement'
+        mediaBuyId:
+          description: Media buy identifier
+          type: string
+        mediaBuyName:
+          description: Media buy name
+          type: string
+        mediaBuyStatus:
+          description: Media buy status
+          type: string
+        packageId:
+          description: Package identifier. Empty string when the media buy has no packages.
+          type: string
+        productId:
+          description: Product identifier for this package. Empty string when no package.
+          type: string
+        productName:
+          description: Human-readable product name for this package. Empty string when no package.
+          type: string
         metrics:
           $ref: '#/components/schemas/ReportingMetrics'
-        mediaBuys:
-          description: Media buy-level breakdown
-          type: array
-          items:
-            $ref: '#/components/schemas/MediaBuyReporting'
       required:
+      - date
+      - advertiserId
+      - advertiserName
+      - currency
       - campaignId
       - campaignName
       - management
-      - metrics
-      - mediaBuys
-      additionalProperties: false
-    PackageReporting:
-      description: Package-level reporting metrics
-      type: object
-      properties:
-        packageId:
-          description: Package identifier
-          type: string
-        productId:
-          description: Product identifier for this package
-          type:
-          - string
-          - 'null'
-        productName:
-          description: Human-readable product name for this package
-          type:
-          - string
-          - 'null'
-        metrics:
-          $ref: '#/components/schemas/ReportingMetrics'
-      required:
+      - mediaBuyId
+      - mediaBuyName
+      - mediaBuyStatus
       - packageId
       - productId
       - productName
       - metrics
       additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    EventSummaryEntry:
-      description: A single hourly aggregation entry
-      type: object
-      properties:
-        eventHour:
-          description: Start of the aggregated hour window (ISO 8601)
-          example: '2026-03-27T14:00:00.000Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        eventType:
-          description: Type of event
-          allOf:
-          - $ref: '#/components/schemas/EventSummaryType'
-        eventCount:
-          description: Number of events in this hour for this type
-          example: 1500
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - eventHour
-      - eventType
-      - eventCount
-      additionalProperties: false
-    EventSummaryType:
-      description: 'Type of event to filter by: conversion, click, impression, measurement, or mmp'
-      type: string
-      enum:
-      - conversion
-      - click
-      - impression
-      - measurement
-      - mmp
     ReportingTotalsMetrics:
       description: Reporting totals; money metrics are null when returned denominations mix or no denomination is available
       type: object
@@ -924,26 +854,203 @@ components:
       - cpa
       - roas
       additionalProperties: false
-    ApiError:
-      description: Structured error object
+    ReportingMetricsTimeseriesResponse:
+      description: 'Time-series reporting response: flat leaf × day rows (same hierarchy fields as the summary view, plus date)'
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        timeseries:
+          description: 'Flat rows: one entry per (advertiser → campaign → media buy → package) × day, sorted by date ascending'
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeseriesEntry'
+        totals:
+          description: Aggregated totals across the entire period. Money metrics are null when the emitted rows span currencies
+          allOf:
+          - $ref: '#/components/schemas/ReportingTotalsMetrics'
+        totalsCurrency:
+          description: ISO-4217 currency the returned-row totals are denominated in; null when there are no rows or emitted rows span multiple currencies
+          type:
+          - string
+          - 'null'
+        periodStart:
+          description: Start of the reporting period (YYYY-MM-DD)
           type: string
-        message:
-          description: Human-readable error message
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        periodEnd:
+          description: End of the reporting period (YYYY-MM-DD)
           type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+          pattern: ^\d{4}-\d{2}-\d{2}$
       required:
-      - code
-      - message
+      - timeseries
+      - totals
+      - totalsCurrency
+      - periodStart
+      - periodEnd
+      additionalProperties: false
+    EventSummaryResponse:
+      description: Response containing hourly-aggregated event counts for an advertiser
+      type: object
+      properties:
+        periodStart:
+          description: Start of the queried period (inclusive, ISO 8601)
+          example: '2026-03-27T14:00:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        periodEnd:
+          description: End of the queried period (exclusive, ISO 8601)
+          example: '2026-03-27T15:00:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        entries:
+          description: Aggregated event entries within the queried period
+          type: array
+          items:
+            $ref: '#/components/schemas/EventSummaryEntry'
+        totalEventCount:
+          description: Sum of all event counts across all entries
+          example: 5000
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - periodStart
+      - periodEnd
+      - entries
+      - totalEventCount
+      additionalProperties: false
+    EventSummaryEntry:
+      description: A single hourly aggregation entry
+      type: object
+      properties:
+        eventHour:
+          description: Start of the aggregated hour window (ISO 8601)
+          example: '2026-03-27T14:00:00.000Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        eventType:
+          description: Type of event
+          allOf:
+          - $ref: '#/components/schemas/EventSummaryType'
+        eventCount:
+          description: Number of events in this hour for this type
+          example: 1500
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - eventHour
+      - eventType
+      - eventCount
+      additionalProperties: false
+    MarginSourceLeg:
+      description: 'One buy-leg edge: a single source package under a buyer package'
+      type: object
+      properties:
+        sourceId:
+          description: Inventory source the buy leg was sourced from
+          type: string
+        upstreamMediaBuyId:
+          description: The source's media buy id for this leg
+          type: string
+        upstreamPackageId:
+          description: The source's package id for this leg
+          type: string
+        settlementStatus:
+          $ref: '#/components/schemas/SettlementStatus'
+        amounts:
+          $ref: '#/components/schemas/MarginAmounts'
+      required:
+      - sourceId
+      - upstreamMediaBuyId
+      - upstreamPackageId
+      - settlementStatus
+      - amounts
+      additionalProperties: false
+    SettlementStatus:
+      description: 'Per-edge settlement state: booked (committed, no delivery yet), accruing (delivering), settled (final), void (cancelled — excluded from this report).'
+      type: string
+      enum:
+      - booked
+      - accruing
+      - settled
+      - void
+    StorefrontReportingMetricsTimeseriesResponse:
+      description: 'Time-series storefront reporting response: flat leaf × day rows'
+      type: object
+      properties:
+        timeseries:
+          description: 'Flat rows: one entry per (advertiser → media buy → package) × day, sorted by date ascending'
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontTimeseriesEntry'
+        totals:
+          description: Aggregated totals across the entire period
+          allOf:
+          - $ref: '#/components/schemas/ReportingMetrics'
+        periodStart:
+          description: Start of the reporting period (YYYY-MM-DD)
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        periodEnd:
+          description: End of the reporting period (YYYY-MM-DD)
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+      required:
+      - timeseries
+      - totals
+      - periodStart
+      - periodEnd
+      additionalProperties: false
+    StorefrontPackageReporting:
+      description: Package-level reporting metrics
+      type: object
+      properties:
+        packageId:
+          description: Package identifier
+          type: string
+        productId:
+          description: Product identifier for this package
+          type:
+          - string
+          - 'null'
+        productName:
+          description: Human-readable product name for this package
+          type:
+          - string
+          - 'null'
+        metrics:
+          $ref: '#/components/schemas/ReportingMetrics'
+      required:
+      - packageId
+      - productId
+      - productName
+      - metrics
+      additionalProperties: false
+    StorefrontAdvertiserReporting:
+      description: Advertiser-level reporting metrics with media buy breakdown (no campaign level)
+      type: object
+      properties:
+        advertiserId:
+          description: Advertiser identifier
+          type: string
+        advertiserName:
+          description: Advertiser name
+          type: string
+        metrics:
+          $ref: '#/components/schemas/ReportingMetrics'
+        mediaBuys:
+          description: Media buy-level breakdown
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontMediaBuyReporting'
+      required:
+      - advertiserId
+      - advertiserName
+      - metrics
+      - mediaBuys
       additionalProperties: false
     StorefrontMediaBuyReporting:
       description: Media buy-level reporting metrics with package breakdown
@@ -984,28 +1091,81 @@ components:
       - metrics
       - packages
       additionalProperties: false
-    StorefrontAdvertiserReporting:
-      description: Advertiser-level reporting metrics with media buy breakdown (no campaign level)
+    MarginMediaBuy:
+      description: Media-buy-level P&L with package breakdown
       type: object
       properties:
-        advertiserId:
-          description: Advertiser identifier
+        mediaBuyId:
+          description: Buyer-facing media buy identifier (the SELL leg)
           type: string
-        advertiserName:
-          description: Advertiser name
-          type: string
-        metrics:
-          $ref: '#/components/schemas/ReportingMetrics'
-        mediaBuys:
-          description: Media buy-level breakdown
+        amounts:
+          $ref: '#/components/schemas/MarginAmounts'
+        packages:
+          description: Package-level P&L breakdown
           type: array
           items:
-            $ref: '#/components/schemas/StorefrontMediaBuyReporting'
+            $ref: '#/components/schemas/MarginPackage'
       required:
-      - advertiserId
-      - advertiserName
-      - metrics
-      - mediaBuys
+      - mediaBuyId
+      - amounts
+      - packages
+      additionalProperties: false
+    StorefrontMarginReportingResponse:
+      description: 'Hierarchical storefront margin (P&L) response: buyer → media buy → package → source leg'
+      type: object
+      properties:
+        buyers:
+          description: Buyer-level P&L data
+          type: array
+          items:
+            $ref: '#/components/schemas/MarginBuyer'
+        totals:
+          description: Aggregated totals, one entry per settlement currency (amounts are never summed across currencies)
+          type: array
+          items:
+            $ref: '#/components/schemas/MarginAmounts'
+        periodStart:
+          description: 'As-of start: earliest booked_at of the included edges (YYYY-MM-DD), null when empty'
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        periodEnd:
+          description: 'As-of end: latest realized_through (or booked_at) of the included edges (YYYY-MM-DD), null when empty'
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{4}-\d{2}-\d{2}$
+      required:
+      - buyers
+      - totals
+      - periodStart
+      - periodEnd
+      additionalProperties: false
+    MarginPackage:
+      description: Package-level P&L with per-source-leg breakdown. Package amounts are the sum of the source legs; this reconciles only while each buyer package routes to a single source package (the single-source guard enforced at forward time). Under curation-mode fan-out (one buyer package → many partitioned source packages) the per-leg sources[] remain exact, but package-level sell would need budget partitioning before the sum holds.
+      type: object
+      properties:
+        packageId:
+          description: Buyer-facing package identifier
+          type: string
+        productId:
+          description: Product identifier this package was composed from
+          type:
+          - string
+          - 'null'
+        amounts:
+          $ref: '#/components/schemas/MarginAmounts'
+        sources:
+          description: 'Per-source buy-leg breakdown: which source package contributed which spread'
+          type: array
+          items:
+            $ref: '#/components/schemas/MarginSourceLeg'
+      required:
+      - packageId
+      - productId
+      - amounts
+      - sources
       additionalProperties: false
     StorefrontReportingMetricsResponse:
       description: 'Hierarchical storefront reporting response: advertiser → media buy → package'
@@ -1061,128 +1221,6 @@ components:
       - amounts
       - mediaBuys
       additionalProperties: false
-    StorefrontPackageReporting:
-      description: Package-level reporting metrics
-      type: object
-      properties:
-        packageId:
-          description: Package identifier
-          type: string
-        productId:
-          description: Product identifier for this package
-          type:
-          - string
-          - 'null'
-        productName:
-          description: Human-readable product name for this package
-          type:
-          - string
-          - 'null'
-        metrics:
-          $ref: '#/components/schemas/ReportingMetrics'
-      required:
-      - packageId
-      - productId
-      - productName
-      - metrics
-      additionalProperties: false
-    StorefrontTimeseriesEntry:
-      description: One row of metrics for a single (advertiser → media buy → package) leaf on a single day
-      type: object
-      properties:
-        date:
-          description: Reporting date (YYYY-MM-DD)
-          example: '2026-01-15'
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
-        advertiserId:
-          description: Advertiser identifier
-          type: string
-        advertiserName:
-          description: Advertiser name
-          type: string
-        mediaBuyId:
-          description: Media buy identifier
-          type: string
-        mediaBuyName:
-          description: Media buy name
-          type: string
-        mediaBuyStatus:
-          description: Media buy status
-          type: string
-        inventorySourceId:
-          description: Deterministic legacy inventory-source association. With sourceBreakdown=true this is the contributing source; otherwise use inventorySourceIds for complete provenance.
-          type: string
-        inventorySourceIds:
-          description: Sorted distinct storefront inventory source IDs carried by the delivery rows aggregated into this result.
-          type: array
-          items:
-            type: string
-        packageId:
-          description: Package identifier. Empty string when the media buy has no packages.
-          type: string
-        productId:
-          description: Product identifier for this package. Empty string when no package.
-          type: string
-        productName:
-          description: Human-readable product name for this package. Empty string when no package.
-          type: string
-        metrics:
-          $ref: '#/components/schemas/ReportingMetrics'
-      required:
-      - date
-      - advertiserId
-      - advertiserName
-      - mediaBuyId
-      - mediaBuyName
-      - mediaBuyStatus
-      - inventorySourceId
-      - inventorySourceIds
-      - packageId
-      - productId
-      - productName
-      - metrics
-      additionalProperties: false
-    StorefrontMarginReportingResponse:
-      description: 'Hierarchical storefront margin (P&L) response: buyer → media buy → package → source leg'
-      type: object
-      properties:
-        buyers:
-          description: Buyer-level P&L data
-          type: array
-          items:
-            $ref: '#/components/schemas/MarginBuyer'
-        totals:
-          description: Aggregated totals, one entry per settlement currency (amounts are never summed across currencies)
-          type: array
-          items:
-            $ref: '#/components/schemas/MarginAmounts'
-        periodStart:
-          description: 'As-of start: earliest booked_at of the included edges (YYYY-MM-DD), null when empty'
-          type:
-          - string
-          - 'null'
-          pattern: ^\d{4}-\d{2}-\d{2}$
-        periodEnd:
-          description: 'As-of end: latest realized_through (or booked_at) of the included edges (YYYY-MM-DD), null when empty'
-          type:
-          - string
-          - 'null'
-          pattern: ^\d{4}-\d{2}-\d{2}$
-      required:
-      - buyers
-      - totals
-      - periodStart
-      - periodEnd
-      additionalProperties: false
-    SettlementStatus:
-      description: 'Per-edge settlement state: booked (committed, no delivery yet), accruing (delivering), settled (final), void (cancelled — excluded from this report).'
-      type: string
-      enum:
-      - booked
-      - accruing
-      - settled
-      - void
     MarginAmounts:
       description: Booked vs realized buy/sell/spread and margin %, one currency. The buy/sell/spread figures are independent coverage sums (each over the legs that carry that figure); when *Complete is false they do not reconcile by sell − buy = spread.
       type: object
@@ -1249,100 +1287,62 @@ components:
       - bookedComplete
       - realizedComplete
       additionalProperties: false
-    MarginMediaBuy:
-      description: Media-buy-level P&L with package breakdown
+    StorefrontTimeseriesEntry:
+      description: One row of metrics for a single (advertiser → media buy → package) leaf on a single day
       type: object
       properties:
-        mediaBuyId:
-          description: Buyer-facing media buy identifier (the SELL leg)
+        date:
+          description: Reporting date (YYYY-MM-DD)
+          example: '2026-01-15'
           type: string
-        amounts:
-          $ref: '#/components/schemas/MarginAmounts'
-        packages:
-          description: Package-level P&L breakdown
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        advertiserId:
+          description: Advertiser identifier
+          type: string
+        advertiserName:
+          description: Advertiser name
+          type: string
+        mediaBuyId:
+          description: Media buy identifier
+          type: string
+        mediaBuyName:
+          description: Media buy name
+          type: string
+        mediaBuyStatus:
+          description: Media buy status
+          type: string
+        inventorySourceId:
+          description: Deterministic legacy inventory-source association. With sourceBreakdown=true this is the contributing source; otherwise use inventorySourceIds for complete provenance.
+          type: string
+        inventorySourceIds:
+          description: Sorted distinct storefront inventory source IDs carried by the delivery rows aggregated into this result.
           type: array
           items:
-            $ref: '#/components/schemas/MarginPackage'
-      required:
-      - mediaBuyId
-      - amounts
-      - packages
-      additionalProperties: false
-    MarginPackage:
-      description: Package-level P&L with per-source-leg breakdown. Package amounts are the sum of the source legs; this reconciles only while each buyer package routes to a single source package (the single-source guard enforced at forward time). Under curation-mode fan-out (one buyer package → many partitioned source packages) the per-leg sources[] remain exact, but package-level sell would need budget partitioning before the sum holds.
-      type: object
-      properties:
+            type: string
         packageId:
-          description: Buyer-facing package identifier
+          description: Package identifier. Empty string when the media buy has no packages.
           type: string
         productId:
-          description: Product identifier this package was composed from
-          type:
-          - string
-          - 'null'
-        amounts:
-          $ref: '#/components/schemas/MarginAmounts'
-        sources:
-          description: 'Per-source buy-leg breakdown: which source package contributed which spread'
-          type: array
-          items:
-            $ref: '#/components/schemas/MarginSourceLeg'
+          description: Product identifier for this package. Empty string when no package.
+          type: string
+        productName:
+          description: Human-readable product name for this package. Empty string when no package.
+          type: string
+        metrics:
+          $ref: '#/components/schemas/ReportingMetrics'
       required:
+      - date
+      - advertiserId
+      - advertiserName
+      - mediaBuyId
+      - mediaBuyName
+      - mediaBuyStatus
+      - inventorySourceId
+      - inventorySourceIds
       - packageId
       - productId
-      - amounts
-      - sources
-      additionalProperties: false
-    StorefrontReportingMetricsTimeseriesResponse:
-      description: 'Time-series storefront reporting response: flat leaf × day rows'
-      type: object
-      properties:
-        timeseries:
-          description: 'Flat rows: one entry per (advertiser → media buy → package) × day, sorted by date ascending'
-          type: array
-          items:
-            $ref: '#/components/schemas/StorefrontTimeseriesEntry'
-        totals:
-          description: Aggregated totals across the entire period
-          allOf:
-          - $ref: '#/components/schemas/ReportingMetrics'
-        periodStart:
-          description: Start of the reporting period (YYYY-MM-DD)
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
-        periodEnd:
-          description: End of the reporting period (YYYY-MM-DD)
-          type: string
-          pattern: ^\d{4}-\d{2}-\d{2}$
-      required:
-      - timeseries
-      - totals
-      - periodStart
-      - periodEnd
-      additionalProperties: false
-    MarginSourceLeg:
-      description: 'One buy-leg edge: a single source package under a buyer package'
-      type: object
-      properties:
-        sourceId:
-          description: Inventory source the buy leg was sourced from
-          type: string
-        upstreamMediaBuyId:
-          description: The source's media buy id for this leg
-          type: string
-        upstreamPackageId:
-          description: The source's package id for this leg
-          type: string
-        settlementStatus:
-          $ref: '#/components/schemas/SettlementStatus'
-        amounts:
-          $ref: '#/components/schemas/MarginAmounts'
-      required:
-      - sourceId
-      - upstreamMediaBuyId
-      - upstreamPackageId
-      - settlementStatus
-      - amounts
+      - productName
+      - metrics
       additionalProperties: false
   securitySchemes:
     bearerAuth:

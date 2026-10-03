@@ -230,18 +230,6 @@ paths:
       - Gpu
 components:
   schemas:
-    GPUResponse:
-      title: GPU Response
-      type: object
-      additionalProperties: false
-      required:
-      - gpus
-      properties:
-        gpus:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/GPU'
     Error:
       type: object
       additionalProperties: false
@@ -259,6 +247,42 @@ components:
               type: string
             field:
               type: string
+    GPUUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: NVIDIA A100 40GB
+        max_power_w:
+          type: number
+          example: 700
+          format: float
+          x-go-type: float64
+        embodied_emissions_kgco2e:
+          type: number
+          example: 282.1
+          format: float
+          x-go-type: float64
+        embodied_water_mlh2o:
+          type: number
+          example: 181.1
+          format: float
+          x-go-type: float64
+        performance_ratio_to_h200:
+          type: number
+          example: 1.5
+          format: float
+          x-go-type: float64
+        ols_coefficient_gpu_count:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
+        ols_intercept:
+          type: number
+          example: 11.4
+          format: float
+          x-go-type: float64
     GPU:
       type: object
       required:
@@ -325,42 +349,6 @@ components:
         created_by:
           type: string
           description: ID of the user who created the node (admin or owner only)
-    GPUUpdateRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          example: NVIDIA A100 40GB
-        max_power_w:
-          type: number
-          example: 700
-          format: float
-          x-go-type: float64
-        embodied_emissions_kgco2e:
-          type: number
-          example: 282.1
-          format: float
-          x-go-type: float64
-        embodied_water_mlh2o:
-          type: number
-          example: 181.1
-          format: float
-          x-go-type: float64
-        performance_ratio_to_h200:
-          type: number
-          example: 1.5
-          format: float
-          x-go-type: float64
-        ols_coefficient_gpu_count:
-          type: number
-          example: 11.4
-          format: float
-          x-go-type: float64
-        ols_intercept:
-          type: number
-          example: 11.4
-          format: float
-          x-go-type: float64
     GPUCreateRequest:
       type: object
       required:
@@ -409,6 +397,18 @@ components:
           example: 11.4
           format: float
           x-go-type: float64
+    GPUResponse:
+      title: GPU Response
+      type: object
+      additionalProperties: false
+      required:
+      - gpus
+      properties:
+        gpus:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/GPU'
   securitySchemes:
     bearerAuth:
       type: http

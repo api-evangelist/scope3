@@ -166,41 +166,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    EsaMediaBuyList:
-      type: object
-      properties:
-        mediaBuys:
-          type: array
-          items:
-            $ref: '#/components/schemas/EsaMediaBuySummary'
-        count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        nextCursor:
-          type:
-          - string
-          - 'null'
-      required:
-      - mediaBuys
-      - count
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
     EsaMediaBuyStatusEvent:
       type: object
       properties:
@@ -215,6 +180,27 @@ components:
       required:
       - occurredAt
       - status
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
       additionalProperties: false
     EsaMediaBuyDetail:
       type: object
@@ -288,6 +274,41 @@ components:
       - creatives
       - statusHistory
       additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    EsaMediaBuyList:
+      type: object
+      properties:
+        mediaBuys:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaMediaBuySummary'
+        count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - mediaBuys
+      - count
+      additionalProperties: false
     EsaMediaBuySummary:
       type: object
       properties:
@@ -339,27 +360,6 @@ components:
       - totalBudget
       - currency
       - createdAt
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
       additionalProperties: false
   securitySchemes:
     bearerAuth:

@@ -336,23 +336,6 @@ paths:
       - Model
 components:
   schemas:
-    Error:
-      type: object
-      additionalProperties: false
-      required:
-      - message
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        details:
-          type: object
-          properties:
-            reason:
-              type: string
-            field:
-              type: string
     ModelResponse:
       title: Model Response
       type: object
@@ -365,6 +348,29 @@ components:
           maxItems: 100
           items:
             $ref: '#/components/schemas/Model'
+    DataType:
+      type: string
+      enum:
+      - fp8
+      - fp8-e4m3
+      - fp8-e5m2
+      - fp16
+      - tf32
+      - fp32
+      - fp64
+      - bfloat8
+      - bfloat16
+      - bf16
+      - int4
+      - int8
+      - int16
+      - int32
+      - int64
+      - uint4
+      - uint8
+      - uint16
+      - uint32
+      - uint64
     Family:
       type: string
       enum:
@@ -405,6 +411,91 @@ components:
         - Models may appear in multiple categories if they have both commercial and open source variants
 
         '
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+    ModelUpdateRequest:
+      type: object
+      description: Update an existing model
+      properties:
+        name:
+          type: string
+          example: GPT-4 Turbo
+        family:
+          type: string
+          example: gpt
+        hugging_face_path:
+          type: string
+          example: EleutherAI/gpt-neo-2.7B
+        benchmark_model_id:
+          type: string
+          example: gpt-4-turbo
+        estimated_use_life_days:
+          type: number
+          format: float
+          example: 365
+          x-go-type: float64
+        estimated_requests_per_day:
+          type: number
+          example: 1000
+          format: float
+          x-go-type: float64
+        fine_tuned_from_model_id:
+          type: string
+          example: gpt-4-turbo
+        total_params_billions:
+          type: number
+          example: 175
+          format: float
+          x-go-type: float64
+        number_of_experts:
+          type: integer
+          x-go-type: int64
+          example: 7
+        params_per_expert_billions:
+          type: number
+          example: 8
+          format: float
+          x-go-type: float64
+        training_usage_energy_kwh:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_emissions_kgco2e:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_usage_water_l:
+          type: number
+          example: 1013.1
+          format: float
+          x-go-type: float64
+        training_embodied_emissions_kgco2e:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
+        training_embodied_water_l:
+          type: number
+          example: 11013.1
+          format: float
+          x-go-type: float64
     Model:
       title: Model
       type: object
@@ -595,97 +686,6 @@ components:
           example: 11013.1
           format: float
           x-go-type: float64
-    ModelUpdateRequest:
-      type: object
-      description: Update an existing model
-      properties:
-        name:
-          type: string
-          example: GPT-4 Turbo
-        family:
-          type: string
-          example: gpt
-        hugging_face_path:
-          type: string
-          example: EleutherAI/gpt-neo-2.7B
-        benchmark_model_id:
-          type: string
-          example: gpt-4-turbo
-        estimated_use_life_days:
-          type: number
-          format: float
-          example: 365
-          x-go-type: float64
-        estimated_requests_per_day:
-          type: number
-          example: 1000
-          format: float
-          x-go-type: float64
-        fine_tuned_from_model_id:
-          type: string
-          example: gpt-4-turbo
-        total_params_billions:
-          type: number
-          example: 175
-          format: float
-          x-go-type: float64
-        number_of_experts:
-          type: integer
-          x-go-type: int64
-          example: 7
-        params_per_expert_billions:
-          type: number
-          example: 8
-          format: float
-          x-go-type: float64
-        training_usage_energy_kwh:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_usage_emissions_kgco2e:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_usage_water_l:
-          type: number
-          example: 1013.1
-          format: float
-          x-go-type: float64
-        training_embodied_emissions_kgco2e:
-          type: number
-          example: 11013.1
-          format: float
-          x-go-type: float64
-        training_embodied_water_l:
-          type: number
-          example: 11013.1
-          format: float
-          x-go-type: float64
-    DataType:
-      type: string
-      enum:
-      - fp8
-      - fp8-e4m3
-      - fp8-e5m2
-      - fp16
-      - tf32
-      - fp32
-      - fp64
-      - bfloat8
-      - bfloat16
-      - bf16
-      - int4
-      - int8
-      - int16
-      - int32
-      - int64
-      - uint4
-      - uint8
-      - uint16
-      - uint32
-      - uint64
     Task:
       type: string
       enum:

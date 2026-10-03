@@ -240,6 +240,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
     NotificationSummary:
       description: Compact notification view returned by list endpoints. Use the notification detail endpoint for the full `data` payload.
       type: object
@@ -379,19 +400,6 @@ components:
       - actionUrl
       - createdAt
       additionalProperties: false
-    NotificationActionResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          enum:
-          - true
-        notificationId:
-          type: string
-      required:
-      - success
-      - notificationId
-      additionalProperties: false
     ErrorResponse:
       description: Standard error response
       type: object
@@ -433,26 +441,43 @@ components:
       - unreadCount
       - hasMore
       additionalProperties: false
-    ApiError:
-      description: Structured error object
+    NotificationActionResponse:
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        success:
+          type: boolean
+          enum:
+          - true
+        notificationId:
           type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
       required:
-      - code
-      - message
+      - success
+      - notificationId
+      additionalProperties: false
+    StorefrontNotificationListResponse:
+      description: Paginated list of notification summaries (storefront spec)
+      type: object
+      properties:
+        notifications:
+          description: Notifications projected to the summary shape. Use the notification detail endpoint for the full `data` payload.
+          type: array
+          items:
+            $ref: '#/components/schemas/StorefrontNotificationSummary'
+        totalCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        unreadCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        hasMore:
+          type: boolean
+      required:
+      - notifications
+      - totalCount
+      - unreadCount
+      - hasMore
       additionalProperties: false
     StorefrontNotificationSummary:
       description: Compact notification view returned by the storefront list endpoint. Identical to NotificationSummary, minus buyer-only event types that can never appear in a seller notification list.
@@ -588,31 +613,6 @@ components:
       - messagePreview
       - actionUrl
       - createdAt
-      additionalProperties: false
-    StorefrontNotificationListResponse:
-      description: Paginated list of notification summaries (storefront spec)
-      type: object
-      properties:
-        notifications:
-          description: Notifications projected to the summary shape. Use the notification detail endpoint for the full `data` payload.
-          type: array
-          items:
-            $ref: '#/components/schemas/StorefrontNotificationSummary'
-        totalCount:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        unreadCount:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        hasMore:
-          type: boolean
-      required:
-      - notifications
-      - totalCount
-      - unreadCount
-      - hasMore
       additionalProperties: false
   securitySchemes:
     bearerAuth:

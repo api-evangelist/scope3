@@ -84,52 +84,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    TaskResponse:
-      description: Response containing a single task
-      type: object
-      properties:
-        task:
-          $ref: '#/components/schemas/TaskOutput'
-      required:
-      - task
-      additionalProperties: false
-    TaskError:
-      description: AdCP-compatible error object
-      type: object
-      properties:
-        code:
-          description: Error code for programmatic handling
-          example: VALIDATION_ERROR
-          type: string
-        message:
-          description: Human-readable error message
-          example: Invalid budget value
-          type: string
-        field:
-          description: Field path associated with the error
-          example: packages[0].targeting
-          type: string
-        suggestion:
-          description: Suggested fix for the error
-          type: string
-        retryAfter:
-          description: Seconds to wait before retrying the operation
-          type: number
-        details:
-          description: Additional task-specific error details
-          type: object
-          additionalProperties: {}
-        recovery:
-          description: 'Agent recovery classification: transient (retry), correctable (fix and resend), terminal (requires human action)'
-          type: string
-          enum:
-          - transient
-          - correctable
-          - terminal
-      required:
-      - code
-      - message
-      additionalProperties: false
     TaskOutput:
       description: Async task resource representation
       type: object
@@ -217,22 +171,6 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
     ApiError:
       description: Structured error object
       type: object
@@ -253,6 +191,68 @@ components:
       required:
       - code
       - message
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    TaskError:
+      description: AdCP-compatible error object
+      type: object
+      properties:
+        code:
+          description: Error code for programmatic handling
+          example: VALIDATION_ERROR
+          type: string
+        message:
+          description: Human-readable error message
+          example: Invalid budget value
+          type: string
+        field:
+          description: Field path associated with the error
+          example: packages[0].targeting
+          type: string
+        suggestion:
+          description: Suggested fix for the error
+          type: string
+        retryAfter:
+          description: Seconds to wait before retrying the operation
+          type: number
+        details:
+          description: Additional task-specific error details
+          type: object
+          additionalProperties: {}
+        recovery:
+          description: 'Agent recovery classification: transient (retry), correctable (fix and resend), terminal (requires human action)'
+          type: string
+          enum:
+          - transient
+          - correctable
+          - terminal
+      required:
+      - code
+      - message
+      additionalProperties: false
+    TaskResponse:
+      description: Response containing a single task
+      type: object
+      properties:
+        task:
+          $ref: '#/components/schemas/TaskOutput'
+      required:
+      - task
       additionalProperties: false
   securitySchemes:
     bearerAuth:

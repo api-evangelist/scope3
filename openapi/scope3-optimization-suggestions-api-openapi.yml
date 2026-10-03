@@ -287,40 +287,6 @@ components:
       - code
       - message
       additionalProperties: false
-    OptimizationSuggestionListItem:
-      type: object
-      properties:
-        suggestionId:
-          type: string
-        campaignId:
-          type: string
-        mediaBuyId:
-          type: string
-        optimizationMetric:
-          type:
-          - string
-          - 'null'
-        status:
-          type: string
-        productAdjustmentCount:
-          type: number
-        bidAdjustmentCount:
-          type: number
-        createdAt:
-          type: string
-        statusUpdatedAt:
-          type: string
-      required:
-      - suggestionId
-      - campaignId
-      - mediaBuyId
-      - optimizationMetric
-      - status
-      - productAdjustmentCount
-      - bidAdjustmentCount
-      - createdAt
-      - statusUpdatedAt
-      additionalProperties: false
     OptimizationSuggestionDetail:
       type: object
       properties:
@@ -417,22 +383,6 @@ components:
       - createdAt
       - statusUpdatedAt
       additionalProperties: {}
-    OptimizationSuggestionList:
-      type: object
-      properties:
-        suggestions:
-          type: array
-          items:
-            $ref: '#/components/schemas/OptimizationSuggestionListItem'
-        totalCount:
-          type: number
-        hasMore:
-          type: boolean
-      required:
-      - suggestions
-      - totalCount
-      - hasMore
-      additionalProperties: false
     ErrorResponse:
       description: Standard error response
       type: object
@@ -459,6 +409,56 @@ components:
       required:
       - suggestionId
       - status
+      additionalProperties: false
+    OptimizationSuggestionListItem:
+      type: object
+      properties:
+        suggestionId:
+          type: string
+        campaignId:
+          type: string
+        mediaBuyId:
+          type: string
+        optimizationMetric:
+          type:
+          - string
+          - 'null'
+        status:
+          type: string
+        productAdjustmentCount:
+          type: number
+        bidAdjustmentCount:
+          type: number
+        createdAt:
+          type: string
+        statusUpdatedAt:
+          type: string
+      required:
+      - suggestionId
+      - campaignId
+      - mediaBuyId
+      - optimizationMetric
+      - status
+      - productAdjustmentCount
+      - bidAdjustmentCount
+      - createdAt
+      - statusUpdatedAt
+      additionalProperties: false
+    OptimizationSuggestionList:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptimizationSuggestionListItem'
+        totalCount:
+          type: number
+        hasMore:
+          type: boolean
+      required:
+      - suggestions
+      - totalCount
+      - hasMore
       additionalProperties: false
   securitySchemes:
     bearerAuth:

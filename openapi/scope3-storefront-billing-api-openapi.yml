@@ -633,98 +633,1478 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    PayoutPayee:
-      description: 'A payout payee — the bank account for one legal payout entity in one payout currency (masked: the account number is reduced to its last 4 characters).'
+    ListPayoutPayeesResponse:
+      description: Payout payees on file (masked), one per legal entity per payout currency. The default payee on the billing config is listed separately on GET /billing.
       type: object
       properties:
-        beneficiaryName:
-          description: Payout beneficiary legal name
-          type: string
-        addressLine1:
-          description: Beneficiary street address, line 1
-          type: string
-        addressLine2:
-          description: Beneficiary street address, line 2
-          type:
-          - string
-          - 'null'
-        city:
-          description: Beneficiary city
-          type: string
-        region:
-          description: Beneficiary state/province/region
-          type:
-          - string
-          - 'null'
-        postalCode:
-          description: Beneficiary postal/ZIP code
-          type: string
-        countryCode:
-          description: Beneficiary country (ISO 3166-1 alpha-2)
-          type: string
-        accountNumberLast4:
-          description: Last 4 characters of the account number or IBAN. The full value is never returned by the API.
-          type: string
-        bankIdentifierType:
-          description: 'Which bank identifier system `bankIdentifierValue` uses: FEDWIRE_ABA (US Fedwire/ABA routing number, 9 digits), CHIPS_ABA (CHIPS ABA number, 9 digits), SWIFT_BIC (SWIFT/BIC code, 8 or 11 characters), or BANK_CODE (a local/domestic bank code for banks without a SWIFT-BIC).'
-          type: string
-          enum:
-          - FEDWIRE_ABA
-          - CHIPS_ABA
-          - SWIFT_BIC
-          - BANK_CODE
-        bankIdentifierValue:
-          description: The bank identifier (routing number, CHIPS ABA, SWIFT-BIC, or local bank code)
-          type: string
-        completedAt:
-          description: When payout details were last completed (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        id:
-          description: Payee ID
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        entityName:
-          description: 'Label for the legal payout entity this bank account belongs to (e.g. "Acme Media India Pvt Ltd"). Together with the payout currency it identifies the payee: one bank account per entity per currency.'
-          type: string
-          minLength: 1
-          maxLength: 255
-        currency:
-          description: Payout currency for this payee (ISO 4217 code). One bank account per entity per currency.
-          type: string
-        isPrimary:
-          description: Whether this is the customer's PRIMARY payout entity — the one returned as `payoutDetails` on GET /billing. At most one payee per customer is primary.
-          type: boolean
-        createdAt:
-          description: Creation timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: Last update timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        payees:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayoutPayee'
       required:
-      - beneficiaryName
-      - addressLine1
-      - addressLine2
-      - city
-      - region
-      - postalCode
-      - countryCode
-      - accountNumberLast4
-      - bankIdentifierType
-      - bankIdentifierValue
-      - completedAt
-      - id
-      - entityName
-      - currency
-      - isPrimary
-      - createdAt
-      - updatedAt
+      - payees
+      additionalProperties: false
+    PayoutActivityRow:
+      description: 'One row of payout activity for a seller org, newest first. `kind: "setup"` rows come from the payout-details audit trail (available now); `kind: "ledger"` rows come from payout runs (land once producers exist).'
+      oneOf:
+      - $ref: '#/components/schemas/PayoutActivitySetupRow'
+      - $ref: '#/components/schemas/PayoutActivityLedgerRow'
+      type: object
+      discriminator:
+        propertyName: kind
+        mapping:
+          setup: '#/components/schemas/PayoutActivitySetupRow'
+          ledger: '#/components/schemas/PayoutActivityLedgerRow'
+    AcceptStorefrontRateCardOfferResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              pattern: ^\d+$
+            acceptingCustomerId:
+              type: integer
+              maximum: 9007199254740991
+              minimum: 1
+            contractId:
+              type: string
+              pattern: ^\d+$
+            agreementDocumentId:
+              type: string
+              pattern: ^\d+$
+            agreementKind:
+              type: string
+              enum:
+              - STANDARD_TOS
+              - CUSTOM_CONTRACT
+              - AAA
+            tosVersion:
+              type:
+              - string
+              - 'null'
+            rateCardId:
+              type: string
+              pattern: ^\d+$
+            rateCardPublicVersion:
+              type: string
+            planId:
+              type: string
+              pattern: ^\d+$
+            planCode:
+              type: string
+            planName:
+              type: string
+            renewalPosture:
+              type: string
+              enum:
+              - STANDARD_ROLLING
+              - PINNED
+            predecessorBindingId:
+              type:
+              - string
+              - 'null'
+              pattern: ^\d+$
+            offerVersion:
+              type: string
+              minLength: 1
+            effectiveRateCard:
+              type: object
+              properties:
+                version:
+                  type: string
+                  pattern: ^erc-v1:[0-9a-f]{64}$
+                visibility:
+                  type: string
+                  enum:
+                  - PUBLIC
+                  - PRIVATE
+                displayName:
+                  type: string
+                  minLength: 1
+                  maxLength: 160
+                commercialOfferId:
+                  type:
+                  - string
+                  - 'null'
+                  pattern: ^\d+$
+                adjustmentSource:
+                  type: string
+                  enum:
+                  - RATE_CARD_DEFAULT
+                  - LEGACY_DISCOUNT
+                  - DIRECT
+                  - PROMOTION_CODE
+                  - REFERRAL_CODE
+                renewalBehavior:
+                  default: PIN_EXACT
+                  type: string
+                  enum:
+                  - PIN_EXACT
+                  - REVIEW_REQUIRED
+                adjustments:
+                  type: object
+                  properties:
+                    price:
+                      default: null
+                      oneOf:
+                      - type: object
+                        properties:
+                          kind:
+                            type: string
+                            enum:
+                            - PERCENT
+                          basisPoints:
+                            type: integer
+                            minimum: 1
+                            maximum: 9999
+                        required:
+                        - kind
+                        - basisPoints
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          kind:
+                            type: string
+                            enum:
+                            - PACKAGE
+                          monthlyCommitmentMinor:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                          includedIus:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                          overageUnitAmountMinor:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                          currency:
+                            default: USD
+                            type: string
+                            enum:
+                            - USD
+                            - EUR
+                            - GBP
+                            - AUD
+                        required:
+                        - kind
+                        - monthlyCommitmentMinor
+                        - includedIus
+                        - overageUnitAmountMinor
+                        - currency
+                        additionalProperties: false
+                      type:
+                      - object
+                      - 'null'
+                    platform:
+                      default: null
+                      type:
+                      - object
+                      - 'null'
+                      properties:
+                        displayName:
+                          type: string
+                          minLength: 1
+                          maxLength: 120
+                        monthlyFeeMinor:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        currency:
+                          type: string
+                          enum:
+                          - USD
+                          - EUR
+                          - GBP
+                          - AUD
+                        entitlementBundleKey:
+                          type: string
+                          minLength: 1
+                          maxLength: 120
+                          pattern: ^[a-z0-9][a-z0-9._-]*$
+                      required:
+                      - displayName
+                      - monthlyFeeMinor
+                      - currency
+                      - entitlementBundleKey
+                      additionalProperties: false
+                    activityTerms:
+                      default: []
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          activityCode:
+                            type: string
+                            enum:
+                            - ACTIVATED_SOCIAL_ACCOUNT_MONTH
+                            - MULTI_SELLER_PRODUCT_RANKING
+                            - PROPOSAL_EVALUATION_PASS
+                            - COMPARATIVE_PROPOSAL_RANKING_PASS
+                            - MURPH_WORKING_SESSION
+                            - SIMPLE_PROPOSAL_EVALUATION
+                            - COMPLEX_PROPOSAL_EVALUATION
+                            - MERCHANDISING_BRIEF_RESPONSE
+                            - MURPH_AI_SUPPORT_SESSION
+                            - HUMAN_EXPERT_SUPPORT_HOUR
+                            - GENERATED_IMAGE
+                            - GENERATED_VIDEO_SECONDS
+                            - ANALYZE_ACCOUNT
+                            - CAMPAIGN_OPTIMIZATION_MONTH
+                            - MANAGED_MEDIA_BUY_MONTH
+                            - STANDARD_DOCUMENT_UNDERSTANDING
+                            - LARGE_DOCUMENT_UNDERSTANDING
+                            - AUDIO_VIDEO_UNDERSTANDING_MINUTES
+                            - CUSTOM_BIGQUERY_GIB
+                            - MODULAR_SOURCE_MANAGEMENT_MONTH
+                          displayName:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                          billingPosture:
+                            type: string
+                            enum:
+                            - INCLUDED
+                            - IU_PRICE
+                          iuAmountMilli:
+                            type:
+                            - integer
+                            - 'null'
+                            maximum: 9007199254740991
+                            minimum: 1
+                        required:
+                        - activityCode
+                        - displayName
+                        - billingPosture
+                        - iuAmountMilli
+                        additionalProperties: false
+                    setupCredit:
+                      default: null
+                      type:
+                      - object
+                      - 'null'
+                      properties:
+                        program:
+                          type: string
+                          enum:
+                          - STOREFRONT_SETUP
+                      required:
+                      - program
+                      additionalProperties: false
+                  required:
+                  - price
+                  - platform
+                  - activityTerms
+                  - setupCredit
+                  additionalProperties: false
+                rateCardSnapshot:
+                  default: null
+                  type:
+                  - object
+                  - 'null'
+                  properties:
+                    schemaVersion:
+                      type: number
+                      enum:
+                      - 1
+                    activityCatalogVersion:
+                      anyOf:
+                      - type: number
+                        enum:
+                        - 0
+                      - type: number
+                        enum:
+                        - 1
+                      - type: number
+                        enum:
+                        - 2
+                    source:
+                      type: object
+                      properties:
+                        rateCardId:
+                          type: string
+                          pattern: ^\d+$
+                        rateCardPublicVersion:
+                          type: string
+                          minLength: 1
+                          maxLength: 80
+                        planId:
+                          type: string
+                          pattern: ^\d+$
+                      required:
+                      - rateCardId
+                      - rateCardPublicVersion
+                      - planId
+                      additionalProperties: false
+                    plan:
+                      type: object
+                      properties:
+                        planCode:
+                          type: string
+                        displayName:
+                          type: string
+                        displayOrder:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        visibility:
+                          type: string
+                          enum:
+                          - PUBLIC
+                          - PRIVATE
+                        monthlyCommitmentMinor:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        includedIus:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        overageUnitAmountMinor:
+                          type: integer
+                          minimum: 0
+                          maximum: 9007199254740991
+                        currency:
+                          type: string
+                          enum:
+                          - USD
+                        billingPeriodMonths:
+                          type: number
+                          enum:
+                          - 1
+                        commitmentBillingTiming:
+                          type: string
+                          enum:
+                          - PERIOD_START
+                        usageBillingTiming:
+                          type: string
+                          enum:
+                          - PERIOD_END
+                        resetInterval:
+                          type: string
+                          enum:
+                          - MONTH
+                        rolloverPolicy:
+                          type:
+                          - object
+                          - 'null'
+                          properties:
+                            capBasisPoints:
+                              type: integer
+                              minimum: 1
+                              maximum: 5000
+                            expiresAfterBillingPeriods:
+                              type: number
+                              enum:
+                              - 1
+                          required:
+                          - capBasisPoints
+                          - expiresAfterBillingPeriods
+                          additionalProperties: false
+                        paymentTermsDays:
+                          type: integer
+                          maximum: 9007199254740991
+                          minimum: 1
+                        renewalPosture:
+                          type: string
+                          enum:
+                          - STANDARD_ROLLING
+                          - PINNED
+                        prices:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              currency:
+                                type: string
+                                enum:
+                                - EUR
+                                - GBP
+                                - AUD
+                              monthlyCommitmentMinor:
+                                type: integer
+                                minimum: 0
+                                maximum: 9007199254740991
+                              overageUnitAmountMinor:
+                                type: integer
+                                minimum: 0
+                                maximum: 9007199254740991
+                            required:
+                            - currency
+                            - monthlyCommitmentMinor
+                            - overageUnitAmountMinor
+                            additionalProperties: false
+                      required:
+                      - planCode
+                      - displayName
+                      - displayOrder
+                      - visibility
+                      - monthlyCommitmentMinor
+                      - includedIus
+                      - overageUnitAmountMinor
+                      - currency
+                      - billingPeriodMonths
+                      - commitmentBillingTiming
+                      - usageBillingTiming
+                      - resetInterval
+                      - rolloverPolicy
+                      - paymentTermsDays
+                      - renewalPosture
+                      - prices
+                      additionalProperties: false
+                    activityTerms:
+                      $ref: '#/components/schemas/IuRateCardActivityScheduleResponse'
+                    setupGrant:
+                      type:
+                      - object
+                      - 'null'
+                      properties:
+                        grantedIus:
+                          default: 100
+                          type: integer
+                          minimum: 1
+                          maximum: 1000000
+                        validForDays:
+                          default: 60
+                          type: integer
+                          minimum: 1
+                          maximum: 3650
+                        rolloverEnabled:
+                          default: false
+                          type: boolean
+                          enum:
+                          - false
+                        automatic:
+                          default: true
+                          type: boolean
+                          enum:
+                          - true
+                      required:
+                      - grantedIus
+                      - validForDays
+                      - rolloverEnabled
+                      - automatic
+                      additionalProperties: false
+                  required:
+                  - schemaVersion
+                  - activityCatalogVersion
+                  - source
+                  - plan
+                  - activityTerms
+                  - setupGrant
+                  additionalProperties: false
+              required:
+              - version
+              - visibility
+              - displayName
+              - commercialOfferId
+              - adjustmentSource
+              - renewalBehavior
+              - adjustments
+              - rateCardSnapshot
+              additionalProperties: false
+            entitlementBundle:
+              default: null
+              type:
+              - object
+              - 'null'
+              properties:
+                schemaVersion:
+                  type: number
+                  enum:
+                  - 1
+                bundleKey:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                  pattern: ^[a-z0-9][a-z0-9._-]*$
+                revision:
+                  type: integer
+                  maximum: 2147483647
+                  minimum: 1
+                displayName:
+                  type: string
+                  minLength: 1
+                  maxLength: 160
+                visibility:
+                  type: string
+                  enum:
+                  - REUSABLE
+                  - PRIVATE
+                features:
+                  minItems: 1
+                  maxItems: 200
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      kind:
+                        type: string
+                        enum:
+                        - FEATURE_ACCESS
+                      featureKey:
+                        type: string
+                        minLength: 1
+                        maxLength: 120
+                        pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+                      scope:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            enum:
+                            - ORGANIZATION
+                        required:
+                        - kind
+                        additionalProperties: false
+                    required:
+                    - kind
+                    - featureKey
+                    - scope
+                    additionalProperties: false
+              required:
+              - schemaVersion
+              - bundleKey
+              - revision
+              - displayName
+              - visibility
+              - features
+              additionalProperties: false
+            supportPackage:
+              default: null
+              anyOf:
+              - oneOf:
+                - type: object
+                  properties:
+                    schemaVersion:
+                      type: number
+                      enum:
+                      - 1
+                    kind:
+                      type: string
+                      enum:
+                      - UNLIMITED_NAMED_SUPPORT
+                    displayName:
+                      type: string
+                      minLength: 1
+                      maxLength: 120
+                  required:
+                  - schemaVersion
+                  - kind
+                  - displayName
+                  additionalProperties: false
+                - type: object
+                  properties:
+                    schemaVersion:
+                      type: number
+                      enum:
+                      - 1
+                    kind:
+                      type: string
+                      enum:
+                      - NAMED_SUPPORT_PACKAGE
+                    displayName:
+                      type: string
+                      minLength: 1
+                      maxLength: 120
+                    includedHoursPerMonth:
+                      type: number
+                      maximum: 744
+                      exclusiveMinimum: 0
+                    additionalHourIus:
+                      type: number
+                      maximum: 1000000
+                      exclusiveMinimum: 0
+                  required:
+                  - schemaVersion
+                  - kind
+                  - displayName
+                  - includedHoursPerMonth
+                  - additionalHourIus
+                  additionalProperties: false
+                type: object
+              - oneOf:
+                - type: object
+                  properties:
+                    schemaVersion:
+                      type: number
+                      enum:
+                      - 2
+                    kind:
+                      type: string
+                      enum:
+                      - UNLIMITED_NAMED_SUPPORT
+                    displayName:
+                      type: string
+                      minLength: 1
+                      maxLength: 120
+                  required:
+                  - schemaVersion
+                  - kind
+                  - displayName
+                  additionalProperties: false
+                - type: object
+                  properties:
+                    schemaVersion:
+                      type: number
+                      enum:
+                      - 2
+                    kind:
+                      type: string
+                      enum:
+                      - NAMED_SUPPORT_PACKAGE
+                    displayName:
+                      type: string
+                      minLength: 1
+                      maxLength: 120
+                    includedHoursPerMonth:
+                      type: number
+                      maximum: 744
+                      exclusiveMinimum: 0
+                  required:
+                  - schemaVersion
+                  - kind
+                  - displayName
+                  - includedHoursPerMonth
+                  additionalProperties: false
+                type: object
+            proposal:
+              default: null
+              oneOf:
+              - type: object
+                properties:
+                  schemaVersion:
+                    type: number
+                    enum:
+                    - 1
+                  documentTitle:
+                    type: string
+                    minLength: 1
+                    maxLength: 160
+                  executiveSummary:
+                    type: string
+                    minLength: 1
+                    maxLength: 5000
+                  scope:
+                    type: object
+                    properties:
+                      included:
+                        minItems: 1
+                        maxItems: 50
+                        type: array
+                        items:
+                          type: string
+                          minLength: 1
+                          maxLength: 500
+                      exclusions:
+                        default: []
+                        maxItems: 50
+                        type: array
+                        items:
+                          type: string
+                          minLength: 1
+                          maxLength: 500
+                    required:
+                    - included
+                    - exclusions
+                    additionalProperties: false
+                  term:
+                    type: object
+                    properties:
+                      serviceStart:
+                        oneOf:
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - ON_ACCEPTANCE
+                          required:
+                          - kind
+                          additionalProperties: false
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - FIXED_DATE
+                            date:
+                              type: string
+                              format: date
+                              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                          required:
+                          - kind
+                          - date
+                          additionalProperties: false
+                        type: object
+                      initialTermMonths:
+                        type: integer
+                        maximum: 120
+                        minimum: 1
+                      renewal:
+                        oneOf:
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - NO_AUTOMATIC_RENEWAL
+                          required:
+                          - kind
+                          additionalProperties: false
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - AUTOMATIC
+                            renewalTermMonths:
+                              type: integer
+                              maximum: 120
+                              minimum: 1
+                            nonRenewalNoticeDays:
+                              type: integer
+                              minimum: 0
+                              maximum: 365
+                          required:
+                          - kind
+                          - renewalTermMonths
+                          - nonRenewalNoticeDays
+                          additionalProperties: false
+                        type: object
+                      terminationForConvenience:
+                        type:
+                        - object
+                        - 'null'
+                        properties:
+                          noticeDays:
+                            type: integer
+                            minimum: 0
+                            maximum: 365
+                        required:
+                        - noticeDays
+                        additionalProperties: false
+                    required:
+                    - serviceStart
+                    - initialTermMonths
+                    - renewal
+                    - terminationForConvenience
+                    additionalProperties: false
+                  paymentOptions:
+                    minItems: 1
+                    maxItems: 4
+                    type: array
+                    items:
+                      oneOf:
+                      - type: object
+                        properties:
+                          kind:
+                            type: string
+                            enum:
+                            - MONTHLY
+                          optionKey:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                            pattern: ^[a-z0-9][a-z0-9._-]*$
+                          displayName:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                          currency:
+                            type: string
+                            enum:
+                            - USD
+                            - EUR
+                            - GBP
+                            - AUD
+                          monthlyAmountMinor:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                          termMonths:
+                            type: integer
+                            maximum: 120
+                            minimum: 1
+                          paymentTermsDays:
+                            type: integer
+                            minimum: 0
+                            maximum: 365
+                          collectionMethods:
+                            minItems: 1
+                            maxItems: 3
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                              - ACH
+                              - CARD
+                              - INVOICE
+                        required:
+                        - kind
+                        - optionKey
+                        - displayName
+                        - currency
+                        - monthlyAmountMinor
+                        - termMonths
+                        - paymentTermsDays
+                        - collectionMethods
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          kind:
+                            type: string
+                            enum:
+                            - TERM_PREPAY
+                          optionKey:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                            pattern: ^[a-z0-9][a-z0-9._-]*$
+                          displayName:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                          currency:
+                            type: string
+                            enum:
+                            - USD
+                            - EUR
+                            - GBP
+                            - AUD
+                          prepaidAmountMinor:
+                            type: integer
+                            maximum: 9007199254740991
+                            minimum: 1
+                          termMonths:
+                            type: integer
+                            maximum: 120
+                            minimum: 1
+                          paymentTermsDays:
+                            type: integer
+                            minimum: 0
+                            maximum: 365
+                          collectionMethods:
+                            minItems: 1
+                            maxItems: 3
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                              - ACH
+                              - CARD
+                              - INVOICE
+                        required:
+                        - kind
+                        - optionKey
+                        - displayName
+                        - currency
+                        - prepaidAmountMinor
+                        - termMonths
+                        - paymentTermsDays
+                        - collectionMethods
+                        additionalProperties: false
+                      type: object
+                  templateKey:
+                    type: string
+                    enum:
+                    - ENTERPRISE_V1
+                    - PARTNER_ENTERPRISE_V1
+                  organizationNameAtIssue:
+                    type: string
+                    minLength: 1
+                    maxLength: 160
+                required:
+                - schemaVersion
+                - documentTitle
+                - executiveSummary
+                - scope
+                - term
+                - paymentOptions
+                - templateKey
+                - organizationNameAtIssue
+                additionalProperties: false
+              - type: object
+                properties:
+                  schemaVersion:
+                    type: number
+                    enum:
+                    - 2
+                  documentTitle:
+                    type: string
+                    minLength: 1
+                    maxLength: 160
+                  executiveSummary:
+                    type: string
+                    minLength: 1
+                    maxLength: 5000
+                  scope:
+                    type: object
+                    properties:
+                      included:
+                        minItems: 1
+                        maxItems: 50
+                        type: array
+                        items:
+                          type: string
+                          minLength: 1
+                          maxLength: 500
+                      exclusions:
+                        default: []
+                        maxItems: 50
+                        type: array
+                        items:
+                          type: string
+                          minLength: 1
+                          maxLength: 500
+                    required:
+                    - included
+                    - exclusions
+                    additionalProperties: false
+                  term:
+                    type: object
+                    properties:
+                      serviceStart:
+                        oneOf:
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - ON_ACCEPTANCE
+                          required:
+                          - kind
+                          additionalProperties: false
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - FIXED_DATE
+                            date:
+                              type: string
+                              format: date
+                              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+                          required:
+                          - kind
+                          - date
+                          additionalProperties: false
+                        type: object
+                      initialTermMonths:
+                        type: integer
+                        maximum: 120
+                        minimum: 1
+                      renewal:
+                        oneOf:
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - NO_AUTOMATIC_RENEWAL
+                          required:
+                          - kind
+                          additionalProperties: false
+                        - type: object
+                          properties:
+                            kind:
+                              type: string
+                              enum:
+                              - AUTOMATIC
+                            renewalTermMonths:
+                              type: integer
+                              maximum: 120
+                              minimum: 1
+                            nonRenewalNoticeDays:
+                              type: integer
+                              minimum: 0
+                              maximum: 365
+                          required:
+                          - kind
+                          - renewalTermMonths
+                          - nonRenewalNoticeDays
+                          additionalProperties: false
+                        type: object
+                      terminationForConvenience:
+                        type:
+                        - object
+                        - 'null'
+                        properties:
+                          noticeDays:
+                            type: integer
+                            minimum: 0
+                            maximum: 365
+                        required:
+                        - noticeDays
+                        additionalProperties: false
+                    required:
+                    - serviceStart
+                    - initialTermMonths
+                    - renewal
+                    - terminationForConvenience
+                    additionalProperties: false
+                  paymentOptions:
+                    minItems: 1
+                    maxItems: 4
+                    type: array
+                    items:
+                      oneOf:
+                      - type: object
+                        properties:
+                          kind:
+                            type: string
+                            enum:
+                            - MONTHLY
+                          optionKey:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                            pattern: ^[a-z0-9][a-z0-9._-]*$
+                          displayName:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                          currency:
+                            type: string
+                            enum:
+                            - USD
+                            - EUR
+                            - GBP
+                            - AUD
+                          monthlyAmountMinor:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                          termMonths:
+                            type: integer
+                            maximum: 120
+                            minimum: 1
+                          paymentTermsDays:
+                            type: integer
+                            minimum: 0
+                            maximum: 365
+                          collectionMethods:
+                            minItems: 1
+                            maxItems: 3
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                              - ACH
+                              - CARD
+                              - INVOICE
+                        required:
+                        - kind
+                        - optionKey
+                        - displayName
+                        - currency
+                        - monthlyAmountMinor
+                        - termMonths
+                        - paymentTermsDays
+                        - collectionMethods
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          kind:
+                            type: string
+                            enum:
+                            - TERM_PREPAY
+                          optionKey:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                            pattern: ^[a-z0-9][a-z0-9._-]*$
+                          displayName:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                          currency:
+                            type: string
+                            enum:
+                            - USD
+                            - EUR
+                            - GBP
+                            - AUD
+                          prepaidAmountMinor:
+                            type: integer
+                            maximum: 9007199254740991
+                            minimum: 1
+                          termMonths:
+                            type: integer
+                            maximum: 120
+                            minimum: 1
+                          paymentTermsDays:
+                            type: integer
+                            minimum: 0
+                            maximum: 365
+                          collectionMethods:
+                            minItems: 1
+                            maxItems: 3
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                              - ACH
+                              - CARD
+                              - INVOICE
+                        required:
+                        - kind
+                        - optionKey
+                        - displayName
+                        - currency
+                        - prepaidAmountMinor
+                        - termMonths
+                        - paymentTermsDays
+                        - collectionMethods
+                        additionalProperties: false
+                      type: object
+                  defaultPaymentOptionKey:
+                    type: string
+                    minLength: 1
+                    maxLength: 120
+                    pattern: ^[a-z0-9][a-z0-9._-]*$
+                  planOrigin:
+                    type: object
+                    properties:
+                      rateCardId:
+                        type: string
+                        pattern: ^\d+$
+                      rateCardPublicVersion:
+                        type: string
+                        minLength: 1
+                        maxLength: 80
+                      planId:
+                        type: string
+                        pattern: ^\d+$
+                      planCode:
+                        type: string
+                        pattern: ^[A-Z][A-Z0-9_]{1,63}$
+                    required:
+                    - rateCardId
+                    - rateCardPublicVersion
+                    - planId
+                    - planCode
+                    additionalProperties: false
+                  customization:
+                    oneOf:
+                    - type: object
+                      properties:
+                        posture:
+                          type: string
+                          enum:
+                          - EXACT
+                      required:
+                      - posture
+                      additionalProperties: false
+                    - type: object
+                      properties:
+                        posture:
+                          type: string
+                          enum:
+                          - CUSTOMIZED
+                        reason:
+                          type: string
+                          minLength: 10
+                          maxLength: 1000
+                      required:
+                      - posture
+                      - reason
+                      additionalProperties: false
+                    type: object
+                  organizationNameAtIssue:
+                    type: string
+                    minLength: 1
+                    maxLength: 160
+                required:
+                - schemaVersion
+                - documentTitle
+                - executiveSummary
+                - scope
+                - term
+                - paymentOptions
+                - defaultPaymentOptionKey
+                - planOrigin
+                - customization
+                - organizationNameAtIssue
+                additionalProperties: false
+              type:
+              - object
+              - 'null'
+            selectedPaymentOption:
+              default: null
+              oneOf:
+              - type: object
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                    - MONTHLY
+                  optionKey:
+                    type: string
+                    minLength: 1
+                    maxLength: 120
+                    pattern: ^[a-z0-9][a-z0-9._-]*$
+                  displayName:
+                    type: string
+                    minLength: 1
+                    maxLength: 120
+                  currency:
+                    type: string
+                    enum:
+                    - USD
+                    - EUR
+                    - GBP
+                    - AUD
+                  monthlyAmountMinor:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                  termMonths:
+                    type: integer
+                    maximum: 120
+                    minimum: 1
+                  paymentTermsDays:
+                    type: integer
+                    minimum: 0
+                    maximum: 365
+                  collectionMethods:
+                    minItems: 1
+                    maxItems: 3
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                      - ACH
+                      - CARD
+                      - INVOICE
+                required:
+                - kind
+                - optionKey
+                - displayName
+                - currency
+                - monthlyAmountMinor
+                - termMonths
+                - paymentTermsDays
+                - collectionMethods
+                additionalProperties: false
+              - type: object
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                    - TERM_PREPAY
+                  optionKey:
+                    type: string
+                    minLength: 1
+                    maxLength: 120
+                    pattern: ^[a-z0-9][a-z0-9._-]*$
+                  displayName:
+                    type: string
+                    minLength: 1
+                    maxLength: 120
+                  currency:
+                    type: string
+                    enum:
+                    - USD
+                    - EUR
+                    - GBP
+                    - AUD
+                  prepaidAmountMinor:
+                    type: integer
+                    maximum: 9007199254740991
+                    minimum: 1
+                  termMonths:
+                    type: integer
+                    maximum: 120
+                    minimum: 1
+                  paymentTermsDays:
+                    type: integer
+                    minimum: 0
+                    maximum: 365
+                  collectionMethods:
+                    minItems: 1
+                    maxItems: 3
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                      - ACH
+                      - CARD
+                      - INVOICE
+                required:
+                - kind
+                - optionKey
+                - displayName
+                - currency
+                - prepaidAmountMinor
+                - termMonths
+                - paymentTermsDays
+                - collectionMethods
+                additionalProperties: false
+              type:
+              - object
+              - 'null'
+            termStart:
+              type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            termEnd:
+              type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            listCommitmentMinor:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            listOverageUnitAmountMinor:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            includedIus:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            discountAuthorizationId:
+              type:
+              - string
+              - 'null'
+              pattern: ^\d+$
+            discountBasisPoints:
+              type: integer
+              minimum: 0
+              maximum: 9999
+            netCommitmentMinor:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            netOverageUnitAmountMinor:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+            currency:
+              type: string
+              enum:
+              - USD
+              - EUR
+              - GBP
+              - AUD
+            billingPeriodMonths:
+              type: number
+              enum:
+              - 1
+            rolloverPolicy:
+              type:
+              - object
+              - 'null'
+              properties:
+                capBasisPoints:
+                  type: integer
+                  minimum: 1
+                  maximum: 5000
+                expiresAfterBillingPeriods:
+                  type: number
+                  enum:
+                  - 1
+              required:
+              - capBasisPoints
+              - expiresAfterBillingPeriods
+              additionalProperties: false
+            paymentTermsDays:
+              type: integer
+              maximum: 9007199254740991
+              minimum: 1
+            acceptedByUserId:
+              type: string
+              pattern: ^\d+$
+            acceptedAt:
+              type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+            acceptanceSource:
+              type: string
+              enum:
+              - SIGNUP
+              - PLAN_BILLING
+              - MCP_APP
+              - ADMIN_ORDER_FORM
+              - AUTO_RENEWAL
+            activityTerms:
+              type: array
+              items:
+                type: object
+                properties:
+                  activityCode:
+                    type: string
+                    enum:
+                    - ACTIVATED_SOCIAL_ACCOUNT_MONTH
+                  displayName:
+                    type: string
+                    minLength: 1
+                    maxLength: 120
+                  iuAmountMilli:
+                    type: integer
+                    minimum: 1
+                    maximum: 2147483647
+                  billingPeriodMonths:
+                    type: number
+                    enum:
+                    - 1
+                  includedBackfillMonths:
+                    type: integer
+                    minimum: 0
+                    maximum: 120
+                required:
+                - activityCode
+                - displayName
+                - iuAmountMilli
+                - billingPeriodMonths
+                - includedBackfillMonths
+                additionalProperties: false
+            activitySchedule:
+              $ref: '#/components/schemas/IuRateCardActivityScheduleResponse'
+          required:
+          - id
+          - acceptingCustomerId
+          - contractId
+          - agreementDocumentId
+          - agreementKind
+          - tosVersion
+          - rateCardId
+          - rateCardPublicVersion
+          - planId
+          - planCode
+          - planName
+          - renewalPosture
+          - predecessorBindingId
+          - offerVersion
+          - entitlementBundle
+          - supportPackage
+          - proposal
+          - selectedPaymentOption
+          - termStart
+          - termEnd
+          - listCommitmentMinor
+          - listOverageUnitAmountMinor
+          - includedIus
+          - discountAuthorizationId
+          - discountBasisPoints
+          - netCommitmentMinor
+          - netOverageUnitAmountMinor
+          - currency
+          - billingPeriodMonths
+          - rolloverPolicy
+          - paymentTermsDays
+          - acceptedByUserId
+          - acceptedAt
+          - acceptanceSource
+          - activityTerms
+          - activitySchedule
+          additionalProperties: false
+      required:
+      - data
       additionalProperties: false
     IuRateCardActivityScheduleResponse:
       anyOf:
@@ -934,29 +2314,186 @@ components:
           - billable
           - includedBackfillMonths
           additionalProperties: false
-    ApiError:
-      description: Structured error object
+    SetPayoutDetailsResponse:
       type: object
       properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+        billing:
+          $ref: '#/components/schemas/StorefrontBillingResponse'
       required:
-      - code
-      - message
+      - billing
       additionalProperties: false
-    PayoutDetails:
-      description: 'Payout bank details on file (masked): the account number is reduced to its last 4 characters.'
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    BillingFee:
+      description: An additional billing fee entry
+      type: object
+      properties:
+        name:
+          description: Fee label
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Fee description
+          type: string
+          maxLength: 500
+        feePercent:
+          description: Fee percentage (0–100)
+          type: number
+          minimum: 0
+          maximum: 100
+      required:
+      - name
+      - feePercent
+    ChildBillingStatus:
+      description: Billing status for a child customer
+      type: object
+      properties:
+        customerId:
+          description: Child customer ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        name:
+          description: Child customer name
+          type: string
+        company:
+          description: Child company name
+          type:
+          - string
+          - 'null'
+        inherited:
+          description: Whether billing is inherited from parent (true) or has its own payout details (false)
+          type: boolean
+        onboardingStatus:
+          description: Payout setup status of the child account, or "none" if inherited
+          type: string
+          enum:
+          - pending
+          - complete
+          - restricted
+          - none
+      required:
+      - customerId
+      - name
+      - company
+      - inherited
+      - onboardingStatus
+      additionalProperties: false
+    PayoutActivityResponse:
+      description: Payout activity for the caller’s org, newest first. `setup` rows (payout-details changes) appear as soon as they happen; `ledger` rows appear once a payout run has produced at least one artifact.
+      type: object
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayoutActivityRow'
+      required:
+      - rows
+      additionalProperties: false
+    BillingAccountsResponse:
+      description: Billing status for managed accounts of a parent customer
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChildBillingStatus'
+      required:
+      - accounts
+      additionalProperties: false
+    PayoutActivityLedgerRow:
+      description: One payout-run row for a seller org. No producer exists yet — lands once payout run artifacts / the PUBLISHER_PAYOUT ledger entry type exist to project.
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - ledger
+        status:
+          description: Status of one payout ledger activity row
+          type: string
+          enum:
+          - pending
+          - paid
+          - failed
+        periodLabel:
+          description: Human-readable payout period label (e.g. "June 2026" or "2026-06-01–2026-06-30")
+          type: string
+        entityName:
+          description: Legal payout entity this row belongs to (matches `PayoutPayee.entityName` for multi-entity sellers, or the seller org name for the single default payee)
+          type: string
+        currency:
+          description: ISO 4217 currency code
+          example: USD
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+        amountMinor:
+          description: Payout amount in minor units (e.g. cents for USD)
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        expectedAt:
+          description: Expected payout date (ISO 8601), when known and not yet paid
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        paidAt:
+          description: When the payout was actually paid out (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        statementRef:
+          description: Reference to the payout statement/remittance advice, when available
+          type: string
+      required:
+      - kind
+      - status
+      - periodLabel
+      - entityName
+      - currency
+      - amountMinor
+      additionalProperties: false
+    BillingFeeOutput:
+      description: An additional billing fee entry
+      type: object
+      properties:
+        name:
+          description: Fee label
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Fee description
+          type: string
+          maxLength: 500
+        feePercent:
+          description: Fee percentage (0–100)
+          type: number
+          minimum: 0
+          maximum: 100
+      required:
+      - name
+      - feePercent
+      additionalProperties: false
+    PayoutPayee:
+      description: 'A payout payee — the bank account for one legal payout entity in one payout currency (masked: the account number is reduced to its last 4 characters).'
       type: object
       properties:
         beneficiaryName:
@@ -1003,6 +2540,32 @@ components:
           type: string
           format: date-time
           pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        id:
+          description: Payee ID
+          type: integer
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        entityName:
+          description: 'Label for the legal payout entity this bank account belongs to (e.g. "Acme Media India Pvt Ltd"). Together with the payout currency it identifies the payee: one bank account per entity per currency.'
+          type: string
+          minLength: 1
+          maxLength: 255
+        currency:
+          description: Payout currency for this payee (ISO 4217 code). One bank account per entity per currency.
+          type: string
+        isPrimary:
+          description: Whether this is the customer's PRIMARY payout entity — the one returned as `payoutDetails` on GET /billing. At most one payee per customer is primary.
+          type: boolean
+        createdAt:
+          description: Creation timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: Last update timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
       - beneficiaryName
       - addressLine1
@@ -1015,6 +2578,87 @@ components:
       - bankIdentifierType
       - bankIdentifierValue
       - completedAt
+      - id
+      - entityName
+      - currency
+      - isPrimary
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    StorefrontBillingResponse:
+      description: Storefront billing configuration. Storefront billing setup is optional only for official Scope3 sales-adapter storefronts on existing downstream platform settlement agreements. Third-party sales agents and finished-product/pass-through sources are normal Interchange-cleared storefront sources and still require payout bank details. Seller-cleared settlement is not yet configurable for normal storefronts.
+      type: object
+      properties:
+        onboardingStatus:
+          description: Payout setup status. 'complete' once payout bank details are on file.
+          type: string
+          enum:
+          - pending
+          - complete
+          - restricted
+        platformFeePercent:
+          description: Platform fee percentage
+          type:
+          - number
+          - 'null'
+        fees:
+          description: Additional fees
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/BillingFeeOutput'
+        currency:
+          description: Payout currency (ISO 4217 code)
+          type:
+          - string
+          - 'null'
+        country:
+          description: ISO 3166-1 alpha-2 country used for billing
+          type:
+          - string
+          - 'null'
+        defaultNetDays:
+          description: Payment terms in days
+          type:
+          - number
+          - 'null'
+        payoutDetails:
+          description: Masked payout bank details on file, or null when none have been added yet
+          allOf:
+          - $ref: '#/components/schemas/PayoutDetails'
+        inherited:
+          description: Whether this billing config is inherited from a parent customer
+          type: boolean
+        createdAt:
+          description: Creation timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: Last update timestamp (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - onboardingStatus
+      - platformFeePercent
+      - fees
+      - currency
+      - country
+      - defaultNetDays
+      - payoutDetails
+      - inherited
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    SetPayoutPayeeResponse:
+      type: object
+      properties:
+        payee:
+          $ref: '#/components/schemas/PayoutPayee'
+      required:
+      - payee
       additionalProperties: false
     GetStorefrontRateCardOfferResponse:
       type: object
@@ -3585,1693 +5229,6 @@ components:
       required:
       - data
       additionalProperties: false
-    AcceptStorefrontRateCardOfferResponse:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            id:
-              type: string
-              pattern: ^\d+$
-            acceptingCustomerId:
-              type: integer
-              maximum: 9007199254740991
-              minimum: 1
-            contractId:
-              type: string
-              pattern: ^\d+$
-            agreementDocumentId:
-              type: string
-              pattern: ^\d+$
-            agreementKind:
-              type: string
-              enum:
-              - STANDARD_TOS
-              - CUSTOM_CONTRACT
-              - AAA
-            tosVersion:
-              type:
-              - string
-              - 'null'
-            rateCardId:
-              type: string
-              pattern: ^\d+$
-            rateCardPublicVersion:
-              type: string
-            planId:
-              type: string
-              pattern: ^\d+$
-            planCode:
-              type: string
-            planName:
-              type: string
-            renewalPosture:
-              type: string
-              enum:
-              - STANDARD_ROLLING
-              - PINNED
-            predecessorBindingId:
-              type:
-              - string
-              - 'null'
-              pattern: ^\d+$
-            offerVersion:
-              type: string
-              minLength: 1
-            effectiveRateCard:
-              type: object
-              properties:
-                version:
-                  type: string
-                  pattern: ^erc-v1:[0-9a-f]{64}$
-                visibility:
-                  type: string
-                  enum:
-                  - PUBLIC
-                  - PRIVATE
-                displayName:
-                  type: string
-                  minLength: 1
-                  maxLength: 160
-                commercialOfferId:
-                  type:
-                  - string
-                  - 'null'
-                  pattern: ^\d+$
-                adjustmentSource:
-                  type: string
-                  enum:
-                  - RATE_CARD_DEFAULT
-                  - LEGACY_DISCOUNT
-                  - DIRECT
-                  - PROMOTION_CODE
-                  - REFERRAL_CODE
-                renewalBehavior:
-                  default: PIN_EXACT
-                  type: string
-                  enum:
-                  - PIN_EXACT
-                  - REVIEW_REQUIRED
-                adjustments:
-                  type: object
-                  properties:
-                    price:
-                      default: null
-                      oneOf:
-                      - type: object
-                        properties:
-                          kind:
-                            type: string
-                            enum:
-                            - PERCENT
-                          basisPoints:
-                            type: integer
-                            minimum: 1
-                            maximum: 9999
-                        required:
-                        - kind
-                        - basisPoints
-                        additionalProperties: false
-                      - type: object
-                        properties:
-                          kind:
-                            type: string
-                            enum:
-                            - PACKAGE
-                          monthlyCommitmentMinor:
-                            type: integer
-                            minimum: 0
-                            maximum: 9007199254740991
-                          includedIus:
-                            type: integer
-                            minimum: 0
-                            maximum: 9007199254740991
-                          overageUnitAmountMinor:
-                            type: integer
-                            minimum: 0
-                            maximum: 9007199254740991
-                          currency:
-                            default: USD
-                            type: string
-                            enum:
-                            - USD
-                            - EUR
-                            - GBP
-                            - AUD
-                        required:
-                        - kind
-                        - monthlyCommitmentMinor
-                        - includedIus
-                        - overageUnitAmountMinor
-                        - currency
-                        additionalProperties: false
-                      type:
-                      - object
-                      - 'null'
-                    platform:
-                      default: null
-                      type:
-                      - object
-                      - 'null'
-                      properties:
-                        displayName:
-                          type: string
-                          minLength: 1
-                          maxLength: 120
-                        monthlyFeeMinor:
-                          type: integer
-                          minimum: 0
-                          maximum: 9007199254740991
-                        currency:
-                          type: string
-                          enum:
-                          - USD
-                          - EUR
-                          - GBP
-                          - AUD
-                        entitlementBundleKey:
-                          type: string
-                          minLength: 1
-                          maxLength: 120
-                          pattern: ^[a-z0-9][a-z0-9._-]*$
-                      required:
-                      - displayName
-                      - monthlyFeeMinor
-                      - currency
-                      - entitlementBundleKey
-                      additionalProperties: false
-                    activityTerms:
-                      default: []
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          activityCode:
-                            type: string
-                            enum:
-                            - ACTIVATED_SOCIAL_ACCOUNT_MONTH
-                            - MULTI_SELLER_PRODUCT_RANKING
-                            - PROPOSAL_EVALUATION_PASS
-                            - COMPARATIVE_PROPOSAL_RANKING_PASS
-                            - MURPH_WORKING_SESSION
-                            - SIMPLE_PROPOSAL_EVALUATION
-                            - COMPLEX_PROPOSAL_EVALUATION
-                            - MERCHANDISING_BRIEF_RESPONSE
-                            - MURPH_AI_SUPPORT_SESSION
-                            - HUMAN_EXPERT_SUPPORT_HOUR
-                            - GENERATED_IMAGE
-                            - GENERATED_VIDEO_SECONDS
-                            - ANALYZE_ACCOUNT
-                            - CAMPAIGN_OPTIMIZATION_MONTH
-                            - MANAGED_MEDIA_BUY_MONTH
-                            - STANDARD_DOCUMENT_UNDERSTANDING
-                            - LARGE_DOCUMENT_UNDERSTANDING
-                            - AUDIO_VIDEO_UNDERSTANDING_MINUTES
-                            - CUSTOM_BIGQUERY_GIB
-                            - MODULAR_SOURCE_MANAGEMENT_MONTH
-                          displayName:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                          billingPosture:
-                            type: string
-                            enum:
-                            - INCLUDED
-                            - IU_PRICE
-                          iuAmountMilli:
-                            type:
-                            - integer
-                            - 'null'
-                            maximum: 9007199254740991
-                            minimum: 1
-                        required:
-                        - activityCode
-                        - displayName
-                        - billingPosture
-                        - iuAmountMilli
-                        additionalProperties: false
-                    setupCredit:
-                      default: null
-                      type:
-                      - object
-                      - 'null'
-                      properties:
-                        program:
-                          type: string
-                          enum:
-                          - STOREFRONT_SETUP
-                      required:
-                      - program
-                      additionalProperties: false
-                  required:
-                  - price
-                  - platform
-                  - activityTerms
-                  - setupCredit
-                  additionalProperties: false
-                rateCardSnapshot:
-                  default: null
-                  type:
-                  - object
-                  - 'null'
-                  properties:
-                    schemaVersion:
-                      type: number
-                      enum:
-                      - 1
-                    activityCatalogVersion:
-                      anyOf:
-                      - type: number
-                        enum:
-                        - 0
-                      - type: number
-                        enum:
-                        - 1
-                      - type: number
-                        enum:
-                        - 2
-                    source:
-                      type: object
-                      properties:
-                        rateCardId:
-                          type: string
-                          pattern: ^\d+$
-                        rateCardPublicVersion:
-                          type: string
-                          minLength: 1
-                          maxLength: 80
-                        planId:
-                          type: string
-                          pattern: ^\d+$
-                      required:
-                      - rateCardId
-                      - rateCardPublicVersion
-                      - planId
-                      additionalProperties: false
-                    plan:
-                      type: object
-                      properties:
-                        planCode:
-                          type: string
-                        displayName:
-                          type: string
-                        displayOrder:
-                          type: integer
-                          minimum: 0
-                          maximum: 9007199254740991
-                        visibility:
-                          type: string
-                          enum:
-                          - PUBLIC
-                          - PRIVATE
-                        monthlyCommitmentMinor:
-                          type: integer
-                          minimum: 0
-                          maximum: 9007199254740991
-                        includedIus:
-                          type: integer
-                          minimum: 0
-                          maximum: 9007199254740991
-                        overageUnitAmountMinor:
-                          type: integer
-                          minimum: 0
-                          maximum: 9007199254740991
-                        currency:
-                          type: string
-                          enum:
-                          - USD
-                        billingPeriodMonths:
-                          type: number
-                          enum:
-                          - 1
-                        commitmentBillingTiming:
-                          type: string
-                          enum:
-                          - PERIOD_START
-                        usageBillingTiming:
-                          type: string
-                          enum:
-                          - PERIOD_END
-                        resetInterval:
-                          type: string
-                          enum:
-                          - MONTH
-                        rolloverPolicy:
-                          type:
-                          - object
-                          - 'null'
-                          properties:
-                            capBasisPoints:
-                              type: integer
-                              minimum: 1
-                              maximum: 5000
-                            expiresAfterBillingPeriods:
-                              type: number
-                              enum:
-                              - 1
-                          required:
-                          - capBasisPoints
-                          - expiresAfterBillingPeriods
-                          additionalProperties: false
-                        paymentTermsDays:
-                          type: integer
-                          maximum: 9007199254740991
-                          minimum: 1
-                        renewalPosture:
-                          type: string
-                          enum:
-                          - STANDARD_ROLLING
-                          - PINNED
-                        prices:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              currency:
-                                type: string
-                                enum:
-                                - EUR
-                                - GBP
-                                - AUD
-                              monthlyCommitmentMinor:
-                                type: integer
-                                minimum: 0
-                                maximum: 9007199254740991
-                              overageUnitAmountMinor:
-                                type: integer
-                                minimum: 0
-                                maximum: 9007199254740991
-                            required:
-                            - currency
-                            - monthlyCommitmentMinor
-                            - overageUnitAmountMinor
-                            additionalProperties: false
-                      required:
-                      - planCode
-                      - displayName
-                      - displayOrder
-                      - visibility
-                      - monthlyCommitmentMinor
-                      - includedIus
-                      - overageUnitAmountMinor
-                      - currency
-                      - billingPeriodMonths
-                      - commitmentBillingTiming
-                      - usageBillingTiming
-                      - resetInterval
-                      - rolloverPolicy
-                      - paymentTermsDays
-                      - renewalPosture
-                      - prices
-                      additionalProperties: false
-                    activityTerms:
-                      $ref: '#/components/schemas/IuRateCardActivityScheduleResponse'
-                    setupGrant:
-                      type:
-                      - object
-                      - 'null'
-                      properties:
-                        grantedIus:
-                          default: 100
-                          type: integer
-                          minimum: 1
-                          maximum: 1000000
-                        validForDays:
-                          default: 60
-                          type: integer
-                          minimum: 1
-                          maximum: 3650
-                        rolloverEnabled:
-                          default: false
-                          type: boolean
-                          enum:
-                          - false
-                        automatic:
-                          default: true
-                          type: boolean
-                          enum:
-                          - true
-                      required:
-                      - grantedIus
-                      - validForDays
-                      - rolloverEnabled
-                      - automatic
-                      additionalProperties: false
-                  required:
-                  - schemaVersion
-                  - activityCatalogVersion
-                  - source
-                  - plan
-                  - activityTerms
-                  - setupGrant
-                  additionalProperties: false
-              required:
-              - version
-              - visibility
-              - displayName
-              - commercialOfferId
-              - adjustmentSource
-              - renewalBehavior
-              - adjustments
-              - rateCardSnapshot
-              additionalProperties: false
-            entitlementBundle:
-              default: null
-              type:
-              - object
-              - 'null'
-              properties:
-                schemaVersion:
-                  type: number
-                  enum:
-                  - 1
-                bundleKey:
-                  type: string
-                  minLength: 1
-                  maxLength: 120
-                  pattern: ^[a-z0-9][a-z0-9._-]*$
-                revision:
-                  type: integer
-                  maximum: 2147483647
-                  minimum: 1
-                displayName:
-                  type: string
-                  minLength: 1
-                  maxLength: 160
-                visibility:
-                  type: string
-                  enum:
-                  - REUSABLE
-                  - PRIVATE
-                features:
-                  minItems: 1
-                  maxItems: 200
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      kind:
-                        type: string
-                        enum:
-                        - FEATURE_ACCESS
-                      featureKey:
-                        type: string
-                        minLength: 1
-                        maxLength: 120
-                        pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
-                      scope:
-                        type: object
-                        properties:
-                          kind:
-                            type: string
-                            enum:
-                            - ORGANIZATION
-                        required:
-                        - kind
-                        additionalProperties: false
-                    required:
-                    - kind
-                    - featureKey
-                    - scope
-                    additionalProperties: false
-              required:
-              - schemaVersion
-              - bundleKey
-              - revision
-              - displayName
-              - visibility
-              - features
-              additionalProperties: false
-            supportPackage:
-              default: null
-              anyOf:
-              - oneOf:
-                - type: object
-                  properties:
-                    schemaVersion:
-                      type: number
-                      enum:
-                      - 1
-                    kind:
-                      type: string
-                      enum:
-                      - UNLIMITED_NAMED_SUPPORT
-                    displayName:
-                      type: string
-                      minLength: 1
-                      maxLength: 120
-                  required:
-                  - schemaVersion
-                  - kind
-                  - displayName
-                  additionalProperties: false
-                - type: object
-                  properties:
-                    schemaVersion:
-                      type: number
-                      enum:
-                      - 1
-                    kind:
-                      type: string
-                      enum:
-                      - NAMED_SUPPORT_PACKAGE
-                    displayName:
-                      type: string
-                      minLength: 1
-                      maxLength: 120
-                    includedHoursPerMonth:
-                      type: number
-                      maximum: 744
-                      exclusiveMinimum: 0
-                    additionalHourIus:
-                      type: number
-                      maximum: 1000000
-                      exclusiveMinimum: 0
-                  required:
-                  - schemaVersion
-                  - kind
-                  - displayName
-                  - includedHoursPerMonth
-                  - additionalHourIus
-                  additionalProperties: false
-                type: object
-              - oneOf:
-                - type: object
-                  properties:
-                    schemaVersion:
-                      type: number
-                      enum:
-                      - 2
-                    kind:
-                      type: string
-                      enum:
-                      - UNLIMITED_NAMED_SUPPORT
-                    displayName:
-                      type: string
-                      minLength: 1
-                      maxLength: 120
-                  required:
-                  - schemaVersion
-                  - kind
-                  - displayName
-                  additionalProperties: false
-                - type: object
-                  properties:
-                    schemaVersion:
-                      type: number
-                      enum:
-                      - 2
-                    kind:
-                      type: string
-                      enum:
-                      - NAMED_SUPPORT_PACKAGE
-                    displayName:
-                      type: string
-                      minLength: 1
-                      maxLength: 120
-                    includedHoursPerMonth:
-                      type: number
-                      maximum: 744
-                      exclusiveMinimum: 0
-                  required:
-                  - schemaVersion
-                  - kind
-                  - displayName
-                  - includedHoursPerMonth
-                  additionalProperties: false
-                type: object
-            proposal:
-              default: null
-              oneOf:
-              - type: object
-                properties:
-                  schemaVersion:
-                    type: number
-                    enum:
-                    - 1
-                  documentTitle:
-                    type: string
-                    minLength: 1
-                    maxLength: 160
-                  executiveSummary:
-                    type: string
-                    minLength: 1
-                    maxLength: 5000
-                  scope:
-                    type: object
-                    properties:
-                      included:
-                        minItems: 1
-                        maxItems: 50
-                        type: array
-                        items:
-                          type: string
-                          minLength: 1
-                          maxLength: 500
-                      exclusions:
-                        default: []
-                        maxItems: 50
-                        type: array
-                        items:
-                          type: string
-                          minLength: 1
-                          maxLength: 500
-                    required:
-                    - included
-                    - exclusions
-                    additionalProperties: false
-                  term:
-                    type: object
-                    properties:
-                      serviceStart:
-                        oneOf:
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - ON_ACCEPTANCE
-                          required:
-                          - kind
-                          additionalProperties: false
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - FIXED_DATE
-                            date:
-                              type: string
-                              format: date
-                              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-                          required:
-                          - kind
-                          - date
-                          additionalProperties: false
-                        type: object
-                      initialTermMonths:
-                        type: integer
-                        maximum: 120
-                        minimum: 1
-                      renewal:
-                        oneOf:
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - NO_AUTOMATIC_RENEWAL
-                          required:
-                          - kind
-                          additionalProperties: false
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - AUTOMATIC
-                            renewalTermMonths:
-                              type: integer
-                              maximum: 120
-                              minimum: 1
-                            nonRenewalNoticeDays:
-                              type: integer
-                              minimum: 0
-                              maximum: 365
-                          required:
-                          - kind
-                          - renewalTermMonths
-                          - nonRenewalNoticeDays
-                          additionalProperties: false
-                        type: object
-                      terminationForConvenience:
-                        type:
-                        - object
-                        - 'null'
-                        properties:
-                          noticeDays:
-                            type: integer
-                            minimum: 0
-                            maximum: 365
-                        required:
-                        - noticeDays
-                        additionalProperties: false
-                    required:
-                    - serviceStart
-                    - initialTermMonths
-                    - renewal
-                    - terminationForConvenience
-                    additionalProperties: false
-                  paymentOptions:
-                    minItems: 1
-                    maxItems: 4
-                    type: array
-                    items:
-                      oneOf:
-                      - type: object
-                        properties:
-                          kind:
-                            type: string
-                            enum:
-                            - MONTHLY
-                          optionKey:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                            pattern: ^[a-z0-9][a-z0-9._-]*$
-                          displayName:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                          currency:
-                            type: string
-                            enum:
-                            - USD
-                            - EUR
-                            - GBP
-                            - AUD
-                          monthlyAmountMinor:
-                            type: integer
-                            minimum: 0
-                            maximum: 9007199254740991
-                          termMonths:
-                            type: integer
-                            maximum: 120
-                            minimum: 1
-                          paymentTermsDays:
-                            type: integer
-                            minimum: 0
-                            maximum: 365
-                          collectionMethods:
-                            minItems: 1
-                            maxItems: 3
-                            type: array
-                            items:
-                              type: string
-                              enum:
-                              - ACH
-                              - CARD
-                              - INVOICE
-                        required:
-                        - kind
-                        - optionKey
-                        - displayName
-                        - currency
-                        - monthlyAmountMinor
-                        - termMonths
-                        - paymentTermsDays
-                        - collectionMethods
-                        additionalProperties: false
-                      - type: object
-                        properties:
-                          kind:
-                            type: string
-                            enum:
-                            - TERM_PREPAY
-                          optionKey:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                            pattern: ^[a-z0-9][a-z0-9._-]*$
-                          displayName:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                          currency:
-                            type: string
-                            enum:
-                            - USD
-                            - EUR
-                            - GBP
-                            - AUD
-                          prepaidAmountMinor:
-                            type: integer
-                            maximum: 9007199254740991
-                            minimum: 1
-                          termMonths:
-                            type: integer
-                            maximum: 120
-                            minimum: 1
-                          paymentTermsDays:
-                            type: integer
-                            minimum: 0
-                            maximum: 365
-                          collectionMethods:
-                            minItems: 1
-                            maxItems: 3
-                            type: array
-                            items:
-                              type: string
-                              enum:
-                              - ACH
-                              - CARD
-                              - INVOICE
-                        required:
-                        - kind
-                        - optionKey
-                        - displayName
-                        - currency
-                        - prepaidAmountMinor
-                        - termMonths
-                        - paymentTermsDays
-                        - collectionMethods
-                        additionalProperties: false
-                      type: object
-                  templateKey:
-                    type: string
-                    enum:
-                    - ENTERPRISE_V1
-                    - PARTNER_ENTERPRISE_V1
-                  organizationNameAtIssue:
-                    type: string
-                    minLength: 1
-                    maxLength: 160
-                required:
-                - schemaVersion
-                - documentTitle
-                - executiveSummary
-                - scope
-                - term
-                - paymentOptions
-                - templateKey
-                - organizationNameAtIssue
-                additionalProperties: false
-              - type: object
-                properties:
-                  schemaVersion:
-                    type: number
-                    enum:
-                    - 2
-                  documentTitle:
-                    type: string
-                    minLength: 1
-                    maxLength: 160
-                  executiveSummary:
-                    type: string
-                    minLength: 1
-                    maxLength: 5000
-                  scope:
-                    type: object
-                    properties:
-                      included:
-                        minItems: 1
-                        maxItems: 50
-                        type: array
-                        items:
-                          type: string
-                          minLength: 1
-                          maxLength: 500
-                      exclusions:
-                        default: []
-                        maxItems: 50
-                        type: array
-                        items:
-                          type: string
-                          minLength: 1
-                          maxLength: 500
-                    required:
-                    - included
-                    - exclusions
-                    additionalProperties: false
-                  term:
-                    type: object
-                    properties:
-                      serviceStart:
-                        oneOf:
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - ON_ACCEPTANCE
-                          required:
-                          - kind
-                          additionalProperties: false
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - FIXED_DATE
-                            date:
-                              type: string
-                              format: date
-                              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
-                          required:
-                          - kind
-                          - date
-                          additionalProperties: false
-                        type: object
-                      initialTermMonths:
-                        type: integer
-                        maximum: 120
-                        minimum: 1
-                      renewal:
-                        oneOf:
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - NO_AUTOMATIC_RENEWAL
-                          required:
-                          - kind
-                          additionalProperties: false
-                        - type: object
-                          properties:
-                            kind:
-                              type: string
-                              enum:
-                              - AUTOMATIC
-                            renewalTermMonths:
-                              type: integer
-                              maximum: 120
-                              minimum: 1
-                            nonRenewalNoticeDays:
-                              type: integer
-                              minimum: 0
-                              maximum: 365
-                          required:
-                          - kind
-                          - renewalTermMonths
-                          - nonRenewalNoticeDays
-                          additionalProperties: false
-                        type: object
-                      terminationForConvenience:
-                        type:
-                        - object
-                        - 'null'
-                        properties:
-                          noticeDays:
-                            type: integer
-                            minimum: 0
-                            maximum: 365
-                        required:
-                        - noticeDays
-                        additionalProperties: false
-                    required:
-                    - serviceStart
-                    - initialTermMonths
-                    - renewal
-                    - terminationForConvenience
-                    additionalProperties: false
-                  paymentOptions:
-                    minItems: 1
-                    maxItems: 4
-                    type: array
-                    items:
-                      oneOf:
-                      - type: object
-                        properties:
-                          kind:
-                            type: string
-                            enum:
-                            - MONTHLY
-                          optionKey:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                            pattern: ^[a-z0-9][a-z0-9._-]*$
-                          displayName:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                          currency:
-                            type: string
-                            enum:
-                            - USD
-                            - EUR
-                            - GBP
-                            - AUD
-                          monthlyAmountMinor:
-                            type: integer
-                            minimum: 0
-                            maximum: 9007199254740991
-                          termMonths:
-                            type: integer
-                            maximum: 120
-                            minimum: 1
-                          paymentTermsDays:
-                            type: integer
-                            minimum: 0
-                            maximum: 365
-                          collectionMethods:
-                            minItems: 1
-                            maxItems: 3
-                            type: array
-                            items:
-                              type: string
-                              enum:
-                              - ACH
-                              - CARD
-                              - INVOICE
-                        required:
-                        - kind
-                        - optionKey
-                        - displayName
-                        - currency
-                        - monthlyAmountMinor
-                        - termMonths
-                        - paymentTermsDays
-                        - collectionMethods
-                        additionalProperties: false
-                      - type: object
-                        properties:
-                          kind:
-                            type: string
-                            enum:
-                            - TERM_PREPAY
-                          optionKey:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                            pattern: ^[a-z0-9][a-z0-9._-]*$
-                          displayName:
-                            type: string
-                            minLength: 1
-                            maxLength: 120
-                          currency:
-                            type: string
-                            enum:
-                            - USD
-                            - EUR
-                            - GBP
-                            - AUD
-                          prepaidAmountMinor:
-                            type: integer
-                            maximum: 9007199254740991
-                            minimum: 1
-                          termMonths:
-                            type: integer
-                            maximum: 120
-                            minimum: 1
-                          paymentTermsDays:
-                            type: integer
-                            minimum: 0
-                            maximum: 365
-                          collectionMethods:
-                            minItems: 1
-                            maxItems: 3
-                            type: array
-                            items:
-                              type: string
-                              enum:
-                              - ACH
-                              - CARD
-                              - INVOICE
-                        required:
-                        - kind
-                        - optionKey
-                        - displayName
-                        - currency
-                        - prepaidAmountMinor
-                        - termMonths
-                        - paymentTermsDays
-                        - collectionMethods
-                        additionalProperties: false
-                      type: object
-                  defaultPaymentOptionKey:
-                    type: string
-                    minLength: 1
-                    maxLength: 120
-                    pattern: ^[a-z0-9][a-z0-9._-]*$
-                  planOrigin:
-                    type: object
-                    properties:
-                      rateCardId:
-                        type: string
-                        pattern: ^\d+$
-                      rateCardPublicVersion:
-                        type: string
-                        minLength: 1
-                        maxLength: 80
-                      planId:
-                        type: string
-                        pattern: ^\d+$
-                      planCode:
-                        type: string
-                        pattern: ^[A-Z][A-Z0-9_]{1,63}$
-                    required:
-                    - rateCardId
-                    - rateCardPublicVersion
-                    - planId
-                    - planCode
-                    additionalProperties: false
-                  customization:
-                    oneOf:
-                    - type: object
-                      properties:
-                        posture:
-                          type: string
-                          enum:
-                          - EXACT
-                      required:
-                      - posture
-                      additionalProperties: false
-                    - type: object
-                      properties:
-                        posture:
-                          type: string
-                          enum:
-                          - CUSTOMIZED
-                        reason:
-                          type: string
-                          minLength: 10
-                          maxLength: 1000
-                      required:
-                      - posture
-                      - reason
-                      additionalProperties: false
-                    type: object
-                  organizationNameAtIssue:
-                    type: string
-                    minLength: 1
-                    maxLength: 160
-                required:
-                - schemaVersion
-                - documentTitle
-                - executiveSummary
-                - scope
-                - term
-                - paymentOptions
-                - defaultPaymentOptionKey
-                - planOrigin
-                - customization
-                - organizationNameAtIssue
-                additionalProperties: false
-              type:
-              - object
-              - 'null'
-            selectedPaymentOption:
-              default: null
-              oneOf:
-              - type: object
-                properties:
-                  kind:
-                    type: string
-                    enum:
-                    - MONTHLY
-                  optionKey:
-                    type: string
-                    minLength: 1
-                    maxLength: 120
-                    pattern: ^[a-z0-9][a-z0-9._-]*$
-                  displayName:
-                    type: string
-                    minLength: 1
-                    maxLength: 120
-                  currency:
-                    type: string
-                    enum:
-                    - USD
-                    - EUR
-                    - GBP
-                    - AUD
-                  monthlyAmountMinor:
-                    type: integer
-                    minimum: 0
-                    maximum: 9007199254740991
-                  termMonths:
-                    type: integer
-                    maximum: 120
-                    minimum: 1
-                  paymentTermsDays:
-                    type: integer
-                    minimum: 0
-                    maximum: 365
-                  collectionMethods:
-                    minItems: 1
-                    maxItems: 3
-                    type: array
-                    items:
-                      type: string
-                      enum:
-                      - ACH
-                      - CARD
-                      - INVOICE
-                required:
-                - kind
-                - optionKey
-                - displayName
-                - currency
-                - monthlyAmountMinor
-                - termMonths
-                - paymentTermsDays
-                - collectionMethods
-                additionalProperties: false
-              - type: object
-                properties:
-                  kind:
-                    type: string
-                    enum:
-                    - TERM_PREPAY
-                  optionKey:
-                    type: string
-                    minLength: 1
-                    maxLength: 120
-                    pattern: ^[a-z0-9][a-z0-9._-]*$
-                  displayName:
-                    type: string
-                    minLength: 1
-                    maxLength: 120
-                  currency:
-                    type: string
-                    enum:
-                    - USD
-                    - EUR
-                    - GBP
-                    - AUD
-                  prepaidAmountMinor:
-                    type: integer
-                    maximum: 9007199254740991
-                    minimum: 1
-                  termMonths:
-                    type: integer
-                    maximum: 120
-                    minimum: 1
-                  paymentTermsDays:
-                    type: integer
-                    minimum: 0
-                    maximum: 365
-                  collectionMethods:
-                    minItems: 1
-                    maxItems: 3
-                    type: array
-                    items:
-                      type: string
-                      enum:
-                      - ACH
-                      - CARD
-                      - INVOICE
-                required:
-                - kind
-                - optionKey
-                - displayName
-                - currency
-                - prepaidAmountMinor
-                - termMonths
-                - paymentTermsDays
-                - collectionMethods
-                additionalProperties: false
-              type:
-              - object
-              - 'null'
-            termStart:
-              type: string
-              format: date-time
-              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-            termEnd:
-              type: string
-              format: date-time
-              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-            listCommitmentMinor:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            listOverageUnitAmountMinor:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            includedIus:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            discountAuthorizationId:
-              type:
-              - string
-              - 'null'
-              pattern: ^\d+$
-            discountBasisPoints:
-              type: integer
-              minimum: 0
-              maximum: 9999
-            netCommitmentMinor:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            netOverageUnitAmountMinor:
-              type: integer
-              minimum: 0
-              maximum: 9007199254740991
-            currency:
-              type: string
-              enum:
-              - USD
-              - EUR
-              - GBP
-              - AUD
-            billingPeriodMonths:
-              type: number
-              enum:
-              - 1
-            rolloverPolicy:
-              type:
-              - object
-              - 'null'
-              properties:
-                capBasisPoints:
-                  type: integer
-                  minimum: 1
-                  maximum: 5000
-                expiresAfterBillingPeriods:
-                  type: number
-                  enum:
-                  - 1
-              required:
-              - capBasisPoints
-              - expiresAfterBillingPeriods
-              additionalProperties: false
-            paymentTermsDays:
-              type: integer
-              maximum: 9007199254740991
-              minimum: 1
-            acceptedByUserId:
-              type: string
-              pattern: ^\d+$
-            acceptedAt:
-              type: string
-              format: date-time
-              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-            acceptanceSource:
-              type: string
-              enum:
-              - SIGNUP
-              - PLAN_BILLING
-              - MCP_APP
-              - ADMIN_ORDER_FORM
-              - AUTO_RENEWAL
-            activityTerms:
-              type: array
-              items:
-                type: object
-                properties:
-                  activityCode:
-                    type: string
-                    enum:
-                    - ACTIVATED_SOCIAL_ACCOUNT_MONTH
-                  displayName:
-                    type: string
-                    minLength: 1
-                    maxLength: 120
-                  iuAmountMilli:
-                    type: integer
-                    minimum: 1
-                    maximum: 2147483647
-                  billingPeriodMonths:
-                    type: number
-                    enum:
-                    - 1
-                  includedBackfillMonths:
-                    type: integer
-                    minimum: 0
-                    maximum: 120
-                required:
-                - activityCode
-                - displayName
-                - iuAmountMilli
-                - billingPeriodMonths
-                - includedBackfillMonths
-                additionalProperties: false
-            activitySchedule:
-              $ref: '#/components/schemas/IuRateCardActivityScheduleResponse'
-          required:
-          - id
-          - acceptingCustomerId
-          - contractId
-          - agreementDocumentId
-          - agreementKind
-          - tosVersion
-          - rateCardId
-          - rateCardPublicVersion
-          - planId
-          - planCode
-          - planName
-          - renewalPosture
-          - predecessorBindingId
-          - offerVersion
-          - entitlementBundle
-          - supportPackage
-          - proposal
-          - selectedPaymentOption
-          - termStart
-          - termEnd
-          - listCommitmentMinor
-          - listOverageUnitAmountMinor
-          - includedIus
-          - discountAuthorizationId
-          - discountBasisPoints
-          - netCommitmentMinor
-          - netOverageUnitAmountMinor
-          - currency
-          - billingPeriodMonths
-          - rolloverPolicy
-          - paymentTermsDays
-          - acceptedByUserId
-          - acceptedAt
-          - acceptanceSource
-          - activityTerms
-          - activitySchedule
-          additionalProperties: false
-      required:
-      - data
-      additionalProperties: false
-    PayoutActivityResponse:
-      description: Payout activity for the caller’s org, newest first. `setup` rows (payout-details changes) appear as soon as they happen; `ledger` rows appear once a payout run has produced at least one artifact.
-      type: object
-      properties:
-        rows:
-          type: array
-          items:
-            $ref: '#/components/schemas/PayoutActivityRow'
-      required:
-      - rows
-      additionalProperties: false
-    PayoutActivityRow:
-      description: 'One row of payout activity for a seller org, newest first. `kind: "setup"` rows come from the payout-details audit trail (available now); `kind: "ledger"` rows come from payout runs (land once producers exist).'
-      oneOf:
-      - $ref: '#/components/schemas/PayoutActivitySetupRow'
-      - $ref: '#/components/schemas/PayoutActivityLedgerRow'
-      type: object
-      discriminator:
-        propertyName: kind
-        mapping:
-          setup: '#/components/schemas/PayoutActivitySetupRow'
-          ledger: '#/components/schemas/PayoutActivityLedgerRow'
-    StorefrontBillingResponse:
-      description: Storefront billing configuration. Storefront billing setup is optional only for official Scope3 sales-adapter storefronts on existing downstream platform settlement agreements. Third-party sales agents and finished-product/pass-through sources are normal Interchange-cleared storefront sources and still require payout bank details. Seller-cleared settlement is not yet configurable for normal storefronts.
-      type: object
-      properties:
-        onboardingStatus:
-          description: Payout setup status. 'complete' once payout bank details are on file.
-          type: string
-          enum:
-          - pending
-          - complete
-          - restricted
-        platformFeePercent:
-          description: Platform fee percentage
-          type:
-          - number
-          - 'null'
-        fees:
-          description: Additional fees
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/BillingFeeOutput'
-        currency:
-          description: Payout currency (ISO 4217 code)
-          type:
-          - string
-          - 'null'
-        country:
-          description: ISO 3166-1 alpha-2 country used for billing
-          type:
-          - string
-          - 'null'
-        defaultNetDays:
-          description: Payment terms in days
-          type:
-          - number
-          - 'null'
-        payoutDetails:
-          description: Masked payout bank details on file, or null when none have been added yet
-          allOf:
-          - $ref: '#/components/schemas/PayoutDetails'
-        inherited:
-          description: Whether this billing config is inherited from a parent customer
-          type: boolean
-        createdAt:
-          description: Creation timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: Last update timestamp (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-      required:
-      - onboardingStatus
-      - platformFeePercent
-      - fees
-      - currency
-      - country
-      - defaultNetDays
-      - payoutDetails
-      - inherited
-      - createdAt
-      - updatedAt
-      additionalProperties: false
-    ChildBillingStatus:
-      description: Billing status for a child customer
-      type: object
-      properties:
-        customerId:
-          description: Child customer ID
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        name:
-          description: Child customer name
-          type: string
-        company:
-          description: Child company name
-          type:
-          - string
-          - 'null'
-        inherited:
-          description: Whether billing is inherited from parent (true) or has its own payout details (false)
-          type: boolean
-        onboardingStatus:
-          description: Payout setup status of the child account, or "none" if inherited
-          type: string
-          enum:
-          - pending
-          - complete
-          - restricted
-          - none
-      required:
-      - customerId
-      - name
-      - company
-      - inherited
-      - onboardingStatus
-      additionalProperties: false
-    GetBillingResponse:
-      type: object
-      properties:
-        billing:
-          allOf:
-          - $ref: '#/components/schemas/StorefrontBillingResponse'
-      required:
-      - billing
-      additionalProperties: false
-    SetPayoutPayeeResponse:
-      type: object
-      properties:
-        payee:
-          $ref: '#/components/schemas/PayoutPayee'
-      required:
-      - payee
-      additionalProperties: false
-    BillingFeeOutput:
-      description: An additional billing fee entry
-      type: object
-      properties:
-        name:
-          description: Fee label
-          type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          description: Fee description
-          type: string
-          maxLength: 500
-        feePercent:
-          description: Fee percentage (0–100)
-          type: number
-          minimum: 0
-          maximum: 100
-      required:
-      - name
-      - feePercent
-      additionalProperties: false
-    UpdateStorefrontBillingResponse:
-      type: object
-      properties:
-        billing:
-          $ref: '#/components/schemas/StorefrontBillingResponse'
-      required:
-      - billing
-      additionalProperties: false
-    ListPayoutPayeesResponse:
-      description: Payout payees on file (masked), one per legal entity per payout currency. The default payee on the billing config is listed separately on GET /billing.
-      type: object
-      properties:
-        payees:
-          type: array
-          items:
-            $ref: '#/components/schemas/PayoutPayee'
-      required:
-      - payees
-      additionalProperties: false
-    PayoutActivityLedgerRow:
-      description: One payout-run row for a seller org. No producer exists yet — lands once payout run artifacts / the PUBLISHER_PAYOUT ledger entry type exist to project.
-      type: object
-      properties:
-        kind:
-          type: string
-          enum:
-          - ledger
-        status:
-          description: Status of one payout ledger activity row
-          type: string
-          enum:
-          - pending
-          - paid
-          - failed
-        periodLabel:
-          description: Human-readable payout period label (e.g. "June 2026" or "2026-06-01–2026-06-30")
-          type: string
-        entityName:
-          description: Legal payout entity this row belongs to (matches `PayoutPayee.entityName` for multi-entity sellers, or the seller org name for the single default payee)
-          type: string
-        currency:
-          description: ISO 4217 currency code
-          example: USD
-          type: string
-          minLength: 3
-          maxLength: 3
-          pattern: ^[A-Z]{3}$
-        amountMinor:
-          description: Payout amount in minor units (e.g. cents for USD)
-          type: integer
-          minimum: -9007199254740991
-          maximum: 9007199254740991
-        expectedAt:
-          description: Expected payout date (ISO 8601), when known and not yet paid
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        paidAt:
-          description: When the payout was actually paid out (ISO 8601)
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        statementRef:
-          description: Reference to the payout statement/remittance advice, when available
-          type: string
-      required:
-      - kind
-      - status
-      - periodLabel
-      - entityName
-      - currency
-      - amountMinor
-      additionalProperties: false
     PayoutActivitySetupRow:
       description: 'One setup/audit row in payout activity: payout bank details were added, updated, or cleared. Projected from the payout-details audit trail — never carries payout values.'
       type: object
@@ -5307,44 +5264,28 @@ components:
       - actorEmail
       - occurredAt
       additionalProperties: false
-    BillingFee:
-      description: An additional billing fee entry
+    ApiError:
+      description: Structured error object
       type: object
       properties:
-        name:
-          description: Fee label
+        code:
+          description: Machine-readable error code
           type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          description: Fee description
+        message:
+          description: Human-readable error message
           type: string
-          maxLength: 500
-        feePercent:
-          description: Fee percentage (0–100)
-          type: number
-          minimum: 0
-          maximum: 100
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
       required:
-      - name
-      - feePercent
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
+      - code
+      - message
       additionalProperties: false
-    SetPayoutDetailsResponse:
+    UpdateStorefrontBillingResponse:
       type: object
       properties:
         billing:
@@ -5352,16 +5293,75 @@ components:
       required:
       - billing
       additionalProperties: false
-    BillingAccountsResponse:
-      description: Billing status for managed accounts of a parent customer
+    PayoutDetails:
+      description: 'Payout bank details on file (masked): the account number is reduced to its last 4 characters.'
       type: object
       properties:
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChildBillingStatus'
+        beneficiaryName:
+          description: Payout beneficiary legal name
+          type: string
+        addressLine1:
+          description: Beneficiary street address, line 1
+          type: string
+        addressLine2:
+          description: Beneficiary street address, line 2
+          type:
+          - string
+          - 'null'
+        city:
+          description: Beneficiary city
+          type: string
+        region:
+          description: Beneficiary state/province/region
+          type:
+          - string
+          - 'null'
+        postalCode:
+          description: Beneficiary postal/ZIP code
+          type: string
+        countryCode:
+          description: Beneficiary country (ISO 3166-1 alpha-2)
+          type: string
+        accountNumberLast4:
+          description: Last 4 characters of the account number or IBAN. The full value is never returned by the API.
+          type: string
+        bankIdentifierType:
+          description: 'Which bank identifier system `bankIdentifierValue` uses: FEDWIRE_ABA (US Fedwire/ABA routing number, 9 digits), CHIPS_ABA (CHIPS ABA number, 9 digits), SWIFT_BIC (SWIFT/BIC code, 8 or 11 characters), or BANK_CODE (a local/domestic bank code for banks without a SWIFT-BIC).'
+          type: string
+          enum:
+          - FEDWIRE_ABA
+          - CHIPS_ABA
+          - SWIFT_BIC
+          - BANK_CODE
+        bankIdentifierValue:
+          description: The bank identifier (routing number, CHIPS ABA, SWIFT-BIC, or local bank code)
+          type: string
+        completedAt:
+          description: When payout details were last completed (ISO 8601)
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - accounts
+      - beneficiaryName
+      - addressLine1
+      - addressLine2
+      - city
+      - region
+      - postalCode
+      - countryCode
+      - accountNumberLast4
+      - bankIdentifierType
+      - bankIdentifierValue
+      - completedAt
+      additionalProperties: false
+    GetBillingResponse:
+      type: object
+      properties:
+        billing:
+          allOf:
+          - $ref: '#/components/schemas/StorefrontBillingResponse'
+      required:
+      - billing
       additionalProperties: false
   securitySchemes:
     bearerAuth:

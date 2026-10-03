@@ -5308,28 +5308,6 @@ paths:
       description: Production server
 components:
   schemas:
-    SignalsPage:
-      type: object
-      required:
-      - data
-      - page
-      - page_size
-      - has_more
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/MQSignal'
-          description: Domain-level MQ signals for this page
-        page:
-          type: integer
-          description: Current page number (1-based)
-        page_size:
-          type: integer
-          description: Number of results per page requested
-        has_more:
-          type: boolean
-          description: Whether additional pages of results exist
     MQSignal:
       type: object
       required:
@@ -5528,6 +5506,28 @@ components:
           - number
           - 'null'
           description: Maximum depth of the supply chain
+    SignalsPage:
+      type: object
+      required:
+      - data
+      - page
+      - page_size
+      - has_more
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MQSignal'
+          description: Domain-level MQ signals for this page
+        page:
+          type: integer
+          description: Current page number (1-based)
+        page_size:
+          type: integer
+          description: Number of results per page requested
+        has_more:
+          type: boolean
+          description: Whether additional pages of results exist
     UpdateSignalFromAgentInput:
       type: object
       properties:
@@ -7266,6 +7266,68 @@ components:
             minimum: 1
       required:
       - signalId
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    DiscoverSignalsInput:
+      type: object
+      properties:
+        agentId:
+          type: string
+          maxLength: 255
+        signalSpec:
+          type: string
+          maxLength: 5000
+        signalIds:
+          maxItems: 100
+          type: array
+          items:
+            type: string
+            maxLength: 255
+        limit:
+          default: 20
+          type: integer
+          maximum: 100
+          minimum: 1
+        offset:
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
     RegisterSignalInput:
       type: object
       properties:
@@ -8193,68 +8255,6 @@ components:
       - signalId
       - name
       - keyType
-    DiscoverSignalsInput:
-      type: object
-      properties:
-        agentId:
-          type: string
-          maxLength: 255
-        signalSpec:
-          type: string
-          maxLength: 5000
-        signalIds:
-          maxItems: 100
-          type: array
-          items:
-            type: string
-            maxLength: 255
-        limit:
-          default: 20
-          type: integer
-          maximum: 100
-          minimum: 1
-        offset:
-          default: 0
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
-      additionalProperties: false
   securitySchemes:
     bearerAuth:
       type: http

@@ -387,48 +387,32 @@ paths:
       - bearerAuth: []
 components:
   schemas:
-    McpAskCapabilityRequest:
+    McpToolResponse:
       type: object
       properties:
         jsonrpc:
           type: string
           enum:
           - '2.0'
-          description: JSON-RPC version
         id:
           oneOf:
           - type: string
           - type: number
-          description: Request ID
-        method:
-          type: string
-          enum:
-          - tools/call
-          description: Method name
-        params:
+        result:
           type: object
           properties:
-            name:
-              type: string
-              enum:
-              - ask_about_capability
-              description: Tool name
-            arguments:
-              type: object
-              properties:
-                question:
-                  type: string
-                  description: Natural language question about API capabilities
-              required:
-              - question
-          required:
-          - name
-          - arguments
-      required:
-      - jsonrpc
-      - id
-      - method
-      - params
+            content:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                    - text
+                  text:
+                    type: string
+                    description: Response content
     McpInitializeResponse:
       type: object
       properties:
@@ -503,32 +487,6 @@ components:
       - id
       - method
       - params
-    McpToolResponse:
-      type: object
-      properties:
-        jsonrpc:
-          type: string
-          enum:
-          - '2.0'
-        id:
-          oneOf:
-          - type: string
-          - type: number
-        result:
-          type: object
-          properties:
-            content:
-              type: array
-              items:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                    - text
-                  text:
-                    type: string
-                    description: Response content
     McpApiCallRequest:
       type: object
       properties:
@@ -578,6 +536,48 @@ components:
               required:
               - method
               - path
+          required:
+          - name
+          - arguments
+      required:
+      - jsonrpc
+      - id
+      - method
+      - params
+    McpAskCapabilityRequest:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          enum:
+          - '2.0'
+          description: JSON-RPC version
+        id:
+          oneOf:
+          - type: string
+          - type: number
+          description: Request ID
+        method:
+          type: string
+          enum:
+          - tools/call
+          description: Method name
+        params:
+          type: object
+          properties:
+            name:
+              type: string
+              enum:
+              - ask_about_capability
+              description: Tool name
+            arguments:
+              type: object
+              properties:
+                question:
+                  type: string
+                  description: Natural language question about API capabilities
+              required:
+              - question
           required:
           - name
           - arguments
