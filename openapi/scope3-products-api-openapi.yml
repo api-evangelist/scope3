@@ -75,6 +75,22 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
     ApiError:
       description: Structured error object
       type: object
@@ -106,22 +122,6 @@ components:
             $ref: '#/components/schemas/StorefrontProductSummary'
       required:
       - data
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
       additionalProperties: false
     StorefrontProductSummary:
       description: A product from an ad server source associated with this storefront

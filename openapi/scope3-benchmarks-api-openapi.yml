@@ -43,15 +43,20 @@ paths:
       - Benchmarks
 components:
   schemas:
-    ChannelWithBenchmarks:
+    RequestId:
       type: string
-      enum:
-      - app
-      - web
-      - streaming-video
-      - social
-      - ctv-bvod
-      example: web
+      description: Auto generated request identifier
+    BenchmarksResponse:
+      type: object
+      required:
+      - benchmarks
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestId'
+        benchmarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenchmarkInformation'
     BenchmarkInformation:
       type: object
       required:
@@ -72,21 +77,6 @@ components:
           format: double
           example: 1.02
           description: Ad tech emissions in grams of CO₂e.
-    CountryInput:
-      type: string
-      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
-      example: US
-    BenchmarksResponse:
-      type: object
-      required:
-      - benchmarks
-      properties:
-        requestId:
-          $ref: '#/components/schemas/RequestId'
-        benchmarks:
-          type: array
-          items:
-            $ref: '#/components/schemas/BenchmarkInformation'
     BenchmarksRequest:
       type: object
       required:
@@ -101,9 +91,19 @@ components:
           type: string
           description: 'Year-month which specifies which month''s benchmarks to use. (Supported Formats: YYYY-MM, YYYYMM, or YYYY/MM)'
           example: 2023-04
-    RequestId:
+    CountryInput:
       type: string
-      description: Auto generated request identifier
+      description: 'This is the country ISO 3166-2 alpha-2 code, alpha-3 code, or a country name e.g. US, USA, United States. (Supported Languages: English)'
+      example: US
+    ChannelWithBenchmarks:
+      type: string
+      enum:
+      - app
+      - web
+      - streaming-video
+      - social
+      - ctv-bvod
+      example: web
   securitySchemes:
     bearerAuth:
       type: http

@@ -81,6 +81,22 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
     ResolveBrandResponse:
       type: object
       properties:
@@ -158,22 +174,6 @@ components:
           minLength: 1
       required:
       - domain
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
   securitySchemes:
     bearerAuth:
       type: http

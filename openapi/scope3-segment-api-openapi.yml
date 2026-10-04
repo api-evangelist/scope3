@@ -72,20 +72,100 @@ paths:
       - Segment
 components:
   schemas:
-    Paging:
+    DistributionMethod:
+      type: string
+      enum:
+      - BUCKET_PUSH
+      - API_PULL
+      - INTEGRATION
+      description: The segment distribution method
+    SegmentData:
       type: object
       required:
-      - totalRecords
+      - id
+      - segmentId
+      - type
+      - property
+      - channel
+      - country
+      - inventoryId
       properties:
-        next:
-          type: string
-          description: The url to query for the next page of data
-        previous:
-          type: string
-          description: The url to query for the next page of data
-        totalRecords:
+        id:
           type: integer
-          description: The total number of records
+          description: The internal Scope3 segment id
+        segmentId:
+          type: string
+          description: The client segment id
+        type:
+          $ref: '#/components/schemas/SegmentDataType'
+        property:
+          type: string
+          description: The property that the inventory belongs to
+        channel:
+          type: string
+          description: The property channel
+        country:
+          type: string
+          description: The country, is not populated applies worldwide
+        inventoryId:
+          type: string
+          description: The inventory identifier
+        appStore:
+          type:
+          - string
+          - 'null'
+          description: If the inventory is an app, populated with the the app store
+        gpids:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: The GPIDs excluded for the given property
+    SegmentPartner:
+      type: object
+      required:
+      - name
+      - segmentId
+      properties:
+        name:
+          type: string
+          description: The client partner's name
+        segmentId:
+          type: string
+          description: The client partner's segment id
+        seatId:
+          type:
+          - string
+          - 'null'
+          description: The client partner's seat id
+    SegmentDataType:
+      type: string
+      enum:
+      - INCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY
+      - EXCLUDED_PROPERTY_PLACEMENTS
+      description: The segment data type
+    PlacementList:
+      type: object
+      required:
+      - name
+      - countries
+      properties:
+        name:
+          type: string
+          description: The placement list name
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries included in the segment
+    UpdateFrequency:
+      type: string
+      enum:
+      - DAILY
+      - MONTHLY
+      description: The segment update frequency
     Segment:
       type: object
       required:
@@ -148,101 +228,6 @@ components:
           format: date-time
           description: Deactivated date and time
           example: '2021-01-30T08:30:00Z'
-    PlacementList:
-      type: object
-      required:
-      - name
-      - countries
-      properties:
-        name:
-          type: string
-          description: The placement list name
-        countries:
-          type: array
-          items:
-            type: string
-          description: The countries included in the segment
-    SegmentData:
-      type: object
-      required:
-      - id
-      - segmentId
-      - type
-      - property
-      - channel
-      - country
-      - inventoryId
-      properties:
-        id:
-          type: integer
-          description: The internal Scope3 segment id
-        segmentId:
-          type: string
-          description: The client segment id
-        type:
-          $ref: '#/components/schemas/SegmentDataType'
-        property:
-          type: string
-          description: The property that the inventory belongs to
-        channel:
-          type: string
-          description: The property channel
-        country:
-          type: string
-          description: The country, is not populated applies worldwide
-        inventoryId:
-          type: string
-          description: The inventory identifier
-        appStore:
-          type:
-          - string
-          - 'null'
-          description: If the inventory is an app, populated with the the app store
-        gpids:
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-          description: The GPIDs excluded for the given property
-    SegmentDataResponse:
-      type: object
-      required:
-      - data
-      - paging
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SegmentData'
-          description: The segment data
-        paging:
-          $ref: '#/components/schemas/Paging'
-    SegmentList:
-      type: object
-      required:
-      - segments
-      - paging
-      properties:
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/Segment'
-        paging:
-          $ref: '#/components/schemas/Paging'
-    DistributionMethod:
-      type: string
-      enum:
-      - BUCKET_PUSH
-      - API_PULL
-      - INTEGRATION
-      description: The segment distribution method
-    UpdateFrequency:
-      type: string
-      enum:
-      - DAILY
-      - MONTHLY
-      description: The segment update frequency
     PropertyList:
       type: object
       required:
@@ -261,30 +246,45 @@ components:
         isInclusion:
           type: boolean
           description: Whether the property list is included or excluded from the segment
-    SegmentPartner:
+    SegmentDataResponse:
       type: object
       required:
-      - name
-      - segmentId
+      - data
+      - paging
       properties:
-        name:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentData'
+          description: The segment data
+        paging:
+          $ref: '#/components/schemas/Paging'
+    Paging:
+      type: object
+      required:
+      - totalRecords
+      properties:
+        next:
           type: string
-          description: The client partner's name
-        segmentId:
+          description: The url to query for the next page of data
+        previous:
           type: string
-          description: The client partner's segment id
-        seatId:
-          type:
-          - string
-          - 'null'
-          description: The client partner's seat id
-    SegmentDataType:
-      type: string
-      enum:
-      - INCLUDED_PROPERTY
-      - EXCLUDED_PROPERTY
-      - EXCLUDED_PROPERTY_PLACEMENTS
-      description: The segment data type
+          description: The url to query for the next page of data
+        totalRecords:
+          type: integer
+          description: The total number of records
+    SegmentList:
+      type: object
+      required:
+      - segments
+      - paging
+      properties:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+        paging:
+          $ref: '#/components/schemas/Paging'
   securitySchemes:
     bearerAuth:
       type: http

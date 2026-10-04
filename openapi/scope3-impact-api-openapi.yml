@@ -76,6 +76,101 @@ paths:
       - Impact
 components:
   schemas:
+    Task:
+      type: string
+      enum:
+      - text-generation
+      - chat
+      - text-embedding
+      - text-classification
+      - sentiment-analysis
+      - named-entity-recognition
+      - question-answering
+      - summarization
+      - translation
+      - image-classification
+      - object-detection
+      - image-segmentation
+      - image-generation
+      - image-to-text
+      - text-to-image
+      - style-transfer
+      - face-detection
+      - facial-recognition
+      - speech-to-text
+      - text-to-speech
+      - speaker-identification
+      - audio-classification
+      - music-generation
+      - multimodal-embedding
+      - multimodal-generation
+      - visual-question-answering
+      - recommendation-system
+      - reinforcement-learning
+      - anomaly-detection
+      - time-series-forecasting
+      - clustering
+      description: 'Common types of AI/ML models and their primary functions:
+
+        - Text-based models for natural language processing
+
+        - Vision models for image analysis and generation
+
+        - Audio models for speech and sound processing
+
+        - Multimodal models that combine different types of inputs/outputs
+
+        - Specialized models for specific use cases
+
+        '
+    Node:
+      allOf:
+      - $ref: '#/components/schemas/NodeCreateRequest'
+      - type: object
+        required:
+        - created_at
+        - updated_at
+        properties:
+          customer_id:
+            type: integer
+            x-go-type: int64
+            description: ID of the customer who owns this node (visible to admins only)
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+          created_by:
+            type: string
+            description: ID of the user who created the node (admin or owner only)
+    DebugInfo:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          $ref: '#/components/schemas/Model'
+        hardware_node:
+          $ref: '#/components/schemas/Node'
+        grid_mix:
+          $ref: '#/components/schemas/GridMix'
+        steps:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/PredictionStep'
+    ImpactRequest:
+      title: Impact Request
+      type: object
+      additionalProperties: false
+      required:
+      - rows
+      properties:
+        rows:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/ImpactRow'
     ImpactResponse:
       title: Impact Response
       type: object
@@ -107,6 +202,24 @@ components:
         has_errors:
           type: boolean
           example: false
+    GridMix:
+      type: object
+      additionalProperties: false
+      required:
+      - country
+      - gco2e_per_kwh
+      properties:
+        country:
+          $ref: '#/components/schemas/CountryCode'
+        region:
+          $ref: '#/components/schemas/RegionCode'
+        gco2e_per_kwh:
+          type: number
+          example: 475
+          format: float
+          x-go-type: float64
+          minimum: 0
+          maximum: 2000
     CountryCode:
       type: string
       pattern: ^[A-Z]{2}$
@@ -114,6 +227,31 @@ components:
       maxLength: 2
       description: Two-letter country code as defined by ISO 3166-1 alpha-2
       example: US
+    ModeledRow:
+      type: object
+      additionalProperties: false
+      required:
+      - total_impact
+      properties:
+        inference_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        training_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        fine_tuning_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        total_impact:
+          $ref: '#/components/schemas/ImpactMetrics'
+        debug:
+          $ref: '#/components/schemas/DebugInfo'
+        error:
+          $ref: '#/components/schemas/Error'
+    RegionCode:
+      type: string
+      pattern: ^[A-Z]{2}$
+      minLength: 2
+      maxLength: 2
+      description: Two-letter region code as defined by ISO 3166-1 alpha-2
+      example: NY
     DataType:
       type: string
       enum:
@@ -137,99 +275,23 @@ components:
       - uint16
       - uint32
       - uint64
-    Node:
-      allOf:
-      - $ref: '#/components/schemas/NodeCreateRequest'
-      - type: object
-        required:
-        - created_at
-        - updated_at
-        properties:
-          customer_id:
-            type: integer
-            x-go-type: int64
-            description: ID of the customer who owns this node (visible to admins only)
-          created_at:
-            type: string
-            format: date-time
-          updated_at:
-            type: string
-            format: date-time
-          created_by:
-            type: string
-            description: ID of the user who created the node (admin or owner only)
-    GridMix:
+    PredictionStep:
       type: object
       additionalProperties: false
       required:
-      - country
-      - gco2e_per_kwh
+      - description
+      - duration_ms
+      - inferences
       properties:
-        country:
-          $ref: '#/components/schemas/CountryCode'
-        region:
-          $ref: '#/components/schemas/RegionCode'
-        gco2e_per_kwh:
+        description:
+          type: string
+        duration_ms:
           type: number
-          example: 475
           format: float
           x-go-type: float64
-          minimum: 0
-          maximum: 2000
-    Error:
-      type: object
-      additionalProperties: false
-      required:
-      - message
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        details:
-          type: object
-          properties:
-            reason:
-              type: string
-            field:
-              type: string
-    Image:
-      type: string
-      example: 1024x1024
-      pattern: ^(\d{1,4})x(\d{1,4})$
-    ModeledRow:
-      type: object
-      additionalProperties: false
-      required:
-      - total_impact
-      properties:
-        inference_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        training_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        fine_tuning_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        total_impact:
-          $ref: '#/components/schemas/ImpactMetrics'
-        debug:
-          $ref: '#/components/schemas/DebugInfo'
-        error:
-          $ref: '#/components/schemas/Error'
-    DebugInfo:
-      type: object
-      additionalProperties: false
-      properties:
-        model:
-          $ref: '#/components/schemas/Model'
-        hardware_node:
-          $ref: '#/components/schemas/Node'
-        grid_mix:
-          $ref: '#/components/schemas/GridMix'
-        steps:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/PredictionStep'
+        inferences:
+          type: integer
+          x-go-type: int64
     ImpactRow:
       type: object
       additionalProperties: false
@@ -401,25 +463,45 @@ components:
           x-go-type: int64
           description: the resolution of the video in number of lines (for instance, 1080 for 1080p)
           example: 1080
-    RegionCode:
-      type: string
-      pattern: ^[A-Z]{2}$
-      minLength: 2
-      maxLength: 2
-      description: Two-letter region code as defined by ISO 3166-1 alpha-2
-      example: NY
-    ImpactRequest:
-      title: Impact Request
+    ImpactMetrics:
       type: object
       additionalProperties: false
       required:
-      - rows
+      - usage_energy_wh
+      - usage_emissions_gco2e
+      - usage_water_ml
+      - embodied_emissions_gco2e
+      - embodied_water_ml
       properties:
-        rows:
-          type: array
-          maxItems: 1000
-          items:
-            $ref: '#/components/schemas/ImpactRow'
+        usage_energy_wh:
+          type: number
+          example: 0.13
+          format: float
+          x-go-type: float64
+        usage_emissions_gco2e:
+          type: number
+          example: 0.81
+          format: float
+          x-go-type: float64
+        usage_water_ml:
+          type: number
+          example: 1.32
+          format: float
+          x-go-type: float64
+        embodied_emissions_gco2e:
+          type: number
+          example: 0.81
+          format: float
+          x-go-type: float64
+        embodied_water_ml:
+          type: number
+          example: 1.32
+          format: float
+          x-go-type: float64
+    Image:
+      type: string
+      example: 1024x1024
+      pattern: ^(\d{1,4})x(\d{1,4})$
     Model:
       title: Model
       type: object
@@ -530,41 +612,23 @@ components:
         created_by:
           type: string
           description: ID of the user who created the node (admin or owner only)
-    ImpactMetrics:
+    Error:
       type: object
       additionalProperties: false
       required:
-      - usage_energy_wh
-      - usage_emissions_gco2e
-      - usage_water_ml
-      - embodied_emissions_gco2e
-      - embodied_water_ml
+      - message
       properties:
-        usage_energy_wh:
-          type: number
-          example: 0.13
-          format: float
-          x-go-type: float64
-        usage_emissions_gco2e:
-          type: number
-          example: 0.81
-          format: float
-          x-go-type: float64
-        usage_water_ml:
-          type: number
-          example: 1.32
-          format: float
-          x-go-type: float64
-        embodied_emissions_gco2e:
-          type: number
-          example: 0.81
-          format: float
-          x-go-type: float64
-        embodied_water_ml:
-          type: number
-          example: 1.32
-          format: float
-          x-go-type: float64
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
     NodeCreateRequest:
       type: object
       required:
@@ -651,70 +715,6 @@ components:
           maximum: 30
           format: float
           x-go-type: float64
-    PredictionStep:
-      type: object
-      additionalProperties: false
-      required:
-      - description
-      - duration_ms
-      - inferences
-      properties:
-        description:
-          type: string
-        duration_ms:
-          type: number
-          format: float
-          x-go-type: float64
-        inferences:
-          type: integer
-          x-go-type: int64
-    Task:
-      type: string
-      enum:
-      - text-generation
-      - chat
-      - text-embedding
-      - text-classification
-      - sentiment-analysis
-      - named-entity-recognition
-      - question-answering
-      - summarization
-      - translation
-      - image-classification
-      - object-detection
-      - image-segmentation
-      - image-generation
-      - image-to-text
-      - text-to-image
-      - style-transfer
-      - face-detection
-      - facial-recognition
-      - speech-to-text
-      - text-to-speech
-      - speaker-identification
-      - audio-classification
-      - music-generation
-      - multimodal-embedding
-      - multimodal-generation
-      - visual-question-answering
-      - recommendation-system
-      - reinforcement-learning
-      - anomaly-detection
-      - time-series-forecasting
-      - clustering
-      description: 'Common types of AI/ML models and their primary functions:
-
-        - Text-based models for natural language processing
-
-        - Vision models for image analysis and generation
-
-        - Audio models for speech and sound processing
-
-        - Multimodal models that combine different types of inputs/outputs
-
-        - Specialized models for specific use cases
-
-        '
   securitySchemes:
     bearerAuth:
       type: http

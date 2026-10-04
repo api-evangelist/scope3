@@ -207,6 +207,59 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    ListBuyerActivityResponse:
+      description: Paginated list of buyer activity audit logs
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerAuditLog'
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - logs
+      - total
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
     BuyerAuditLog:
       description: Audit log row surfaced to the buyer activity feed
       type: object
@@ -309,59 +362,6 @@ components:
       - parameters
       - changes
       - description
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    ListBuyerActivityResponse:
-      description: Paginated list of buyer activity audit logs
-      type: object
-      properties:
-        logs:
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerAuditLog'
-        total:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - logs
-      - total
-      additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
       additionalProperties: false
   securitySchemes:
     bearerAuth:

@@ -1097,15 +1097,129 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    UpdateMeasurementConfigInput:
-      description: Request body for updating measurement configuration
+    CohortDefinition:
+      description: Flexible definition for cohort targeting criteria. Type is required, additional fields vary by type.
       type: object
       properties:
+        type:
+          description: Type of cohort definition (e.g., "zip_code", "user_segment", "geo_region", "custom")
+          example: zip_code
+          type: string
+          minLength: 1
+      required:
+      - type
+      additionalProperties: {}
+    SyncMeasurementDataResponse:
+      description: Response from sync_measurement_data
+      type: object
+      properties:
+        measurements:
+          description: Per-record sync results
+          type: array
+          items:
+            $ref: '#/components/schemas/MeasurementDataSyncResult'
+      required:
+      - measurements
+      additionalProperties: false
+    TestCohortListResponse:
+      description: Response containing a paginated list of test-cohort summaries
+      type: object
+      properties:
+        cohorts:
+          description: Test cohorts projected to the summary shape. Use `get_test_cohort` for the full resource.
+          type: array
+          items:
+            $ref: '#/components/schemas/TestCohortSummary'
+        total:
+          description: Total count of cohorts matching the query
+          example: 6
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - cohorts
+      - total
+      additionalProperties: false
+    UpdateTestCohortInput:
+      description: Request body for updating a test cohort (all fields optional)
+      type: object
+      properties:
+        name:
+          description: Updated name of the test cohort
+          example: West Coast Treatment Group - Updated
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Updated description of the test cohort
+          type: string
+          maxLength: 1000
+        cohortType:
+          description: Updated type classification for the cohort
+          type: string
+          minLength: 1
+        role:
+          description: Updated role of the cohort in the test
+          type: string
+          enum:
+          - TREATMENT
+          - CONTROL
+          - OBSERVATION
+        definition:
+          description: Updated cohort targeting definition
+          allOf:
+          - $ref: '#/components/schemas/CohortDefinition'
+        estimatedSize:
+          description: Updated estimated number of users in this cohort
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+    TestCohortResponse:
+      description: Response containing a single test cohort
+      type: object
+      properties:
+        cohort:
+          $ref: '#/components/schemas/TestCohortOutput'
+      required:
+      - cohort
+      additionalProperties: false
+    MmmConfig:
+      description: Marketing Mix Modeling configuration with optional additional fields
+      type: object
+      properties:
+        provider:
+          description: MMM provider name
+          example: measured
+          type: string
+        dataSourceIds:
+          description: IDs of data sources connected for MMM analysis
+          example:
+          - ds_123
+          - ds_456
+          type: array
+          items:
+            type: string
+        reportingFrequency:
+          description: How often MMM reports are generated
+          type: string
+          enum:
+          - weekly
+          - monthly
+          - quarterly
+      additionalProperties: {}
+    MeasurementConfigOutput:
+      description: Full measurement configuration for an advertiser
+      type: object
+      properties:
+        advertiserId:
+          description: Unique identifier for the advertiser
+          example: '12345'
+          type: string
         mmmEnabled:
           description: Whether Marketing Mix Modeling is enabled
           type: boolean
         mmmConfig:
-          description: MMM configuration settings
+          description: MMM configuration settings (present when mmmEnabled is true)
           allOf:
           - $ref: '#/components/schemas/MmmConfig'
         brandLiftEnabled:
@@ -1115,27 +1229,91 @@ components:
           description: Additional measurement settings as key-value pairs
           type: object
           additionalProperties: {}
-    ApiError:
-      description: Structured error object
+        createdAt:
+          description: When the measurement config was created (ISO 8601)
+          example: '2025-01-15T10:30:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        updatedAt:
+          description: When the measurement config was last updated (ISO 8601)
+          example: '2025-01-20T14:45:00Z'
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+      - advertiserId
+      - mmmEnabled
+      - brandLiftEnabled
+      - createdAt
+      - updatedAt
+      additionalProperties: false
+    MeasurementDataSyncResult:
+      description: Per-record result from sync_measurement_data
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        index:
+          description: Index of this measurement in the request array
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        action:
+          description: What happened to this measurement during sync
           type: string
-        message:
-          description: Human-readable error message
+          enum:
+          - created
+          - updated
+          - unchanged
+          - failed
+        error:
+          description: Error message when action is "failed"
           type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
       required:
-      - code
-      - message
+      - index
+      - action
       additionalProperties: false
+    CreateTestCohortInput:
+      description: Request body for creating a new test cohort
+      type: object
+      properties:
+        name:
+          description: Name of the test cohort
+          example: West Coast Treatment Group
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          description: Optional description of the test cohort
+          example: Users in CA, OR, WA receiving full ad exposure
+          type: string
+          maxLength: 1000
+        cohortType:
+          description: Type classification for the cohort
+          example: geographic
+          type: string
+          minLength: 1
+        role:
+          description: 'Role of the cohort in the test (default: TREATMENT)'
+          default: TREATMENT
+          type: string
+          enum:
+          - TREATMENT
+          - CONTROL
+          - OBSERVATION
+        definition:
+          description: Cohort targeting definition
+          allOf:
+          - $ref: '#/components/schemas/CohortDefinition'
+        estimatedSize:
+          description: Estimated number of users in this cohort
+          example: 50000
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+      - name
+      - cohortType
+      - definition
     TestCohortOutput:
       description: Test cohort resource representation
       type: object
@@ -1202,88 +1380,6 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
-    SyncMeasurementDataResponse:
-      description: Response from sync_measurement_data
-      type: object
-      properties:
-        measurements:
-          description: Per-record sync results
-          type: array
-          items:
-            $ref: '#/components/schemas/MeasurementDataSyncResult'
-      required:
-      - measurements
-      additionalProperties: false
-    CreateTestCohortInput:
-      description: Request body for creating a new test cohort
-      type: object
-      properties:
-        name:
-          description: Name of the test cohort
-          example: West Coast Treatment Group
-          type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          description: Optional description of the test cohort
-          example: Users in CA, OR, WA receiving full ad exposure
-          type: string
-          maxLength: 1000
-        cohortType:
-          description: Type classification for the cohort
-          example: geographic
-          type: string
-          minLength: 1
-        role:
-          description: 'Role of the cohort in the test (default: TREATMENT)'
-          default: TREATMENT
-          type: string
-          enum:
-          - TREATMENT
-          - CONTROL
-          - OBSERVATION
-        definition:
-          description: Cohort targeting definition
-          allOf:
-          - $ref: '#/components/schemas/CohortDefinition'
-        estimatedSize:
-          description: Estimated number of users in this cohort
-          example: 50000
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - name
-      - cohortType
-      - definition
-    TestCohortListResponse:
-      description: Response containing a paginated list of test-cohort summaries
-      type: object
-      properties:
-        cohorts:
-          description: Test cohorts projected to the summary shape. Use `get_test_cohort` for the full resource.
-          type: array
-          items:
-            $ref: '#/components/schemas/TestCohortSummary'
-        total:
-          description: Total count of cohorts matching the query
-          example: 6
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-      required:
-      - cohorts
-      - total
-      additionalProperties: false
-    TestCohortResponse:
-      description: Response containing a single test cohort
-      type: object
-      properties:
-        cohort:
-          $ref: '#/components/schemas/TestCohortOutput'
-      required:
-      - cohort
-      additionalProperties: false
     ErrorResponse:
       description: Standard error response
       type: object
@@ -1300,153 +1396,26 @@ components:
       - data
       - error
       additionalProperties: false
-    CohortDefinition:
-      description: Flexible definition for cohort targeting criteria. Type is required, additional fields vary by type.
+    ApiError:
+      description: Structured error object
       type: object
       properties:
-        type:
-          description: Type of cohort definition (e.g., "zip_code", "user_segment", "geo_region", "custom")
-          example: zip_code
+        code:
+          description: Machine-readable error code
           type: string
-          minLength: 1
-      required:
-      - type
-      additionalProperties: {}
-    MmmConfig:
-      description: Marketing Mix Modeling configuration with optional additional fields
-      type: object
-      properties:
-        provider:
-          description: MMM provider name
-          example: measured
+        message:
+          description: Human-readable error message
           type: string
-        dataSourceIds:
-          description: IDs of data sources connected for MMM analysis
-          example:
-          - ds_123
-          - ds_456
-          type: array
-          items:
-            type: string
-        reportingFrequency:
-          description: How often MMM reports are generated
+        field:
+          description: Field path associated with the error
           type: string
-          enum:
-          - weekly
-          - monthly
-          - quarterly
-      additionalProperties: {}
-    UpdateTestCohortInput:
-      description: Request body for updating a test cohort (all fields optional)
-      type: object
-      properties:
-        name:
-          description: Updated name of the test cohort
-          example: West Coast Treatment Group - Updated
-          type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          description: Updated description of the test cohort
-          type: string
-          maxLength: 1000
-        cohortType:
-          description: Updated type classification for the cohort
-          type: string
-          minLength: 1
-        role:
-          description: Updated role of the cohort in the test
-          type: string
-          enum:
-          - TREATMENT
-          - CONTROL
-          - OBSERVATION
-        definition:
-          description: Updated cohort targeting definition
-          allOf:
-          - $ref: '#/components/schemas/CohortDefinition'
-        estimatedSize:
-          description: Updated estimated number of users in this cohort
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-    MeasurementDataSyncResult:
-      description: Per-record result from sync_measurement_data
-      type: object
-      properties:
-        index:
-          description: Index of this measurement in the request array
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        action:
-          description: What happened to this measurement during sync
-          type: string
-          enum:
-          - created
-          - updated
-          - unchanged
-          - failed
-        error:
-          description: Error message when action is "failed"
-          type: string
-      required:
-      - index
-      - action
-      additionalProperties: false
-    SyncMeasurementDataRequest:
-      description: Request body for syncing measurement data (ADCP spec alternative to CAPI)
-      type: object
-      properties:
-        measurements:
-          description: Measurement data points to sync (up to 1000 per call)
-          minItems: 1
-          maxItems: 1000
-          type: array
-          items:
-            $ref: '#/components/schemas/SyncMeasurementObject'
-      required:
-      - measurements
-    MeasurementConfigOutput:
-      description: Full measurement configuration for an advertiser
-      type: object
-      properties:
-        advertiserId:
-          description: Unique identifier for the advertiser
-          example: '12345'
-          type: string
-        mmmEnabled:
-          description: Whether Marketing Mix Modeling is enabled
-          type: boolean
-        mmmConfig:
-          description: MMM configuration settings (present when mmmEnabled is true)
-          allOf:
-          - $ref: '#/components/schemas/MmmConfig'
-        brandLiftEnabled:
-          description: Whether brand lift measurement is enabled
-          type: boolean
-        settings:
-          description: Additional measurement settings as key-value pairs
+        details:
+          description: Additional error context
           type: object
           additionalProperties: {}
-        createdAt:
-          description: When the measurement config was created (ISO 8601)
-          example: '2025-01-15T10:30:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        updatedAt:
-          description: When the measurement config was last updated (ISO 8601)
-          example: '2025-01-20T14:45:00Z'
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
       required:
-      - advertiserId
-      - mmmEnabled
-      - brandLiftEnabled
-      - createdAt
-      - updatedAt
+      - code
+      - message
       additionalProperties: false
     TestCohortSummary:
       description: Compact test-cohort view returned by list endpoints. Use `get_test_cohort` for the full resource.
@@ -1506,6 +1475,28 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
+    MeasurementConfigResponse:
+      description: Response containing measurement configuration
+      type: object
+      properties:
+        measurementConfig:
+          $ref: '#/components/schemas/MeasurementConfigOutput'
+      required:
+      - measurementConfig
+      additionalProperties: false
+    SyncMeasurementDataRequest:
+      description: Request body for syncing measurement data (ADCP spec alternative to CAPI)
+      type: object
+      properties:
+        measurements:
+          description: Measurement data points to sync (up to 1000 per call)
+          minItems: 1
+          maxItems: 1000
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncMeasurementObject'
+      required:
+      - measurements
     SyncMeasurementObject:
       description: A single measurement data point to sync
       type: object
@@ -1611,15 +1602,24 @@ components:
       - metric_id
       - metric_value
       - unit
-    MeasurementConfigResponse:
-      description: Response containing measurement configuration
+    UpdateMeasurementConfigInput:
+      description: Request body for updating measurement configuration
       type: object
       properties:
-        measurementConfig:
-          $ref: '#/components/schemas/MeasurementConfigOutput'
-      required:
-      - measurementConfig
-      additionalProperties: false
+        mmmEnabled:
+          description: Whether Marketing Mix Modeling is enabled
+          type: boolean
+        mmmConfig:
+          description: MMM configuration settings
+          allOf:
+          - $ref: '#/components/schemas/MmmConfig'
+        brandLiftEnabled:
+          description: Whether brand lift measurement is enabled
+          type: boolean
+        settings:
+          description: Additional measurement settings as key-value pairs
+          type: object
+          additionalProperties: {}
   securitySchemes:
     bearerAuth:
       type: http

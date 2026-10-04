@@ -206,53 +206,23 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    ApiError:
-      description: Structured error object
+    SyndicationStatusListResponse:
+      description: Paginated list of syndication status records
       type: object
       properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    SyndicateResponse:
-      description: Response after toggling syndication for one or more ADCP agents
-      type: object
-      properties:
-        data:
+        items:
+          description: List of syndication status records
           type: array
           items:
             $ref: '#/components/schemas/SyndicationStatusOutput'
+        total:
+          description: Total count of records matching the query
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
       required:
-      - data
+      - items
+      - total
       additionalProperties: false
     SyndicationStatusOutput:
       description: Syndication status record
@@ -354,23 +324,53 @@ components:
       - updatedAt
       - completedAt
       additionalProperties: false
-    SyndicationStatusListResponse:
-      description: Paginated list of syndication status records
+    ErrorResponse:
+      description: Standard error response
       type: object
       properties:
-        items:
-          description: List of syndication status records
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    SyndicateResponse:
+      description: Response after toggling syndication for one or more ADCP agents
+      type: object
+      properties:
+        data:
           type: array
           items:
             $ref: '#/components/schemas/SyndicationStatusOutput'
-        total:
-          description: Total count of records matching the query
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
       required:
-      - items
-      - total
+      - data
       additionalProperties: false
   securitySchemes:
     bearerAuth:

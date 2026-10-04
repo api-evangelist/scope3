@@ -266,26 +266,39 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    ApiError:
-      description: Structured error object
+    OptimizationSuggestionListItem:
       type: object
       properties:
-        code:
-          description: Machine-readable error code
+        suggestionId:
           type: string
-        message:
-          description: Human-readable error message
+        campaignId:
           type: string
-        field:
-          description: Field path associated with the error
+        mediaBuyId:
           type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
+        optimizationMetric:
+          type:
+          - string
+          - 'null'
+        status:
+          type: string
+        productAdjustmentCount:
+          type: number
+        bidAdjustmentCount:
+          type: number
+        createdAt:
+          type: string
+        statusUpdatedAt:
+          type: string
       required:
-      - code
-      - message
+      - suggestionId
+      - campaignId
+      - mediaBuyId
+      - optimizationMetric
+      - status
+      - productAdjustmentCount
+      - bidAdjustmentCount
+      - createdAt
+      - statusUpdatedAt
       additionalProperties: false
     OptimizationSuggestionDetail:
       type: object
@@ -399,50 +412,26 @@ components:
       - data
       - error
       additionalProperties: false
-    OptimizationSuggestionStatus:
+    ApiError:
+      description: Structured error object
       type: object
       properties:
-        suggestionId:
+        code:
+          description: Machine-readable error code
           type: string
-        status:
+        message:
+          description: Human-readable error message
           type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
       required:
-      - suggestionId
-      - status
-      additionalProperties: false
-    OptimizationSuggestionListItem:
-      type: object
-      properties:
-        suggestionId:
-          type: string
-        campaignId:
-          type: string
-        mediaBuyId:
-          type: string
-        optimizationMetric:
-          type:
-          - string
-          - 'null'
-        status:
-          type: string
-        productAdjustmentCount:
-          type: number
-        bidAdjustmentCount:
-          type: number
-        createdAt:
-          type: string
-        statusUpdatedAt:
-          type: string
-      required:
-      - suggestionId
-      - campaignId
-      - mediaBuyId
-      - optimizationMetric
-      - status
-      - productAdjustmentCount
-      - bidAdjustmentCount
-      - createdAt
-      - statusUpdatedAt
+      - code
+      - message
       additionalProperties: false
     OptimizationSuggestionList:
       type: object
@@ -459,6 +448,17 @@ components:
       - suggestions
       - totalCount
       - hasMore
+      additionalProperties: false
+    OptimizationSuggestionStatus:
+      type: object
+      properties:
+        suggestionId:
+          type: string
+        status:
+          type: string
+      required:
+      - suggestionId
+      - status
       additionalProperties: false
   securitySchemes:
     bearerAuth:

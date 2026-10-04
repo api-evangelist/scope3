@@ -5308,6 +5308,28 @@ paths:
       description: Production server
 components:
   schemas:
+    SignalsPage:
+      type: object
+      required:
+      - data
+      - page
+      - page_size
+      - has_more
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MQSignal'
+          description: Domain-level MQ signals for this page
+        page:
+          type: integer
+          description: Current page number (1-based)
+        page_size:
+          type: integer
+          description: Number of results per page requested
+        has_more:
+          type: boolean
+          description: Whether additional pages of results exist
     MQSignal:
       type: object
       required:
@@ -5506,28 +5528,958 @@ components:
           - number
           - 'null'
           description: Maximum depth of the supply chain
-    SignalsPage:
+    RegisterSignalInput:
       type: object
-      required:
-      - data
-      - page
-      - page_size
-      - has_more
       properties:
-        data:
+        agentId:
+          type: string
+          minLength: 1
+          maxLength: 255
+        signalId:
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: ^[\w\-:.]+$
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 5000
+        keyType:
+          minItems: 1
           type: array
           items:
-            $ref: '#/components/schemas/MQSignal'
-          description: Domain-level MQ signals for this page
-        page:
-          type: integer
-          description: Current page number (1-based)
-        page_size:
-          type: integer
-          description: Number of results per page requested
-        has_more:
+            type: string
+            enum:
+            - country
+            - region
+            - metro
+            - topic
+            - eidr
+            - gracenote
+            - isrc
+            - gtin
+            - rss_guid
+            - isbn
+            - url
+            - url_hash
+            - custom
+            - maid
+            - rampid
+            - rampid_derived
+            - hashed_email
+            - hashed_phone
+            - id5
+            - uid2
+            - euid
+            - pairid
+        regions:
+          maxItems: 6
+          type: array
+          items:
+            type: string
+            enum:
+            - NORAM
+            - LATAM
+            - EMEA
+            - APAC
+            - ANZ
+            - GLOBAL
+        metadata:
+          type: object
+          additionalProperties: {}
+        access:
+          type: array
+          items:
+            type: object
+            properties:
+              advertiserId:
+                description: Scope3 Advertiser ID that has access
+                type: integer
+                format: int64
+              visibility:
+                description: PUBLIC or PROPRIETARY
+                type: string
+                enum:
+                - PUBLIC
+                - PROPRIETARY
+              price:
+                description: Pricing option for this advertiser
+                anyOf:
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - cpm
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    max_bid:
+                      type: boolean
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - vcpm
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    max_bid:
+                      type: boolean
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - cpc
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    max_bid:
+                      type: boolean
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - cpcv
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    max_bid:
+                      type: boolean
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - cpv
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    max_bid:
+                      type: boolean
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    parameters:
+                      type: object
+                      properties:
+                        view_threshold:
+                          anyOf:
+                          - type: number
+                          - type: object
+                            properties:
+                              duration_seconds:
+                                type: number
+                                minimum: 1
+                            required:
+                            - duration_seconds
+                            additionalProperties: {}
+                      required:
+                      - view_threshold
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  - parameters
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - cpp
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    parameters:
+                      type: object
+                      properties:
+                        demographic_system:
+                          anyOf:
+                          - type: string
+                            enum:
+                            - nielsen
+                          - type: string
+                            enum:
+                            - barb
+                          - type: string
+                            enum:
+                            - agf
+                          - type: string
+                            enum:
+                            - oztam
+                          - type: string
+                            enum:
+                            - mediametrie
+                          - type: string
+                            enum:
+                            - custom
+                        demographic:
+                          type: string
+                        min_points:
+                          type: number
+                          minimum: 0
+                      required:
+                      - demographic
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  - parameters
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - cpa
+                    event_type:
+                      anyOf:
+                      - type: string
+                        enum:
+                        - page_view
+                      - type: string
+                        enum:
+                        - view_content
+                      - type: string
+                        enum:
+                        - select_content
+                      - type: string
+                        enum:
+                        - select_item
+                      - type: string
+                        enum:
+                        - search
+                      - type: string
+                        enum:
+                        - share
+                      - type: string
+                        enum:
+                        - add_to_cart
+                      - type: string
+                        enum:
+                        - remove_from_cart
+                      - type: string
+                        enum:
+                        - viewed_cart
+                      - type: string
+                        enum:
+                        - add_to_wishlist
+                      - type: string
+                        enum:
+                        - initiate_checkout
+                      - type: string
+                        enum:
+                        - add_payment_info
+                      - type: string
+                        enum:
+                        - purchase
+                      - type: string
+                        enum:
+                        - refund
+                      - type: string
+                        enum:
+                        - lead
+                      - type: string
+                        enum:
+                        - qualify_lead
+                      - type: string
+                        enum:
+                        - close_convert_lead
+                      - type: string
+                        enum:
+                        - disqualify_lead
+                      - type: string
+                        enum:
+                        - complete_registration
+                      - type: string
+                        enum:
+                        - subscribe
+                      - type: string
+                        enum:
+                        - follow
+                      - type: string
+                        enum:
+                        - content_view
+                      - type: string
+                        enum:
+                        - watch_milestone
+                      - type: string
+                        enum:
+                        - start_trial
+                      - type: string
+                        enum:
+                        - app_install
+                      - type: string
+                        enum:
+                        - app_launch
+                      - type: string
+                        enum:
+                        - contact
+                      - type: string
+                        enum:
+                        - schedule
+                      - type: string
+                        enum:
+                        - donate
+                      - type: string
+                        enum:
+                        - submit_application
+                      - type: string
+                        enum:
+                        - custom
+                    custom_event_name:
+                      type: string
+                    event_source_id:
+                      type: string
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - event_type
+                  - currency
+                  - fixed_price
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - flat_rate
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    parameters:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                          - dooh
+                        sov_percentage:
+                          type: number
+                          minimum: 0
+                          maximum: 100
+                        loop_duration_seconds:
+                          type: number
+                          minimum: 1
+                        min_plays_per_hour:
+                          type: number
+                          minimum: 1
+                        venue_package:
+                          type: string
+                        duration_hours:
+                          type: number
+                          minimum: 0
+                        daypart:
+                          type: string
+                        estimated_impressions:
+                          type: number
+                          minimum: 0
+                      required:
+                      - type
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  additionalProperties: {}
+                - type: object
+                  properties:
+                    pricing_option_id:
+                      type: string
+                    pricing_model:
+                      type: string
+                      enum:
+                      - time
+                    currency:
+                      type: string
+                      pattern: ^[A-Z]{3}$
+                    fixed_price:
+                      type: number
+                      minimum: 0
+                    floor_price:
+                      type: number
+                      minimum: 0
+                    price_guidance:
+                      type: object
+                      properties:
+                        p25:
+                          type: number
+                          minimum: 0
+                        p50:
+                          type: number
+                          minimum: 0
+                        p75:
+                          type: number
+                          minimum: 0
+                        p90:
+                          type: number
+                          minimum: 0
+                      additionalProperties: {}
+                    parameters:
+                      type: object
+                      properties:
+                        time_unit:
+                          anyOf:
+                          - type: string
+                            enum:
+                            - hour
+                          - type: string
+                            enum:
+                            - day
+                          - type: string
+                            enum:
+                            - week
+                          - type: string
+                            enum:
+                            - month
+                        min_duration:
+                          type: number
+                          minimum: 1
+                        max_duration:
+                          type: number
+                          minimum: 1
+                      required:
+                      - time_unit
+                      additionalProperties: {}
+                    min_spend_per_package:
+                      type: number
+                      minimum: 0
+                    price_breakdown:
+                      type: object
+                      properties:
+                        list_price:
+                          type: number
+                        adjustments:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: {}
+                      required:
+                      - list_price
+                      - adjustments
+                      additionalProperties: {}
+                    eligible_adjustments:
+                      type: array
+                      items:
+                        anyOf:
+                        - type: string
+                          enum:
+                          - fee
+                        - type: string
+                          enum:
+                          - discount
+                        - type: string
+                          enum:
+                          - commission
+                        - type: string
+                          enum:
+                          - settlement
+                  required:
+                  - pricing_option_id
+                  - pricing_model
+                  - currency
+                  - parameters
+                  additionalProperties: {}
+            required:
+            - advertiserId
+            - visibility
+        isLive:
+          default: false
           type: boolean
-          description: Whether additional pages of results exist
+      required:
+      - signalId
+      - name
+      - keyType
+    DiscoverSignalsInput:
+      type: object
+      properties:
+        agentId:
+          type: string
+          maxLength: 255
+        signalSpec:
+          type: string
+          maxLength: 5000
+        signalIds:
+          maxItems: 100
+          type: array
+          items:
+            type: string
+            maxLength: 255
+        limit:
+          default: 20
+          type: integer
+          maximum: 100
+          minimum: 1
+        offset:
+          default: 0
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
     UpdateSignalFromAgentInput:
       type: object
       properties:
@@ -7266,6 +8218,22 @@ components:
             minimum: 1
       required:
       - signalId
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
     ApiError:
       description: Structured error object
       type: object
@@ -7287,974 +8255,6 @@ components:
       - code
       - message
       additionalProperties: false
-    DiscoverSignalsInput:
-      type: object
-      properties:
-        agentId:
-          type: string
-          maxLength: 255
-        signalSpec:
-          type: string
-          maxLength: 5000
-        signalIds:
-          maxItems: 100
-          type: array
-          items:
-            type: string
-            maxLength: 255
-        limit:
-          default: 20
-          type: integer
-          maximum: 100
-          minimum: 1
-        offset:
-          default: 0
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    RegisterSignalInput:
-      type: object
-      properties:
-        agentId:
-          type: string
-          minLength: 1
-          maxLength: 255
-        signalId:
-          type: string
-          minLength: 1
-          maxLength: 255
-          pattern: ^[\w\-:.]+$
-        name:
-          type: string
-          minLength: 1
-          maxLength: 255
-        description:
-          type: string
-          maxLength: 5000
-        keyType:
-          minItems: 1
-          type: array
-          items:
-            type: string
-            enum:
-            - country
-            - region
-            - metro
-            - topic
-            - eidr
-            - gracenote
-            - isrc
-            - gtin
-            - rss_guid
-            - isbn
-            - url
-            - url_hash
-            - custom
-            - maid
-            - rampid
-            - rampid_derived
-            - hashed_email
-            - hashed_phone
-            - id5
-            - uid2
-            - euid
-            - pairid
-        regions:
-          maxItems: 6
-          type: array
-          items:
-            type: string
-            enum:
-            - NORAM
-            - LATAM
-            - EMEA
-            - APAC
-            - ANZ
-            - GLOBAL
-        metadata:
-          type: object
-          additionalProperties: {}
-        access:
-          type: array
-          items:
-            type: object
-            properties:
-              advertiserId:
-                description: Scope3 Advertiser ID that has access
-                type: integer
-                format: int64
-              visibility:
-                description: PUBLIC or PROPRIETARY
-                type: string
-                enum:
-                - PUBLIC
-                - PROPRIETARY
-              price:
-                description: Pricing option for this advertiser
-                anyOf:
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - cpm
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    max_bid:
-                      type: boolean
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - vcpm
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    max_bid:
-                      type: boolean
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - cpc
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    max_bid:
-                      type: boolean
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - cpcv
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    max_bid:
-                      type: boolean
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - cpv
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    max_bid:
-                      type: boolean
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    parameters:
-                      type: object
-                      properties:
-                        view_threshold:
-                          anyOf:
-                          - type: number
-                          - type: object
-                            properties:
-                              duration_seconds:
-                                type: number
-                                minimum: 1
-                            required:
-                            - duration_seconds
-                            additionalProperties: {}
-                      required:
-                      - view_threshold
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  - parameters
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - cpp
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    parameters:
-                      type: object
-                      properties:
-                        demographic_system:
-                          anyOf:
-                          - type: string
-                            enum:
-                            - nielsen
-                          - type: string
-                            enum:
-                            - barb
-                          - type: string
-                            enum:
-                            - agf
-                          - type: string
-                            enum:
-                            - oztam
-                          - type: string
-                            enum:
-                            - mediametrie
-                          - type: string
-                            enum:
-                            - custom
-                        demographic:
-                          type: string
-                        min_points:
-                          type: number
-                          minimum: 0
-                      required:
-                      - demographic
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  - parameters
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - cpa
-                    event_type:
-                      anyOf:
-                      - type: string
-                        enum:
-                        - page_view
-                      - type: string
-                        enum:
-                        - view_content
-                      - type: string
-                        enum:
-                        - select_content
-                      - type: string
-                        enum:
-                        - select_item
-                      - type: string
-                        enum:
-                        - search
-                      - type: string
-                        enum:
-                        - share
-                      - type: string
-                        enum:
-                        - add_to_cart
-                      - type: string
-                        enum:
-                        - remove_from_cart
-                      - type: string
-                        enum:
-                        - viewed_cart
-                      - type: string
-                        enum:
-                        - add_to_wishlist
-                      - type: string
-                        enum:
-                        - initiate_checkout
-                      - type: string
-                        enum:
-                        - add_payment_info
-                      - type: string
-                        enum:
-                        - purchase
-                      - type: string
-                        enum:
-                        - refund
-                      - type: string
-                        enum:
-                        - lead
-                      - type: string
-                        enum:
-                        - qualify_lead
-                      - type: string
-                        enum:
-                        - close_convert_lead
-                      - type: string
-                        enum:
-                        - disqualify_lead
-                      - type: string
-                        enum:
-                        - complete_registration
-                      - type: string
-                        enum:
-                        - subscribe
-                      - type: string
-                        enum:
-                        - follow
-                      - type: string
-                        enum:
-                        - content_view
-                      - type: string
-                        enum:
-                        - watch_milestone
-                      - type: string
-                        enum:
-                        - start_trial
-                      - type: string
-                        enum:
-                        - app_install
-                      - type: string
-                        enum:
-                        - app_launch
-                      - type: string
-                        enum:
-                        - contact
-                      - type: string
-                        enum:
-                        - schedule
-                      - type: string
-                        enum:
-                        - donate
-                      - type: string
-                        enum:
-                        - submit_application
-                      - type: string
-                        enum:
-                        - custom
-                    custom_event_name:
-                      type: string
-                    event_source_id:
-                      type: string
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - event_type
-                  - currency
-                  - fixed_price
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - flat_rate
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    parameters:
-                      type: object
-                      properties:
-                        type:
-                          type: string
-                          enum:
-                          - dooh
-                        sov_percentage:
-                          type: number
-                          minimum: 0
-                          maximum: 100
-                        loop_duration_seconds:
-                          type: number
-                          minimum: 1
-                        min_plays_per_hour:
-                          type: number
-                          minimum: 1
-                        venue_package:
-                          type: string
-                        duration_hours:
-                          type: number
-                          minimum: 0
-                        daypart:
-                          type: string
-                        estimated_impressions:
-                          type: number
-                          minimum: 0
-                      required:
-                      - type
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  additionalProperties: {}
-                - type: object
-                  properties:
-                    pricing_option_id:
-                      type: string
-                    pricing_model:
-                      type: string
-                      enum:
-                      - time
-                    currency:
-                      type: string
-                      pattern: ^[A-Z]{3}$
-                    fixed_price:
-                      type: number
-                      minimum: 0
-                    floor_price:
-                      type: number
-                      minimum: 0
-                    price_guidance:
-                      type: object
-                      properties:
-                        p25:
-                          type: number
-                          minimum: 0
-                        p50:
-                          type: number
-                          minimum: 0
-                        p75:
-                          type: number
-                          minimum: 0
-                        p90:
-                          type: number
-                          minimum: 0
-                      additionalProperties: {}
-                    parameters:
-                      type: object
-                      properties:
-                        time_unit:
-                          anyOf:
-                          - type: string
-                            enum:
-                            - hour
-                          - type: string
-                            enum:
-                            - day
-                          - type: string
-                            enum:
-                            - week
-                          - type: string
-                            enum:
-                            - month
-                        min_duration:
-                          type: number
-                          minimum: 1
-                        max_duration:
-                          type: number
-                          minimum: 1
-                      required:
-                      - time_unit
-                      additionalProperties: {}
-                    min_spend_per_package:
-                      type: number
-                      minimum: 0
-                    price_breakdown:
-                      type: object
-                      properties:
-                        list_price:
-                          type: number
-                        adjustments:
-                          type: array
-                          items:
-                            type: object
-                            additionalProperties: {}
-                      required:
-                      - list_price
-                      - adjustments
-                      additionalProperties: {}
-                    eligible_adjustments:
-                      type: array
-                      items:
-                        anyOf:
-                        - type: string
-                          enum:
-                          - fee
-                        - type: string
-                          enum:
-                          - discount
-                        - type: string
-                          enum:
-                          - commission
-                        - type: string
-                          enum:
-                          - settlement
-                  required:
-                  - pricing_option_id
-                  - pricing_model
-                  - currency
-                  - parameters
-                  additionalProperties: {}
-            required:
-            - advertiserId
-            - visibility
-        isLive:
-          default: false
-          type: boolean
-      required:
-      - signalId
-      - name
-      - keyType
   securitySchemes:
     bearerAuth:
       type: http

@@ -387,32 +387,63 @@ paths:
       - bearerAuth: []
 components:
   schemas:
-    McpToolResponse:
+    McpApiCallRequest:
       type: object
       properties:
         jsonrpc:
           type: string
           enum:
           - '2.0'
+          description: JSON-RPC version
         id:
           oneOf:
           - type: string
           - type: number
-        result:
+          description: Request ID
+        method:
+          type: string
+          enum:
+          - tools/call
+          description: Method name
+        params:
           type: object
           properties:
-            content:
-              type: array
-              items:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                    - text
-                  text:
-                    type: string
-                    description: Response content
+            name:
+              type: string
+              enum:
+              - api_call
+              description: Tool name
+            arguments:
+              type: object
+              properties:
+                method:
+                  type: string
+                  enum:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  description: HTTP method
+                path:
+                  type: string
+                  description: API path (e.g., "/advertisers")
+                body:
+                  type: object
+                  description: Request body for POST/PUT
+                query:
+                  type: object
+                  description: Query parameters
+              required:
+              - method
+              - path
+          required:
+          - name
+          - arguments
+      required:
+      - jsonrpc
+      - id
+      - method
+      - params
     McpInitializeResponse:
       type: object
       properties:
@@ -487,63 +518,32 @@ components:
       - id
       - method
       - params
-    McpApiCallRequest:
+    McpToolResponse:
       type: object
       properties:
         jsonrpc:
           type: string
           enum:
           - '2.0'
-          description: JSON-RPC version
         id:
           oneOf:
           - type: string
           - type: number
-          description: Request ID
-        method:
-          type: string
-          enum:
-          - tools/call
-          description: Method name
-        params:
+        result:
           type: object
           properties:
-            name:
-              type: string
-              enum:
-              - api_call
-              description: Tool name
-            arguments:
-              type: object
-              properties:
-                method:
-                  type: string
-                  enum:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                  description: HTTP method
-                path:
-                  type: string
-                  description: API path (e.g., "/advertisers")
-                body:
-                  type: object
-                  description: Request body for POST/PUT
-                query:
-                  type: object
-                  description: Query parameters
-              required:
-              - method
-              - path
-          required:
-          - name
-          - arguments
-      required:
-      - jsonrpc
-      - id
-      - method
-      - params
+            content:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                    - text
+                  text:
+                    type: string
+                    description: Response content
     McpAskCapabilityRequest:
       type: object
       properties:

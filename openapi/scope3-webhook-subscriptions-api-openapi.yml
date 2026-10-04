@@ -189,53 +189,6 @@ components:
       required:
       - subscription
       additionalProperties: false
-    ApiError:
-      description: Structured error object
-      type: object
-      properties:
-        code:
-          description: Machine-readable error code
-          type: string
-        message:
-          description: Human-readable error message
-          type: string
-        field:
-          description: Field path associated with the error
-          type: string
-        details:
-          description: Additional error context
-          type: object
-          additionalProperties: {}
-      required:
-      - code
-      - message
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    ListBuyerWebhookSubscriptionsResponse:
-      type: object
-      properties:
-        subscriptions:
-          type: array
-          items:
-            $ref: '#/components/schemas/BuyerWebhookSubscription'
-      required:
-      - subscriptions
-      additionalProperties: false
     BuyerWebhookSubscription:
       type: object
       properties:
@@ -282,6 +235,22 @@ components:
       - createdAt
       - updatedAt
       additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
     DeleteBuyerWebhookSubscriptionResponse:
       type: object
       properties:
@@ -294,6 +263,37 @@ components:
       required:
       - success
       - id
+      additionalProperties: false
+    ApiError:
+      description: Structured error object
+      type: object
+      properties:
+        code:
+          description: Machine-readable error code
+          type: string
+        message:
+          description: Human-readable error message
+          type: string
+        field:
+          description: Field path associated with the error
+          type: string
+        details:
+          description: Additional error context
+          type: object
+          additionalProperties: {}
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ListBuyerWebhookSubscriptionsResponse:
+      type: object
+      properties:
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuyerWebhookSubscription'
+      required:
+      - subscriptions
       additionalProperties: false
   securitySchemes:
     bearerAuth:

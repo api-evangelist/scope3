@@ -181,6 +181,41 @@ components:
       - occurredAt
       - status
       additionalProperties: false
+    EsaMediaBuyList:
+      type: object
+      properties:
+        mediaBuys:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsaMediaBuySummary'
+        count:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        nextCursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - mediaBuys
+      - count
+      additionalProperties: false
+    ErrorResponse:
+      description: Standard error response
+      type: object
+      properties:
+        data:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+        error:
+          $ref: '#/components/schemas/ApiError'
+      required:
+      - data
+      - error
+      additionalProperties: false
     ApiError:
       description: Structured error object
       type: object
@@ -273,41 +308,6 @@ components:
       - products
       - creatives
       - statusHistory
-      additionalProperties: false
-    ErrorResponse:
-      description: Standard error response
-      type: object
-      properties:
-        data:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-        error:
-          $ref: '#/components/schemas/ApiError'
-      required:
-      - data
-      - error
-      additionalProperties: false
-    EsaMediaBuyList:
-      type: object
-      properties:
-        mediaBuys:
-          type: array
-          items:
-            $ref: '#/components/schemas/EsaMediaBuySummary'
-        count:
-          type: integer
-          minimum: 0
-          maximum: 9007199254740991
-        nextCursor:
-          type:
-          - string
-          - 'null'
-      required:
-      - mediaBuys
-      - count
       additionalProperties: false
     EsaMediaBuySummary:
       type: object

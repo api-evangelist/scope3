@@ -70,15 +70,6 @@ paths:
       - AI Impact Measurement
 components:
   schemas:
-    ImpactBigQueryError:
-      type: object
-      required:
-      - errorMessage
-      properties:
-        errorMessage:
-          type: string
-          description: Error message for BigQuery
-          example: 'Invalid request format: missing required field ''calls'''
     ImpactBigQueryResponse:
       type: object
       required:
@@ -93,6 +84,15 @@ components:
             type: string
         errorMessage:
           type: string
+    ImpactBigQueryError:
+      type: object
+      required:
+      - errorMessage
+      properties:
+        errorMessage:
+          type: string
+          description: Error message for BigQuery
+          example: 'Invalid request format: missing required field ''calls'''
     ImpactBigQueryRequest:
       type: object
       required:
