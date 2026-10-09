@@ -1,4 +1,4 @@
-generated: '2026-09-16'
+generated: '2026-09-23'
 method: generated
 source: openapi/scope3-account-api-openapi.yml, openapi/scope3-activity-api-openapi.yml, openapi/scope3-advertisers-api-openapi.yml,
   openapi/scope3-ai-impact-measurement-api-openapi.yml, openapi/scope3-ai-usage-api-openapi.yml,
@@ -26,11 +26,11 @@ description: Recommended x-agentic-access execution contracts, classified heuris
 summary:
   operations: 466
   by_action_class:
-    connected: 203
-    acting: 263
+    connected: 205
+    acting: 261
   by_consequence:
-    read: 203
-    write: 251
+    read: 205
+    write: 249
     physical: 7
     safety-critical: 5
   human_in_the_loop_required: 5
@@ -1847,18 +1847,12 @@ operations:
   method: post
   operationId: getImpact
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /
   method: post
   operationId: mcpInitialize
@@ -2545,18 +2539,12 @@ operations:
   method: post
   operationId: getMarketplaceProducts
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /media-buys/batch
   method: post
   operationId: createMediaBuysBatch

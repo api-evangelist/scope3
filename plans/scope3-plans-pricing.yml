@@ -80,3 +80,27 @@ measurement_apis:
     The Carbon Calculator (api.scope3.com/v2) and AI Impact Measurement (aiapi.scope3.com)
     APIs publish no plans or prices; access is granted per customer by a Scope3
     representative. plan_count above covers the Interchange agentic platform only.
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models: []
+  units: []
+  plans:
+  - name: Pay as you go
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
+  - name: '250'
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
+  - name: 1,000
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
